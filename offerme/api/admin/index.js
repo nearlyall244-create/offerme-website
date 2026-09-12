@@ -291,6 +291,43 @@ export default async function handler(req, res) {
       })
     }
 
+    // ── DELETE → admin deletes a business submission ──
+    if (req.method === 'DELETE') {
+      const { shop_id } = req.body
+      if (!shop_id) {
+        return res.status(400).json({ error: 'shop_id is required' })
+      }
+
+      const { data: business, error: fetchError } = await supabaseAdmin
+        .from('sell_your_bussiness')
+        .select('id, shop_name')
+        .eq('id', shop_id)
+        .single()
+
+      if (fetchError || !business) {
+        return res.status(404).json({ error: 'Business not found' })
+      }
+
+      const { error } = await supabaseAdmin
+        .from('sell_your_bussiness')
+        .delete()
+        .eq('id', shop_id)
+
+      if (error) {
+        return res.status(500).json({ error: error.message })
+      }
+
+      await supabaseAdmin.from('admin_logs').insert({
+        admin_uid: decodedToken.uid,
+        action: 'delete_submission',
+        target_type: 'business',
+        target_id: String(shop_id),
+        details: { shop_name: business.shop_name },
+      })
+
+      return res.status(200).json({ message: 'Business deleted successfully' })
+    }
+
     return res.status(405).json({ error: 'Method not allowed' })
   } catch (err) {
     return res.status(500).json({ error: err.message })

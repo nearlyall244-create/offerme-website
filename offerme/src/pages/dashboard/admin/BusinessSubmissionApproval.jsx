@@ -10,12 +10,10 @@ const ITEMS_PER_PAGE = 20
 
 export default function BusinessSubmissionApproval() {
   const { user } = useAuth()
-  const [businesses, setBusinesses] = useState([])
-  const [offers, setOffers] = useState([])
+  const [submissions, setSubmissions] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
-  const [typeFilter, setTypeFilter] = useState('all')
   const [currentPage, setCurrentPage] = useState(1)
 
   const [viewingSubmission, setViewingSubmission] = useState(null)
@@ -23,77 +21,35 @@ export default function BusinessSubmissionApproval() {
 
   useEffect(() => {
     if (!user) return
-    fetchData()
+    fetchSubmissions()
   }, [user])
 
-  async function fetchData() {
+  async function fetchSubmissions() {
     setLoading(true)
     try {
       const token = await user.getIdToken()
-      const headers = { Authorization: `Bearer ${token}` }
-
-      const [bizRes, offerRes] = await Promise.all([
-        fetch('/api/admin?type=submissions', { headers }),
-        fetch('/api/admin?type=offers', { headers }),
-      ])
-
-      const bizData = await bizRes.json()
-      const offerData = await offerRes.json()
-
-      if (bizRes.ok) setBusinesses(bizData.submissions || [])
-      if (offerRes.ok) setOffers(offerData.offers || [])
+      const res = await fetch('/api/admin?type=submissions', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      if (res.ok) setSubmissions(data.submissions || [])
     } catch (err) {
-      console.error('Failed to fetch data:', err)
+      console.error('Failed to fetch submissions:', err)
     } finally {
       setLoading(false)
     }
   }
 
-  const allSubmissions = useMemo(() => {
-    const bizItems = businesses.map((b) => ({
-      ...b,
-      _type: 'business',
-      _name: b.shop_name,
-      _owner: b.business_owners?.owner_name || '—',
-      _category: (b.category_id || '').replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
-      _date: b.created_at,
-      _status: b.status || (b.is_active ? 'approved' : 'pending'),
-    }))
-
-    const offerItems = offers.map((o) => ({
-      ...o,
-      _type: 'offer',
-      _name: o.title,
-      _owner: o.sell_your_bussiness?.business_owners?.owner_name || '—',
-      _category: o.sell_your_bussiness?.shop_name || '—',
-      _date: o.created_at,
-      _status: o.is_active ? 'active' : 'inactive',
-    }))
-
-    return [...bizItems, ...offerItems]
-  }, [businesses, offers])
-
-  async function handleApprove(id, type) {
+  async function handleApprove(id) {
     try {
       const token = await user.getIdToken()
-      if (type === 'business') {
-        const res = await fetch('/api/admin', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ shop_id: id, action: 'approve' }),
-        })
-        if (res.ok) {
-          setBusinesses((prev) => prev.map((s) => s.id === id ? { ...s, status: 'approved', is_active: true } : s))
-        }
-      } else {
-        const res = await fetch('/api/admin', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ offer_id: id, action: 'approve' }),
-        })
-        if (res.ok) {
-          setOffers((prev) => prev.map((o) => o.id === id ? { ...o, is_active: true } : o))
-        }
+      const res = await fetch('/api/admin', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ shop_id: id, action: 'approve' }),
+      })
+      if (res.ok) {
+        setSubmissions((prev) => prev.map((s) => s.id === id ? { ...s, status: 'approved', is_active: true } : s))
       }
     } catch (err) {
       console.error('Failed to approve:', err)
@@ -104,25 +60,16 @@ export default function BusinessSubmissionApproval() {
     if (!rejectingSubmission) return
     try {
       const token = await user.getIdToken()
-      const type = rejectingSubmission._type
-      if (type === 'business') {
-        const res = await fetch('/api/admin', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ shop_id: rejectingSubmission.id, action: 'reject', rejection_reason: reason }),
-        })
-        if (res.ok) {
-          setBusinesses((prev) => prev.map((s) => s.id === rejectingSubmission.id ? { ...s, status: 'rejected', is_active: false, rejection_reason: reason } : s))
-        }
-      } else {
-        const res = await fetch('/api/admin', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ offer_id: rejectingSubmission.id, action: 'reject', rejection_reason: reason }),
-        })
-        if (res.ok) {
-          setOffers((prev) => prev.map((o) => o.id === rejectingSubmission.id ? { ...o, is_active: false } : o))
-        }
+      const res = await fetch('/api/admin', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ shop_id: rejectingSubmission.id, action: 'reject', rejection_reason: reason }),
+      })
+      if (res.ok) {
+        setSubmissions((prev) => prev.map((s) => s.id === rejectingSubmission.id
+          ? { ...s, status: 'rejected', is_active: false, rejection_reason: reason }
+          : s
+        ))
       }
     } catch (err) {
       console.error('Failed to reject:', err)
@@ -130,29 +77,45 @@ export default function BusinessSubmissionApproval() {
     setRejectingSubmission(null)
   }
 
+  async function handleDelete(id) {
+    if (!window.confirm('Are you sure you want to delete this business listing?')) return
+    try {
+      const token = await user.getIdToken()
+      const res = await fetch('/api/admin', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ shop_id: id }),
+      })
+      if (res.ok) {
+        setSubmissions((prev) => prev.filter((s) => s.id !== id))
+      }
+    } catch (err) {
+      console.error('Failed to delete:', err)
+    }
+  }
+
   const filtered = useMemo(() => {
-    let result = [...allSubmissions]
+    let result = [...submissions]
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase()
       result = result.filter(
         (s) =>
-          (s._name || '').toLowerCase().includes(q) ||
-          (s._owner || '').toLowerCase().includes(q) ||
-          (s._category || '').toLowerCase().includes(q)
+          (s.shop_name || '').toLowerCase().includes(q) ||
+          (s.business_email || '').toLowerCase().includes(q) ||
+          (s.enquiry_number || '').includes(q) ||
+          (s.category_id || '').toLowerCase().includes(q) ||
+          (s.subcategory_id || '').toLowerCase().includes(q) ||
+          (s.business_owners?.owner_name || '').toLowerCase().includes(q)
       )
     }
 
     if (statusFilter !== 'all') {
-      result = result.filter((s) => s._status === statusFilter)
-    }
-
-    if (typeFilter !== 'all') {
-      result = result.filter((s) => s._type === typeFilter)
+      result = result.filter((s) => (s.status || (s.is_active ? 'approved' : 'pending')) === statusFilter)
     }
 
     return result
-  }, [allSubmissions, searchQuery, statusFilter, typeFilter])
+  }, [submissions, searchQuery, statusFilter])
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
   const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
@@ -169,25 +132,17 @@ export default function BusinessSubmissionApproval() {
           <input
             type="text"
             className={styles.searchInput}
-            placeholder="Search by name, owner, category..."
+            placeholder="Search by shop name, email, phone, category..."
             value={searchQuery}
             onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1) }}
           />
         </div>
-
-        <select className={styles.filterSelect} value={typeFilter} onChange={(e) => { setTypeFilter(e.target.value); setCurrentPage(1) }}>
-          <option value="all">All Types</option>
-          <option value="business">Business Listings</option>
-          <option value="offer">Offer Posts</option>
-        </select>
 
         <select className={styles.filterSelect} value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1) }}>
           <option value="all">All Status</option>
           <option value="pending">Pending</option>
           <option value="approved">Approved</option>
           <option value="rejected">Rejected</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
         </select>
       </div>
 
@@ -201,10 +156,11 @@ export default function BusinessSubmissionApproval() {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Type</th>
-              <th>Name</th>
-              <th>Owner</th>
-              <th>Category / Shop</th>
+              <th>Shop Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Category</th>
+              <th>Subcategory</th>
               <th>Submitted</th>
               <th>Status</th>
               <th>Actions</th>
@@ -212,50 +168,45 @@ export default function BusinessSubmissionApproval() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={7} className={styles.emptyCell}>Loading...</td></tr>
+              <tr><td colSpan={8} className={styles.emptyCell}>Loading...</td></tr>
             ) : paginated.length > 0 ? (
-              paginated.map((sub) => (
-                <tr key={`${sub._type}-${sub.id}`}>
-                  <td>
-                    <span style={{
-                      display: 'inline-block',
-                      padding: '2px 8px',
-                      borderRadius: '12px',
-                      fontSize: '0.75rem',
-                      fontWeight: 600,
-                      backgroundColor: sub._type === 'business' ? '#dbeafe' : '#fef3c7',
-                      color: sub._type === 'business' ? '#1e40af' : '#92400e',
-                    }}>
-                      {sub._type === 'business' ? '🏪 Business' : '🎉 Offer'}
-                    </span>
-                  </td>
-                  <td className={styles.businessName}>{sub._name}</td>
-                  <td>{sub._owner}</td>
-                  <td>{sub._category}</td>
-                  <td>{formatDate(sub._date)}</td>
-                  <td><StatusBadge status={sub._status} /></td>
-                  <td>
-                    <div className={styles.actions}>
-                      <button className={styles.viewBtn} onClick={() => setViewingSubmission(sub)}>
-                        View
-                      </button>
-                      {sub._status === 'pending' && (
-                        <>
-                          <button className={styles.approveBtn} onClick={() => handleApprove(sub.id, sub._type)}>
-                            Approve
-                          </button>
-                          <button className={styles.rejectBtn} onClick={() => setRejectingSubmission(sub)}>
-                            Reject
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))
+              paginated.map((sub) => {
+                const status = sub.status || (sub.is_active ? 'approved' : 'pending')
+                return (
+                  <tr key={sub.id}>
+                    <td className={styles.businessName}>{sub.shop_name || '—'}</td>
+                    <td>{sub.business_email || '—'}</td>
+                    <td>{sub.enquiry_number || '—'}</td>
+                    <td>{(sub.category_id || '—').replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}</td>
+                    <td>{(sub.subcategory_id || '—').replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}</td>
+                    <td>{formatDate(sub.created_at)}</td>
+                    <td><StatusBadge status={status} /></td>
+                    <td>
+                      <div className={styles.actions}>
+                        <button className={styles.viewBtn} onClick={() => setViewingSubmission(sub)}>
+                          View
+                        </button>
+                        {status === 'pending' && (
+                          <>
+                            <button className={styles.approveBtn} onClick={() => handleApprove(sub.id)}>
+                              Approve
+                            </button>
+                            <button className={styles.rejectBtn} onClick={() => setRejectingSubmission(sub)}>
+                              Reject
+                            </button>
+                          </>
+                        )}
+                        <button className={styles.deleteBtn} onClick={() => handleDelete(sub.id)}>
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })
             ) : (
               <tr>
-                <td colSpan={7} className={styles.emptyCell}>
+                <td colSpan={8} className={styles.emptyCell}>
                   <div className={styles.emptyState}>
                     <span className={styles.emptyIcon}>📭</span>
                     <p>No submissions found matching your filters.</p>
@@ -293,7 +244,7 @@ export default function BusinessSubmissionApproval() {
         <SubmissionDetailPanel
           submission={viewingSubmission}
           onClose={() => setViewingSubmission(null)}
-          onApprove={(id) => handleApprove(id, viewingSubmission._type)}
+          onApprove={handleApprove}
           onReject={(sub) => { setViewingSubmission(null); setRejectingSubmission(sub) }}
         />
       )}

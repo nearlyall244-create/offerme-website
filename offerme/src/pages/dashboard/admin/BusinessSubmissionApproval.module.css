@@ -125,6 +125,18 @@
   border-color: #fca5a5;
 }
 
+.deleteBtn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  border: 1px solid;
+  color: #991b1b;
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
 .emptyCell {
   text-align: center;
 }
