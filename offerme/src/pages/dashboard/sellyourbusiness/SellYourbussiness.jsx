@@ -1,7 +1,6 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
-import { storageService } from '@/services/storageService'
 import styles from './SellYourbussiness.module.css'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024
@@ -252,8 +251,25 @@ export default function SellYourbussiness({ onSuccess, onCancel }) {
 
       let uploadedImageUrl = null
       if (imageFile) {
-        const path = `shop-images/${Date.now()}_${imageFile.name}`
-        uploadedImageUrl = await storageService.uploadFile(imageFile, path)
+        const base64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = () => resolve(reader.result.split(',')[1])
+          reader.onerror = reject
+          reader.readAsDataURL(imageFile)
+        })
+
+        const uploadRes = await fetch('/api/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({
+            file: base64,
+            fileName: imageFile.name,
+            fileType: imageFile.type,
+          }),
+        })
+        const uploadData = await uploadRes.json()
+        if (!uploadRes.ok) throw new Error(uploadData.error || 'Image upload failed')
+        uploadedImageUrl = uploadData.url
       }
 
       const payload = {

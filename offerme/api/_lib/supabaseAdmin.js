@@ -22,4 +22,5 @@ export function getSupabaseAdmin() {
 export const supabaseAdmin = {
   from: (...args) => initClient().from(...args),
   rpc: (...args) => initClient().rpc(...args),
+  storage: (...args) => initClient().storage.from(...args),
 }
