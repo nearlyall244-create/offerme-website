@@ -37,7 +37,7 @@ export default function AdminDashboardHome() {
     fetchData()
   }, [user])
 
-  const pendingCount = shops.filter((s) => s.status === 'pending').length
+  const pendingCount = shops.filter((s) => s.status === 'pending' || (!s.status && !s.is_active)).length
   const approvedCount = shops.filter((s) => s.status === 'approved' || s.is_active).length
   const rejectedCount = shops.filter((s) => s.status === 'rejected').length
 

@@ -25,7 +25,7 @@ export default async function handler(req, res) {
 
         // Find businesses
         const { data: businesses } = await supabaseAdmin
-          .from('businesses')
+          .from('sell_your_bussiness')
           .select('id, shop_name, shop_address, enquiry_number, shop_image_url')
           .eq('owner_id', owner?.id || '00000000-0000-0000-0000-000000000000')
 
@@ -159,7 +159,7 @@ export default async function handler(req, res) {
         let businessId = shop_id
         if (!businessId && owner) {
           const { data: business } = await supabaseAdmin
-            .from('businesses')
+            .from('sell_your_bussiness')
             .select('id')
             .eq('owner_id', owner.id)
             .maybeSingle()
@@ -179,7 +179,7 @@ export default async function handler(req, res) {
 
         if (!businessId && shopName && owner) {
           const { data: newB } = await supabaseAdmin
-            .from('businesses')
+            .from('sell_your_bussiness')
             .insert({
               owner_id: owner.id,
               category_id: categoryId,
@@ -189,6 +189,9 @@ export default async function handler(req, res) {
               enquiry_number: phoneNumber || null,
               shop_image_url: imageUrl || image_url || null,
               shop_description: description || null,
+              business_email: businessEmail || null,
+              status: 'pending',
+              is_active: false,
             })
             .select()
             .single()

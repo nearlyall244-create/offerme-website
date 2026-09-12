@@ -1,9 +1,11 @@
-import { formatDate, formatTime } from '@/utils/date'
+import { formatDate } from '@/utils/date'
 import StatusBadge from '@/components/shared/StatusBadge'
 import styles from './SubmissionDetailPanel.module.css'
 
 export default function SubmissionDetailPanel({ submission, onClose, onApprove, onReject }) {
   if (!submission) return null
+
+  const status = submission.status || (submission.is_active ? 'approved' : 'pending')
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -14,24 +16,42 @@ export default function SubmissionDetailPanel({ submission, onClose, onApprove, 
         </div>
 
         <div className={styles.body}>
+          {submission.shop_image_url && (
+            <section className={styles.section}>
+              <img
+                src={submission.shop_image_url}
+                alt={submission.shop_name}
+                style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '0.5rem' }}
+              />
+            </section>
+          )}
+
           <section className={styles.section}>
             <h3 className={styles.sectionTitle}>Business Information</h3>
             <div className={styles.fieldGroup}>
               <div className={styles.field}>
                 <span className={styles.fieldLabel}>Business Name</span>
-                <span className={styles.fieldValue}>{submission.businessName}</span>
+                <span className={styles.fieldValue}>{submission.shop_name}</span>
+              </div>
+              <div className={styles.field}>
+                <span className={styles.fieldLabel}>Business Email</span>
+                <span className={styles.fieldValue}>{submission.business_email || '—'}</span>
               </div>
               <div className={styles.field}>
                 <span className={styles.fieldLabel}>Business Category</span>
-                <span className={styles.fieldValue}>{submission.category.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}</span>
+                <span className={styles.fieldValue}>{(submission.category_id || '').replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}</span>
               </div>
               <div className={styles.field}>
-                <span className={styles.fieldLabel}>Business Description</span>
-                <span className={styles.fieldValue}>{submission.description}</span>
+                <span className={styles.fieldLabel}>Subcategory</span>
+                <span className={styles.fieldValue}>{(submission.subcategory_id || '').replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()) || '—'}</span>
               </div>
               <div className={styles.field}>
-                <span className={styles.fieldLabel}>Business Phone</span>
-                <span className={styles.fieldValue}>{submission.businessPhone}</span>
+                <span className={styles.fieldLabel}>Phone Number</span>
+                <span className={styles.fieldValue}>{submission.enquiry_number || '—'}</span>
+              </div>
+              <div className={styles.field}>
+                <span className={styles.fieldLabel}>Description</span>
+                <span className={styles.fieldValue}>{submission.shop_description || '—'}</span>
               </div>
             </div>
           </section>
@@ -41,37 +61,7 @@ export default function SubmissionDetailPanel({ submission, onClose, onApprove, 
             <div className={styles.fieldGroup}>
               <div className={styles.field}>
                 <span className={styles.fieldLabel}>Business Address</span>
-                <span className={styles.fieldValue}>{submission.businessAddress}</span>
-              </div>
-              <div className={styles.field}>
-                <span className={styles.fieldLabel}>Area / Locality</span>
-                <span className={styles.fieldValue}>{submission.areaLocality}</span>
-              </div>
-              <div className={styles.field}>
-                <span className={styles.fieldLabel}>City</span>
-                <span className={styles.fieldValue}>{submission.city}</span>
-              </div>
-              <div className={styles.field}>
-                <span className={styles.fieldLabel}>State</span>
-                <span className={styles.fieldValue}>{submission.state}</span>
-              </div>
-              <div className={styles.field}>
-                <span className={styles.fieldLabel}>Pincode</span>
-                <span className={styles.fieldValue}>{submission.pincode}</span>
-              </div>
-            </div>
-          </section>
-
-          <section className={styles.section}>
-            <h3 className={styles.sectionTitle}>Business Hours</h3>
-            <div className={styles.fieldGroup}>
-              <div className={styles.field}>
-                <span className={styles.fieldLabel}>Opening Time</span>
-                <span className={styles.fieldValue}>{formatTime(submission.openingTime)}</span>
-              </div>
-              <div className={styles.field}>
-                <span className={styles.fieldLabel}>Closing Time</span>
-                <span className={styles.fieldValue}>{formatTime(submission.closingTime)}</span>
+                <span className={styles.fieldValue}>{submission.shop_address || '—'}</span>
               </div>
             </div>
           </section>
@@ -81,31 +71,31 @@ export default function SubmissionDetailPanel({ submission, onClose, onApprove, 
             <div className={styles.fieldGroup}>
               <div className={styles.field}>
                 <span className={styles.fieldLabel}>Submitted By</span>
-                <span className={styles.fieldValue}>{submission.ownerName}</span>
+                <span className={styles.fieldValue}>{submission.business_owners?.owner_name || '—'}</span>
+              </div>
+              <div className={styles.field}>
+                <span className={styles.fieldLabel}>Owner Email</span>
+                <span className={styles.fieldValue}>{submission.business_owners?.email || '—'}</span>
               </div>
               <div className={styles.field}>
                 <span className={styles.fieldLabel}>Submitted Date</span>
-                <span className={styles.fieldValue}>{formatDate(submission.submittedAt)}</span>
+                <span className={styles.fieldValue}>{formatDate(submission.created_at)}</span>
               </div>
               <div className={styles.field}>
                 <span className={styles.fieldLabel}>Current Status</span>
-                <StatusBadge status={submission.status} />
+                <StatusBadge status={status} />
               </div>
-              <div className={styles.field}>
-                <span className={styles.fieldLabel}>Last Updated</span>
-                <span className={styles.fieldValue}>{formatDate(submission.updatedAt)}</span>
-              </div>
-              {submission.rejectionReason && (
+              {submission.rejection_reason && (
                 <div className={styles.field}>
                   <span className={styles.fieldLabel}>Rejection Reason</span>
-                  <span className={`${styles.fieldValue} ${styles.rejectionReason}`}>{submission.rejectionReason}</span>
+                  <span className={`${styles.fieldValue} ${styles.rejectionReason}`}>{submission.rejection_reason}</span>
                 </div>
               )}
             </div>
           </section>
         </div>
 
-        {submission.status === 'pending' && (
+        {status === 'pending' && (
           <div className={styles.footer}>
             <button className={styles.approveBtn} onClick={() => onApprove(submission.id)}>
               Approve

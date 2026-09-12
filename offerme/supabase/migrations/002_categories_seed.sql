@@ -2,26 +2,45 @@
 -- This migration:
 -- 1. Converts sub_categories from text to jsonb
 -- 2. Adds missing columns to categories table
--- 3. Adds subcategory_id to businesses table
+-- 3. Adds subcategory_id and category_id to sell_your_bussiness table
 -- 4. Deletes existing categories
 -- 5. Seeds all 38 categories with their subcategories
 
--- Step 1: Convert sub_categories from text to jsonb
-ALTER TABLE categories ALTER COLUMN sub_categories TYPE jsonb USING sub_categories::jsonb;
-ALTER TABLE categories ALTER COLUMN sub_categories SET DEFAULT '[]'::jsonb;
+-- Step 1: Drop and recreate categories table with text id
+-- (old table had uuid id, we need text id for our slug-based IDs)
+DROP TABLE IF EXISTS categories CASCADE;
 
--- Step 2: Add missing columns if they don't exist
-ALTER TABLE categories ADD COLUMN IF NOT EXISTS group_id text;
-ALTER TABLE categories ADD COLUMN IF NOT EXISTS tagline text;
-ALTER TABLE categories ADD COLUMN IF NOT EXISTS pascal_name text;
+CREATE TABLE categories (
+  id text PRIMARY KEY,
+  name text NOT NULL,
+  slug text NOT NULL UNIQUE,
+  icon text,
+  image_url text,
+  is_active boolean NOT NULL DEFAULT true,
+  tagline text,
+  group_id text,
+  pascal_name text,
+  sub_categories jsonb DEFAULT '[]'::jsonb,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
 
--- Step 3: Add subcategory_id to businesses
-ALTER TABLE businesses ADD COLUMN IF NOT EXISTS subcategory_id text;
+-- Step 3: Add subcategory_id and category_id to sell_your_bussiness
+ALTER TABLE sell_your_bussiness ADD COLUMN IF NOT EXISTS subcategory_id text;
+ALTER TABLE sell_your_bussiness ADD COLUMN IF NOT EXISTS category_id text;
 
--- Step 4: Delete all existing rows from categories
-DELETE FROM categories;
+-- Step 5: Recreate trigger and RLS for categories
+DROP TRIGGER IF EXISTS update_categories_updated_at ON categories;
+CREATE TRIGGER update_categories_updated_at
+  BEFORE UPDATE ON categories
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
--- Step 5: Insert all 38 categories with subcategories
+ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "categories_select" ON categories;
+CREATE POLICY "categories_select" ON categories FOR SELECT USING (true);
+CREATE INDEX IF NOT EXISTS idx_categories_slug ON categories(slug);
+
+-- Step 6: Insert all 38 categories with subcategories
 
 INSERT INTO categories (id, name, slug, icon, tagline, image_url, group_id, pascal_name, sub_categories, is_active)
 VALUES ('food-restaurants', 'Food & Restaurants', 'food-restaurants', '🍽️', 'Delicious food, great offers', 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=300&auto=format&fit=crop&q=80', 'food-dining', 'FoodRestaurants', '[{"id":"veg-restaurants","name":"Veg Restaurants","slug":"veg-restaurants","icon":"🥗","description":"Veg Restaurants"},{"id":"non-veg-restaurants","name":"Non-Veg Restaurants","slug":"non-veg-restaurants","icon":"🍗","description":"Non-Veg Restaurants"},{"id":"multi-cuisine-restaurants","name":"Multi-Cuisine Restaurants","slug":"multi-cuisine-restaurants","icon":"🍲","description":"Multi-Cuisine Restaurants"},{"id":"fast-food","name":"Fast Food","slug":"fast-food","icon":"🍔","description":"Fast Food"},{"id":"family-restaurants","name":"Family Restaurants","slug":"family-restaurants","icon":"👨‍👩‍👧‍👦","description":"Family Restaurants"},{"id":"catering-services","name":"Catering Services","slug":"catering-services","icon":"🥘","description":"Catering Services"},{"id":"cloud-kitchens","name":"Cloud Kitchens","slug":"cloud-kitchens","icon":"🍳","description":"Cloud Kitchens"},{"id":"takeaway-food-delivery","name":"Takeaway & Food Delivery","slug":"takeaway-food-delivery","icon":"🛵","description":"Takeaway & Food Delivery"}]'::jsonb, true);

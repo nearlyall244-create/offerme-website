@@ -118,7 +118,7 @@ export default async function handler(req, res) {
         }
 
         await supabaseAdmin
-          .from('businesses')
+          .from('sell_your_bussiness')
           .update({ shop_name: trimmedName, updated_at: new Date().toISOString() })
           .eq('owner_id', owner.id)
 
@@ -308,7 +308,7 @@ export default async function handler(req, res) {
       }
 
       const { data: existingShop } = await supabaseAdmin
-        .from('businesses')
+        .from('sell_your_bussiness')
         .select('id')
         .eq('owner_id', ownerId)
         .maybeSingle()
@@ -328,7 +328,7 @@ export default async function handler(req, res) {
       }
 
       const { data, error } = await supabaseAdmin
-        .from('businesses')
+        .from('sell_your_bussiness')
         .insert({
           owner_id: ownerId,
           category_id: categoryId,

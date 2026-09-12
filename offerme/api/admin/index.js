@@ -42,7 +42,7 @@ export default async function handler(req, res) {
 
       if (type === 'shops') {
         let query = supabaseAdmin
-          .from('businesses')
+          .from('sell_your_bussiness')
           .select('*, business_owners(owner_name, email, firebase_uid)', { count: 'exact' })
 
         if (status === 'active') {
@@ -61,6 +61,35 @@ export default async function handler(req, res) {
 
         return res.status(200).json({
           shops: data,
+          total: count,
+          page: Number(page),
+          limit: Number(limit),
+        })
+      }
+
+      if (type === 'submissions') {
+        let query = supabaseAdmin
+          .from('sell_your_bussiness')
+          .select('*, business_owners(owner_name, email, firebase_uid)', { count: 'exact' })
+
+        if (status === 'pending') {
+          query = query.eq('status', 'pending')
+        } else if (status === 'approved') {
+          query = query.eq('status', 'approved')
+        } else if (status === 'rejected') {
+          query = query.eq('status', 'rejected')
+        }
+
+        const { data, count, error } = await query
+          .order('created_at', { ascending: false })
+          .range(offset, offset + limit - 1)
+
+        if (error) {
+          return res.status(500).json({ error: error.message })
+        }
+
+        return res.status(200).json({
+          submissions: data,
           total: count,
           page: Number(page),
           limit: Number(limit),
@@ -97,9 +126,9 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'type=shops or type=offers is required' })
     }
 
-    // ── PUT → admin toggles business active/inactive OR update owner status ──
+    // ── PUT → admin toggles business active/inactive OR update owner status OR approve/reject submission ──
     if (req.method === 'PUT') {
-      const { shop_id, owner_id, account_status } = req.body
+      const { shop_id, owner_id, account_status, action, rejection_reason } = req.body
 
       if (owner_id && account_status) {
         const { data, error } = await supabaseAdmin
@@ -124,12 +153,60 @@ export default async function handler(req, res) {
         return res.status(200).json({ message: 'Owner status updated', owner: data })
       }
 
+      if (shop_id && action) {
+        if (action === 'approve') {
+          const { data, error } = await supabaseAdmin
+            .from('sell_your_bussiness')
+            .update({ status: 'approved', is_active: true })
+            .eq('id', shop_id)
+            .select()
+            .single()
+
+          if (error) {
+            return res.status(500).json({ error: error.message })
+          }
+
+          await supabaseAdmin.from('admin_logs').insert({
+            admin_uid: decodedToken.uid,
+            action: 'approve_submission',
+            target_type: 'business',
+            target_id: String(shop_id),
+            details: { shop_name: data.shop_name },
+          })
+
+          return res.status(200).json({ message: 'Submission approved', shop: data })
+        }
+
+        if (action === 'reject') {
+          const { data, error } = await supabaseAdmin
+            .from('sell_your_bussiness')
+            .update({ status: 'rejected', is_active: false, rejection_reason: rejection_reason || null })
+            .eq('id', shop_id)
+            .select()
+            .single()
+
+          if (error) {
+            return res.status(500).json({ error: error.message })
+          }
+
+          await supabaseAdmin.from('admin_logs').insert({
+            admin_uid: decodedToken.uid,
+            action: 'reject_submission',
+            target_type: 'business',
+            target_id: String(shop_id),
+            details: { shop_name: data.shop_name, rejection_reason },
+          })
+
+          return res.status(200).json({ message: 'Submission rejected', shop: data })
+        }
+      }
+
       if (!shop_id) {
         return res.status(400).json({ error: 'shop_id or owner_id is required' })
       }
 
       const { data: business, error: fetchError } = await supabaseAdmin
-        .from('businesses')
+        .from('sell_your_bussiness')
         .select('id, is_active, shop_name')
         .eq('id', shop_id)
         .single()
@@ -140,7 +217,7 @@ export default async function handler(req, res) {
 
       const newStatus = !business.is_active
       const { data, error } = await supabaseAdmin
-        .from('businesses')
+        .from('sell_your_bussiness')
         .update({ is_active: newStatus })
         .eq('id', shop_id)
         .select()

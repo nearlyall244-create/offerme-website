@@ -7,7 +7,7 @@ export default async function handler(req, res) {
       const offset = (page - 1) * limit
 
       let query = supabaseAdmin
-        .from('businesses')
+        .from('sell_your_bussiness')
         .select('*, business_owners(owner_name, email)', { count: 'exact' })
         .eq('is_active', true)
 
@@ -79,7 +79,7 @@ export default async function handler(req, res) {
       }
 
       const { data, error } = await supabaseAdmin
-        .from('businesses')
+        .from('sell_your_bussiness')
         .insert({
           owner_id: owner.id,
           category_id: categoryId,
@@ -122,7 +122,7 @@ export default async function handler(req, res) {
       }
 
       let { data: business, error: fetchError } = await supabaseAdmin
-        .from('businesses')
+        .from('sell_your_bussiness')
         .select('id, owner_id, business_owners(firebase_uid)')
         .eq('id', shop_id)
         .maybeSingle()
@@ -130,7 +130,7 @@ export default async function handler(req, res) {
       if (!business) {
         // Fallback: check if shop_id passed was owner_id
         const { data: bByOwner } = await supabaseAdmin
-          .from('businesses')
+          .from('sell_your_bussiness')
           .select('id, owner_id, business_owners(firebase_uid)')
           .eq('owner_id', shop_id)
           .maybeSingle()
@@ -156,7 +156,7 @@ export default async function handler(req, res) {
       }
 
       const { data, error } = await supabaseAdmin
-        .from('businesses')
+        .from('sell_your_bussiness')
         .update(filtered)
         .eq('id', business.id)
         .select()
