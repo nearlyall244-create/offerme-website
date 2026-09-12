@@ -21,13 +21,27 @@ export default async function handler(req, res) {
       const ADMIN_EMAILS = ['nearlyall244@gmail.com', 'delivery.adbricks@gmail.com']
 
       if (email && ADMIN_EMAILS.includes(email)) {
-        const { data: adminRecord } = await supabaseAdmin
+        let adminName = email.split('@')[0]
+
+        const { data: adminRecordByFirebase } = await supabaseAdmin
           .from('admin_log')
           .select('name')
           .eq('firebase_uid', uid)
           .maybeSingle()
 
-        const adminName = adminRecord?.name || email.split('@')[0]
+        if (adminRecordByFirebase?.name) {
+          adminName = adminRecordByFirebase.name
+        } else {
+          const { data: adminRecordByAdmin } = await supabaseAdmin
+            .from('admin_log')
+            .select('name')
+            .eq('admin_uid', uid)
+            .maybeSingle()
+          if (adminRecordByAdmin?.name) {
+            adminName = adminRecordByAdmin.name
+          }
+        }
+
         return res.status(200).json({ role: 'admin', profile: { firebase_uid: uid, email, name: adminName } })
       }
 
@@ -133,28 +147,39 @@ export default async function handler(req, res) {
       }
 
       if (isAdmin) {
-        const { data: existingAdmin } = await supabaseAdmin
+        const { data: existingByFirebase } = await supabaseAdmin
           .from('admin_log')
           .select('id')
           .eq('firebase_uid', uid)
           .maybeSingle()
 
-        if (existingAdmin) {
-          const { data: updated, error: updErr } = await supabaseAdmin
+        if (existingByFirebase) {
+          const { error: updErr } = await supabaseAdmin
             .from('admin_log')
             .update({ name: trimmedName })
-            .eq('id', existingAdmin.id)
-            .select()
-            .single()
+            .eq('id', existingByFirebase.id)
           if (updErr) return res.status(500).json({ error: updErr.message })
           return res.status(200).json({ success: true, profile: { firebase_uid: uid, email, name: trimmedName } })
         }
 
-        const { data: newAdmin, error: insErr } = await supabaseAdmin
+        const { data: existingByAdmin } = await supabaseAdmin
           .from('admin_log')
-          .insert({ firebase_uid: uid, name: trimmedName, email })
-          .select()
-          .single()
+          .select('id')
+          .eq('admin_uid', uid)
+          .maybeSingle()
+
+        if (existingByAdmin) {
+          const { error: updErr } = await supabaseAdmin
+            .from('admin_log')
+            .update({ name: trimmedName })
+            .eq('id', existingByAdmin.id)
+          if (updErr) return res.status(500).json({ error: updErr.message })
+          return res.status(200).json({ success: true, profile: { firebase_uid: uid, email, name: trimmedName } })
+        }
+
+        const { error: insErr } = await supabaseAdmin
+          .from('admin_log')
+          .insert({ firebase_uid: uid, admin_uid: uid, name: trimmedName, email })
         if (insErr) return res.status(500).json({ error: insErr.message })
         return res.status(200).json({ success: true, profile: { firebase_uid: uid, email, name: trimmedName } })
       }
