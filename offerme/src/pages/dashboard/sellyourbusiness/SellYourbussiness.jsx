@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { CATEGORIES } from '@/data/categories'
@@ -12,6 +12,7 @@ const INITIAL_FORM = {
   shopName: '',
   businessEmail: '',
   businessCategory: '',
+  businessSubcategory: '',
   phoneNumber: '',
   shopAddress: '',
   description: '',
@@ -57,6 +58,11 @@ export default function SellYourbussiness({ onSuccess, onCancel, embedded = fals
   const fileInputRef = useRef(null)
   const formRef = useRef(null)
   const firstErrorRef = useRef(null)
+
+  const selectedCategory = useMemo(
+    () => CATEGORIES.find((cat) => cat.id === form.businessCategory) || null,
+    [form.businessCategory]
+  )
 
   /* ── Handlers ───────────────────────────────────────────────── */
 
@@ -165,6 +171,11 @@ export default function SellYourbussiness({ onSuccess, onCancel, embedded = fals
       errs.businessCategory = 'Please select a business category.'
     }
 
+    // Business Subcategory
+    if (!form.businessSubcategory) {
+      errs.businessSubcategory = 'Please select a subcategory.'
+    }
+
     // Phone Number
     const phone = form.phoneNumber.trim()
     if (!phone) {
@@ -229,6 +240,7 @@ export default function SellYourbussiness({ onSuccess, onCancel, embedded = fals
         shopName: form.shopName.trim(),
         businessEmail: form.businessEmail.trim(),
         businessCategory: form.businessCategory,
+        businessSubcategory: form.businessSubcategory,
         phoneNumber: form.phoneNumber.trim(),
         shopAddress: form.shopAddress.trim(),
         description: form.description.trim(),
@@ -403,7 +415,18 @@ export default function SellYourbussiness({ onSuccess, onCancel, embedded = fals
                     id="businessCategory"
                     name="businessCategory"
                     value={form.businessCategory}
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      setForm((prev) => ({ ...prev, businessCategory: e.target.value, businessSubcategory: '' }))
+                      setErrors((prev) => {
+                        if (prev.businessCategory) {
+                          const next = { ...prev }
+                          delete next.businessCategory
+                          delete next.businessSubcategory
+                          return next
+                        }
+                        return prev
+                      })
+                    }}
                     className={errors.businessCategory ? styles.fieldError : ''}
                     aria-invalid={!!errors.businessCategory}
                     aria-describedby={errors.businessCategory ? 'err-businessCategory' : undefined}
@@ -422,6 +445,38 @@ export default function SellYourbussiness({ onSuccess, onCancel, embedded = fals
                   )}
                 </div>
 
+                <div className={styles.field}>
+                  <label htmlFor="businessSubcategory">
+                    Subcategory <span className={styles.requiredStar}>*</span>
+                  </label>
+                  <select
+                    id="businessSubcategory"
+                    name="businessSubcategory"
+                    value={form.businessSubcategory}
+                    onChange={handleChange}
+                    disabled={!form.businessCategory}
+                    className={errors.businessSubcategory ? styles.fieldError : ''}
+                    aria-invalid={!!errors.businessSubcategory}
+                    aria-describedby={errors.businessSubcategory ? 'err-businessSubcategory' : undefined}
+                  >
+                    <option value="">
+                      {form.businessCategory ? 'Select a subcategory' : 'Select a category first'}
+                    </option>
+                    {selectedCategory?.subcategories?.map((sub) => (
+                      <option key={sub.id} value={sub.id}>
+                        {sub.icon} {sub.name}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.businessSubcategory && (
+                    <span className={styles.fieldError} id="err-businessSubcategory" role="alert">
+                      <span className={styles.errorIcon}>⚠</span> {errors.businessSubcategory}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className={styles.fieldRow}>
                 <div className={styles.field}>
                   <label htmlFor="phoneNumber">
                     Phone Number <span className={styles.requiredStar}>*</span>
