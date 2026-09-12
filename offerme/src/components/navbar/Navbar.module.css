@@ -23,14 +23,19 @@
 }
 
 .logoImg {
-  height: 5rem;
-  width: 7rem;
+  height: 3.5rem;
+  width: auto;
 }
 
 @media (max-width: 768px) {
   .logoImg {
-    height: 4rem;
-    width: 6rem;
+    height: 2.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .logoImg {
+    height: 2rem;
   }
 }
 
