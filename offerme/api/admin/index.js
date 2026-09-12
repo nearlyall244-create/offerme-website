@@ -98,8 +98,8 @@ export default async function handler(req, res) {
 
       if (type === 'offers') {
         let query = supabaseAdmin
-          .from('offers')
-          .select('*, businesses(shop_name, business_owners(firebase_uid))', { count: 'exact' })
+          .from('offers_post')
+          .select('*, sell_your_bussiness(shop_name, business_owners(owner_name, email, firebase_uid))', { count: 'exact' })
 
         if (status === 'active') {
           query = query.eq('is_active', true)
@@ -198,6 +198,56 @@ export default async function handler(req, res) {
           })
 
           return res.status(200).json({ message: 'Submission rejected', shop: data })
+        }
+      }
+
+      const { offer_id } = req.body
+
+      if (offer_id && action) {
+        if (action === 'approve') {
+          const { data, error } = await supabaseAdmin
+            .from('offers_post')
+            .update({ is_active: true })
+            .eq('id', offer_id)
+            .select()
+            .single()
+
+          if (error) {
+            return res.status(500).json({ error: error.message })
+          }
+
+          await supabaseAdmin.from('admin_logs').insert({
+            admin_uid: decodedToken.uid,
+            action: 'approve_offer',
+            target_type: 'offer',
+            target_id: String(offer_id),
+            details: { title: data.title },
+          })
+
+          return res.status(200).json({ message: 'Offer approved', offer: data })
+        }
+
+        if (action === 'reject') {
+          const { data, error } = await supabaseAdmin
+            .from('offers_post')
+            .update({ is_active: false })
+            .eq('id', offer_id)
+            .select()
+            .single()
+
+          if (error) {
+            return res.status(500).json({ error: error.message })
+          }
+
+          await supabaseAdmin.from('admin_logs').insert({
+            admin_uid: decodedToken.uid,
+            action: 'reject_offer',
+            target_type: 'offer',
+            target_id: String(offer_id),
+            details: { title: data.title, rejection_reason },
+          })
+
+          return res.status(200).json({ message: 'Offer rejected', offer: data })
         }
       }
 
