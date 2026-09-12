@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { formatDate, formatDateTime } from '@/utils/date'
-import StatusBadge from '@/components/shared/StatusBadge'
 import styles from './BusinessOwnerDetails.module.css'
 
 export default function BusinessOwnerDetails() {
@@ -110,7 +109,6 @@ export default function BusinessOwnerDetails() {
                 <th>Name</th>
                 <th>Email</th>
                 <th>Phone</th>
-                <th>Status</th>
                 <th>Joined</th>
                 <th>Actions</th>
               </tr>
@@ -120,8 +118,7 @@ export default function BusinessOwnerDetails() {
                 <tr key={owner.id} className={selectedOwner?.id === owner.id ? styles.rowActive : ''}>
                   <td className={styles.ownerName}>{owner.owner_name}</td>
                   <td>{owner.email}</td>
-                  <td>{owner.phone}</td>
-                  <td><StatusBadge status={owner.account_status} /></td>
+                  <td>{owner.phone || '—'}</td>
                   <td>{formatDate(owner.created_at)}</td>
                   <td>
                     <button className={styles.viewBtn} onClick={() => setSelectedOwner(owner)}>
@@ -132,7 +129,7 @@ export default function BusinessOwnerDetails() {
               ))}
               {filtered.length === 0 && !loading && (
                 <tr>
-                  <td colSpan={6} className={styles.emptyCell}>
+                  <td colSpan={5} className={styles.emptyCell}>
                     {error ? `Error: ${error}` : 'No owners found.'}
                   </td>
                 </tr>
