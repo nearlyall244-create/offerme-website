@@ -60,17 +60,6 @@ export default function DashboardSidebar({ role = 'user' }) {
 
   return (
     <aside className={styles.sidebar}>
-      {role === 'admin' && (
-        <div className={styles.userInfo}>
-          <div className={styles.userAvatar}>
-            {(userProfile?.displayName || userProfile?.owner_name || 'A')[0].toUpperCase()}
-          </div>
-          <div className={styles.userDetails}>
-            <span className={styles.userName}>{userProfile?.displayName || userProfile?.owner_name || 'Admin'}</span>
-            <span className={styles.userRole}>Admin</span>
-          </div>
-        </div>
-      )}
       <nav className={styles.nav}>
         <ul className={styles.list}>
           {links.map((link) => (
