@@ -26,7 +26,7 @@ export default async function handler(req, res) {
         // Find businesses
         const { data: businesses } = await supabaseAdmin
           .from('sell_your_bussiness')
-          .select('id, shop_name, shop_address, enquiry_number, shop_image_url')
+          .select('id, shop_name, shop_address, enquiry_number, shop_image_url, category_id, subcategory_id, business_email, shop_description')
           .eq('owner_id', owner?.id || '00000000-0000-0000-0000-000000000000')
 
         const bIds = (businesses || []).map((b) => b.id)

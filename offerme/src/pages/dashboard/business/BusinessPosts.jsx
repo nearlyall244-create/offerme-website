@@ -153,16 +153,33 @@ export default function BusinessPosts() {
                       )}
 
                       <div className={styles.cardDetails}>
-                        {post.businesses?.shop_address && (
+                        {post.businesses?.category_id && (
                           <div className={styles.detailItem}>
-                            <MapPin size={14} />
-                            <span>{post.businesses.shop_address}</span>
+                            <Tag size={14} />
+                            <span>{post.businesses.category_id.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}</span>
+                          </div>
+                        )}
+                        {post.businesses?.subcategory_id && (
+                          <div className={styles.detailItem}>
+                            <Tag size={14} />
+                            <span>{post.businesses.subcategory_id.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}</span>
+                          </div>
+                        )}
+                        {post.businesses?.business_email && (
+                          <div className={styles.detailItem}>
+                            <span>📧 {post.businesses.business_email}</span>
                           </div>
                         )}
                         {post.businesses?.enquiry_number && (
                           <div className={styles.detailItem}>
                             <Phone size={14} />
                             <span>{post.businesses.enquiry_number}</span>
+                          </div>
+                        )}
+                        {post.businesses?.shop_address && (
+                          <div className={styles.detailItem}>
+                            <MapPin size={14} />
+                            <span>{post.businesses.shop_address}</span>
                           </div>
                         )}
                         {post.valid_until && (
