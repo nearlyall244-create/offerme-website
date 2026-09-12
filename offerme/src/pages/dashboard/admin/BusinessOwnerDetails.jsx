@@ -44,7 +44,7 @@ export default function BusinessOwnerDetails() {
         (o) =>
           (o.owner_name || '').toLowerCase().includes(q) ||
           (o.email || '').toLowerCase().includes(q) ||
-          (o.phone || '').includes(q)
+          (o.phone_number || '').includes(q)
       )
     }
 
@@ -118,7 +118,7 @@ export default function BusinessOwnerDetails() {
                 <tr key={owner.id} className={selectedOwner?.id === owner.id ? styles.rowActive : ''}>
                   <td className={styles.ownerName}>{owner.owner_name}</td>
                   <td>{owner.email}</td>
-                  <td>{owner.phone || '—'}</td>
+                  <td>{owner.phone_number || '—'}</td>
                   <td>{formatDate(owner.created_at)}</td>
                   <td>
                     <button className={styles.viewBtn} onClick={() => setSelectedOwner(owner)}>
@@ -159,7 +159,7 @@ export default function BusinessOwnerDetails() {
                   </div>
                   <div className={styles.field}>
                     <span className={styles.fieldLabel}>Phone Number</span>
-                    <span className={styles.fieldValue}>{selectedOwner.phone}</span>
+                    <span className={styles.fieldValue}>{selectedOwner.phone_number}</span>
                   </div>
                 </div>
               </section>
