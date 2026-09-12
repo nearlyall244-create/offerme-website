@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
+import { storageService } from '@/services/storageService'
 import styles from './SellYourbussiness.module.css'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024
@@ -245,8 +246,16 @@ export default function SellYourbussiness({ onSuccess, onCancel }) {
       return
     }
 
+    setIsSubmitting(true)
     try {
       const token = await getToken()
+
+      let uploadedImageUrl = null
+      if (imageFile) {
+        const path = `shop-images/${Date.now()}_${imageFile.name}`
+        uploadedImageUrl = await storageService.uploadFile(imageFile, path)
+      }
+
       const payload = {
         shopName: form.shopName.trim(),
         businessEmail: form.shopEmail.trim(),
@@ -255,7 +264,9 @@ export default function SellYourbussiness({ onSuccess, onCancel }) {
         phoneNumber: form.enquiryNumber.trim(),
         shopAddress: form.shopAddress.trim(),
         description: `Opening: ${form.openingTime} | Closing: ${form.closingTime}`,
-        imageUrl: imagePreview || null,
+        imageUrl: uploadedImageUrl,
+        openingTime: form.openingTime,
+        closingTime: form.closingTime,
       }
 
       const res = await fetch('/api/offers?action=sell-business', {

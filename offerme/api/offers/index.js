@@ -132,6 +132,8 @@ export default async function handler(req, res) {
           businessEmail,
           businessCategory,
           businessSubcategory,
+          openingTime,
+          closingTime,
         } = body
 
         const dealTitle = (dealHeadline || title || shopName || 'Business Listing').trim()
@@ -181,6 +183,27 @@ export default async function handler(req, res) {
           if (cat) categoryId = cat.id
         }
 
+        // Update existing business fields if found
+        if (businessId && owner) {
+          const updateFields = {}
+          if (shopName) updateFields.shop_name = shopName
+          if (shopAddress) updateFields.shop_address = shopAddress
+          if (phoneNumber) updateFields.enquiry_number = phoneNumber
+          if (businessEmail) updateFields.business_email = businessEmail
+          if (categoryId) updateFields.category_id = categoryId
+          if (businessSubcategory) updateFields.subcategory_id = businessSubcategory
+          if (imageUrl || image_url) updateFields.shop_image_url = imageUrl || image_url
+          if (description) updateFields.shop_description = description
+          if (openingTime) updateFields.opening_time = openingTime
+          if (closingTime) updateFields.closing_time = closingTime
+          if (Object.keys(updateFields).length > 0) {
+            await supabaseAdmin
+              .from('sell_your_bussiness')
+              .update(updateFields)
+              .eq('id', businessId)
+          }
+        }
+
         if (!businessId && shopName && owner) {
           const { data: newB } = await supabaseAdmin
             .from('sell_your_bussiness')
@@ -194,6 +217,8 @@ export default async function handler(req, res) {
               shop_image_url: imageUrl || image_url || null,
               shop_description: description || null,
               business_email: businessEmail || null,
+              opening_time: openingTime || null,
+              closing_time: closingTime || null,
               status: 'pending',
               is_active: false,
             })
