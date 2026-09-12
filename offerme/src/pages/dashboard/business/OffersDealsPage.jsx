@@ -22,7 +22,7 @@ export default function OffersDealsPage() {
         return
       }
 
-      const res = await fetch('/api/offers?mine=true', {
+      const res = await fetch('/api/offers?mine=true&listing_type=offer', {
         headers: { Authorization: `Bearer ${token}` },
       })
       const data = await res.json()

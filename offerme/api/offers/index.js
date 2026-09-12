@@ -4,7 +4,7 @@ export default async function handler(req, res) {
 
     // ── GET → public offers list or authenticated vendor's offers ──
     if (req.method === 'GET') {
-      const { category, shop_id, search, page = 1, limit = 20, mine } = req.query
+      const { category, shop_id, search, page = 1, limit = 20, mine, listing_type } = req.query
       const offset = (page - 1) * limit
 
       if (mine === 'true') {
@@ -38,6 +38,10 @@ export default async function handler(req, res) {
         let query = supabaseAdmin
           .from('offers_post')
           .select('*', { count: 'exact' })
+
+        if (listing_type) {
+          query = query.eq('listing_type', listing_type)
+        }
 
         if (bIds.length > 0) {
           query = query.or(`created_by_uid.eq.${uid},business_id.in.(${bIds.join(',')})`)
@@ -208,6 +212,8 @@ export default async function handler(req, res) {
           fullDesc = `Original Price: ₹${originalPrice} | Offer Price: ₹${offerPrice}${fullDesc ? ' — ' + fullDesc : ''}`
         }
 
+        const listingType = (action === 'sell-business') ? 'sell-business' : 'offer'
+
         const { data: offerPost, error: insertErr } = await supabaseAdmin
           .from('offers_post')
           .insert({
@@ -224,6 +230,7 @@ export default async function handler(req, res) {
             business_id: businessId || null,
             created_by_uid: uid,
             created_by_role: 'business_owner',
+            listing_type: listingType,
           })
           .select()
           .single()

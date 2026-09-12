@@ -22,7 +22,7 @@ export default function BusinessPosts() {
         return
       }
 
-      const res = await fetch('/api/offers?mine=true', {
+      const res = await fetch('/api/offers?mine=true&listing_type=sell-business', {
         headers: { Authorization: `Bearer ${token}` },
       })
       const data = await res.json()
