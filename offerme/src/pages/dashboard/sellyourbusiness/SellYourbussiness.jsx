@@ -333,55 +333,11 @@ export default function SellYourbussiness({ onSuccess, onCancel, embedded = fals
           </p>
         </div>
 
-        <div className={styles.contentGrid}>
-          {/* ── Left Info Panel ───────────────────────────────── */}
-          <div className={styles.infoPanel}>
-            <span className={styles.infoEmoji} role="img" aria-label="storefront">
-              🏪
-            </span>
-            <h2 className={styles.infoTitle}>List Your Business in Minutes</h2>
-            <p className={styles.infoDescription}>
-              Fill out the form to publish your business with an exciting offer.
-              Once submitted, our team will review your listing and go live within 24 hours.
-            </p>
-
-            <ul className={styles.benefitsList}>
-              <li className={styles.benefitItem}>
-                <span className={styles.benefitIcon}>✓</span>
-                Reach thousands of local customers
-              </li>
-              <li className={styles.benefitItem}>
-                <span className={styles.benefitIcon}>✓</span>
-                Create deals and discount coupons
-              </li>
-              <li className={styles.benefitItem}>
-                <span className={styles.benefitIcon}>✓</span>
-                Appear in search and category listings
-              </li>
-              <li className={styles.benefitItem}>
-                <span className={styles.benefitIcon}>✓</span>
-                Free to list — no hidden charges
-              </li>
-            </ul>
-
-            <div className={styles.infoCard}>
-              <h3 className={styles.infoCardTitle}>
-                <span role="img" aria-label="info">💡</span> Good to Know
-              </h3>
-              <p className={styles.infoCardText}>
-                Make sure your business details are accurate. Listings with complete
-                information and a clear image get approved faster and attract more
-                customers.
-              </p>
-            </div>
-          </div>
-
-          {/* ── Right Form Card ──────────────────────────────── */}
-          <div className={styles.formCard}>
-            <h2 className={styles.formCardTitle}>Business &amp; Offer Details</h2>
-            <p className={styles.formCardSubtitle}>
-              All fields marked with <span style={{ color: '#ef4444' }}>*</span> are required.
-            </p>
+        <div className={styles.formCard}>
+          <h2 className={styles.formCardTitle}>Business &amp; Offer Details</h2>
+          <p className={styles.formCardSubtitle}>
+            All fields marked with <span style={{ color: '#ef4444' }}>*</span> are required.
+          </p>
 
             <form
               ref={formRef}
@@ -672,7 +628,6 @@ export default function SellYourbussiness({ onSuccess, onCancel, embedded = fals
             </form>
           </div>
         </div>
-      </div>
 
       {/* ── Success Overlay ──────────────────────────────────── */}
       {submitted && (
