@@ -65,6 +65,7 @@ export default async function handler(req, res) {
       }
 
       const uid = authResult.decodedToken.uid
+      const email = authResult.decodedToken.email
       const body = req.body || {}
       const name = body.name || body.owner_name || body.businessName || body.shop_name || body.displayName
 
@@ -73,6 +74,9 @@ export default async function handler(req, res) {
       }
 
       const trimmedName = name.trim()
+
+      const ADMIN_EMAILS = ['nearlyall244@gmail.com', 'delivery.adbricks@gmail.com']
+      const isAdmin = email && ADMIN_EMAILS.includes(email)
 
       const { data: owner } = await supabaseAdmin
         .from('business_owners')
@@ -119,6 +123,33 @@ export default async function handler(req, res) {
         }
 
         return res.status(200).json({ success: true, profile: updatedCustomer })
+      }
+
+      if (isAdmin) {
+        const { data: existingAdmin } = await supabaseAdmin
+          .from('public_users')
+          .select('id')
+          .eq('firebase_uid', uid)
+          .maybeSingle()
+
+        if (existingAdmin) {
+          const { data: updated, error: updErr } = await supabaseAdmin
+            .from('public_users')
+            .update({ name: trimmedName, updated_at: new Date().toISOString() })
+            .eq('id', existingAdmin.id)
+            .select()
+            .single()
+          if (updErr) return res.status(500).json({ error: updErr.message })
+          return res.status(200).json({ success: true, profile: updated })
+        }
+
+        const { data: newAdmin, error: insErr } = await supabaseAdmin
+          .from('public_users')
+          .insert({ firebase_uid: uid, name: trimmedName, email })
+          .select()
+          .single()
+        if (insErr) return res.status(500).json({ error: insErr.message })
+        return res.status(200).json({ success: true, profile: newAdmin })
       }
 
       return res.status(404).json({ error: 'User profile not found' })
