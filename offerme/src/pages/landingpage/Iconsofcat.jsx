@@ -1,7 +1,6 @@
-import { useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styles from './Iconsofcat.module.css'
-import { CATEGORIES } from '@/data/categories'
 
 const SPEED = 0.5
 
@@ -11,6 +10,18 @@ export default function Iconsofcat() {
   const isPaused = useRef(false)
   const animRef = useRef(null)
   const scrollPos = useRef(0)
+  const [categories, setCategories] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/categories')
+      .then((res) => res.json())
+      .then((data) => {
+        setCategories(data.categories || [])
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+  }, [])
 
   useEffect(() => {
     function autoScroll() {
@@ -53,6 +64,16 @@ export default function Iconsofcat() {
     navigate(`/category/${cat.slug}`)
   }
 
+  if (loading) {
+    return (
+      <section className={styles.section}>
+        <div className={styles.scrollContainer}>
+          <p style={{ padding: '1rem', color: '#888' }}>Loading categories...</p>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className={styles.section}>
       <div
@@ -61,7 +82,7 @@ export default function Iconsofcat() {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        {CATEGORIES.map((cat) => (
+        {categories.map((cat) => (
           <button
             key={cat.id}
             className={styles.categoryItem}

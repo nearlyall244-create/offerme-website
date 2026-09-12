@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { Search, X, SlidersHorizontal, MapPin, Star, Clock, ChevronDown } from 'lucide-react'
 import { getAllListings } from '@/data/mockListings'
-import { CATEGORIES } from '@/data/categories'
+
 import styles from './UserDashboardHome.module.css'
 
 const RECENT_KEY = 'offerme_recent_searches'
@@ -50,6 +50,23 @@ export default function UserDashboardHome() {
   const [showSuggestions, setShowSuggestions] = useState(false)
   const searchRef = useRef(null)
   const suggestionsRef = useRef(null)
+  const [categories, setCategories] = useState([])
+  const [categoriesLoading, setCategoriesLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await fetch('/api/categories')
+        const data = await res.json()
+        setCategories(data.categories || [])
+      } catch (error) {
+        console.error('Failed to fetch categories:', error)
+      } finally {
+        setCategoriesLoading(false)
+      }
+    }
+    fetchCategories()
+  }, [])
 
   const allListings = useMemo(() => getAllListings(), [])
 
@@ -284,16 +301,20 @@ export default function UserDashboardHome() {
           >
             All
           </button>
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              className={`${styles.categoryChip} ${selectedCategory === cat.id ? styles.categoryChipActive : ''}`}
-              onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
-            >
-              <span className={styles.categoryIcon}>{cat.icon}</span>
-              <span>{cat.name}</span>
-            </button>
-          ))}
+          {categoriesLoading ? (
+            <span className={styles.categoryChip}>Loading...</span>
+          ) : (
+            categories.map((cat) => (
+              <button
+                key={cat.id}
+                className={`${styles.categoryChip} ${selectedCategory === cat.id ? styles.categoryChipActive : ''}`}
+                onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
+              >
+                <span className={styles.categoryIcon}>{cat.icon}</span>
+                <span>{cat.name}</span>
+              </button>
+            ))
+          )}
         </div>
       </section>
 

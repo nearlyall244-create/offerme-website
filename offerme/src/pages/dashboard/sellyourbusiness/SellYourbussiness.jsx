@@ -1,7 +1,6 @@
-import { useState, useRef, useCallback, useMemo } from 'react'
+import { useState, useRef, useCallback, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
-import { CATEGORIES } from '@/data/categories'
 import styles from './SellYourbussiness.module.css'
 
 const MAX_DESCRIPTION_LENGTH = 500
@@ -54,14 +53,35 @@ export default function SellYourbussiness({ onSuccess, onCancel, embedded = fals
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [isDragOver, setIsDragOver] = useState(false)
+  const [categories, setCategories] = useState([])
+  const [categoriesLoading, setCategoriesLoading] = useState(true)
 
   const fileInputRef = useRef(null)
   const formRef = useRef(null)
   const firstErrorRef = useRef(null)
 
+  useEffect(() => {
+    let cancelled = false
+    async function loadCategories() {
+      try {
+        const res = await fetch('/api/categories')
+        const data = await res.json()
+        if (!cancelled && res.ok) {
+          setCategories(data.categories || [])
+        }
+      } catch {
+        // silently fail — category dropdown will be empty
+      } finally {
+        if (!cancelled) setCategoriesLoading(false)
+      }
+    }
+    loadCategories()
+    return () => { cancelled = true }
+  }, [])
+
   const selectedCategory = useMemo(
-    () => CATEGORIES.find((cat) => cat.id === form.businessCategory) || null,
-    [form.businessCategory]
+    () => categories.find((cat) => String(cat.id) === String(form.businessCategory)) || null,
+    [form.businessCategory, categories]
   )
 
   /* ── Handlers ───────────────────────────────────────────────── */
@@ -431,8 +451,8 @@ export default function SellYourbussiness({ onSuccess, onCancel, embedded = fals
                     aria-invalid={!!errors.businessCategory}
                     aria-describedby={errors.businessCategory ? 'err-businessCategory' : undefined}
                   >
-                    <option value="">Select a category</option>
-                    {CATEGORIES.map((cat) => (
+                    <option value="">{categoriesLoading ? 'Loading categories...' : 'Select a category'}</option>
+                    {categories.map((cat) => (
                       <option key={cat.id} value={cat.id}>
                         {cat.icon} {cat.name}
                       </option>
@@ -462,7 +482,7 @@ export default function SellYourbussiness({ onSuccess, onCancel, embedded = fals
                     <option value="">
                       {form.businessCategory ? 'Select a subcategory' : 'Select a category first'}
                     </option>
-                    {selectedCategory?.subcategories?.map((sub) => (
+                    {selectedCategory?.sub_categories?.map((sub) => (
                       <option key={sub.id} value={sub.id}>
                         {sub.icon} {sub.name}
                       </option>

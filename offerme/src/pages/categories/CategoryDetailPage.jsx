@@ -1,6 +1,5 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { getCategoryBySlug, getSubcategoryBySlug } from '@/data/categories'
 import { getListingsByCategory } from '@/data/mockListings'
 import Navbar from '@/components/navbar/Navbar'
 import Footer from '@/pages/footer/Footer'
@@ -21,8 +20,37 @@ export default function CategoryDetailPage() {
   const { slug, subSlug } = useParams()
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState('rating')
+  const [categories, setCategories] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  const category = getCategoryBySlug(slug)
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await fetch('/api/categories')
+        const data = await res.json()
+        setCategories(data.categories || [])
+      } catch {
+        setCategories([])
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchCategories()
+  }, [])
+
+  const category = categories.find((c) => c.slug === slug)
+
+  if (loading) {
+    return (
+      <div>
+        <Navbar />
+        <main className={styles.page}>
+          <div className={styles.notFound}>Loading...</div>
+        </main>
+        <Footer />
+      </div>
+    )
+  }
 
   if (!category) {
     return (
@@ -45,8 +73,8 @@ export default function CategoryDetailPage() {
     )
   }
 
-  const subcategory = subSlug ? getSubcategoryBySlug(slug, subSlug) : null
-  const hasSubcategories = category.subcategories.length > 0
+  const subcategory = subSlug ? category?.sub_categories?.find((s) => s.slug === subSlug) : null
+  const hasSubcategories = category.sub_categories?.length > 0
 
   // Get listings filtered by category and optional subcategory
   const rawListings = getListingsByCategory(slug, subSlug || null)
@@ -122,7 +150,7 @@ export default function CategoryDetailPage() {
             >
               <span className={styles.subCardName + ' ' + styles.allTab}>All</span>
             </Link>
-            {category.subcategories.map((sub) => (
+            {category.sub_categories?.map((sub) => (
               <Link
                 key={sub.id}
                 to={`/category/${slug}/${sub.slug}`}

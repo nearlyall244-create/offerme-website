@@ -1,18 +1,36 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { CATEGORIES, CATEGORY_GROUPS } from '@/data/categories'
 import styles from './CategoriesFullPage.module.css'
 
 export default function CategoriesFullPage() {
   const { categoryId } = useParams()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedGroup, setSelectedGroup] = useState(categoryId || 'all')
+  const [categories, setCategories] = useState([])
+  const [groups, setGroups] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await fetch('/api/categories')
+        const data = await res.json()
+        setCategories(data.categories || [])
+        setGroups(data.groups || [])
+      } catch (err) {
+        console.error('Failed to fetch categories:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchCategories()
+  }, [])
 
   const filteredCategories = useMemo(() => {
-    let list = CATEGORIES
+    let list = categories
 
     if (selectedGroup !== 'all') {
-      list = list.filter((cat) => cat.group === selectedGroup)
+      list = list.filter((cat) => cat.group_id === selectedGroup)
     }
 
     if (searchQuery.trim()) {
@@ -22,14 +40,14 @@ export default function CategoriesFullPage() {
           cat.name.toLowerCase().includes(q) ||
           (cat.tagline && cat.tagline.toLowerCase().includes(q))
         const matchesSubcategory =
-          cat.subcategories &&
-          cat.subcategories.some((sub) => sub.name.toLowerCase().includes(q))
+          cat.sub_categories &&
+          cat.sub_categories.some((sub) => sub.name.toLowerCase().includes(q))
         return matchesCategory || matchesSubcategory
       })
     }
 
     return list
-  }, [selectedGroup, searchQuery])
+  }, [selectedGroup, searchQuery, categories])
 
   return (
     <div className={styles.page}>
@@ -98,10 +116,10 @@ export default function CategoriesFullPage() {
               onClick={() => setSelectedGroup('all')}
               className={`${styles.filterChip} ${selectedGroup === 'all' ? styles.filterChipActive : ''}`}
             >
-              All Categories ({CATEGORIES.length})
+              All Categories ({categories.length})
             </button>
-            {CATEGORY_GROUPS.map((group) => {
-              const count = CATEGORIES.filter((c) => c.group === group.id).length
+            {groups.map((group) => {
+              const count = categories.filter((c) => c.group_id === group.id).length
               if (count === 0) return null
               return (
                 <button
@@ -122,7 +140,12 @@ export default function CategoriesFullPage() {
       {/* ── Category Cards Grid ────────────────────────────────── */}
       <main className={styles.mainContent}>
         <div className={styles.container}>
-          {filteredCategories.length === 0 ? (
+          {loading ? (
+            <div className={styles.noResults}>
+              <span className={styles.noResultsIcon}>⏳</span>
+              <h3>Loading categories...</h3>
+            </div>
+          ) : filteredCategories.length === 0 ? (
             <div className={styles.noResults}>
               <span className={styles.noResultsIcon}>🔍</span>
               <h3>No categories found</h3>
@@ -141,7 +164,7 @@ export default function CategoriesFullPage() {
           ) : (
             <div className={styles.grid}>
               {filteredCategories.map((cat) => {
-                const topSubcategories = cat.subcategories ? cat.subcategories.slice(0, 5) : []
+                const topSubcategories = cat.sub_categories ? cat.sub_categories.slice(0, 5) : []
 
                 return (
                   <div key={cat.id} className={styles.card}>
@@ -158,7 +181,7 @@ export default function CategoriesFullPage() {
 
                       <div className={styles.cardImageWrap}>
                         <img
-                          src={cat.image}
+                          src={cat.image_url}
                           alt={cat.name}
                           className={styles.cardImage}
                           loading="lazy"

@@ -125,6 +125,9 @@ export default async function handler(req, res) {
           shop_id,
           shopAddress,
           phoneNumber,
+          businessEmail,
+          businessCategory,
+          businessSubcategory,
         } = body
 
         const dealTitle = (dealHeadline || title || shopName || 'Business Listing').trim()
@@ -163,15 +166,29 @@ export default async function handler(req, res) {
           if (business) businessId = business.id
         }
 
+        // Look up category_id if businessCategory slug provided
+        let categoryId = null
+        if (businessCategory) {
+          const { data: cat } = await supabaseAdmin
+            .from('categories')
+            .select('id')
+            .eq('slug', businessCategory)
+            .maybeSingle()
+          if (cat) categoryId = cat.id
+        }
+
         if (!businessId && shopName && owner) {
           const { data: newB } = await supabaseAdmin
             .from('businesses')
             .insert({
               owner_id: owner.id,
+              category_id: categoryId,
+              subcategory_id: businessSubcategory || null,
               shop_name: shopName,
               shop_address: shopAddress || null,
               enquiry_number: phoneNumber || null,
               shop_image_url: imageUrl || image_url || null,
+              shop_description: description || null,
             })
             .select()
             .single()

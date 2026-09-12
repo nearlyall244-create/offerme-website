@@ -1,10 +1,28 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { CATEGORY_GROUPS, getCategoriesByGroup } from '@/data/categories'
 import styles from './CategoryMegaMenu.module.css'
 
 export default function CategoryMegaMenu({ onClose }) {
   const menuRef = useRef(null)
+  const [categories, setCategories] = useState([])
+  const [groups, setGroups] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch('/api/categories')
+        const data = await res.json()
+        setCategories(data.categories)
+        setGroups(data.groups)
+      } catch (err) {
+        console.error('Failed to fetch categories:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchCategories()
+  }, [])
 
   useEffect(() => {
     const handleEscape = (e) => {
@@ -34,9 +52,12 @@ export default function CategoryMegaMenu({ onClose }) {
           </button>
         </div>
 
+        {loading ? (
+          <div className={styles.loading}>Loading categories...</div>
+        ) : (
         <div className={styles.columnsGrid}>
-          {CATEGORY_GROUPS.map((group) => {
-            const groupCategories = getCategoriesByGroup(group.id)
+          {groups.map((group) => {
+            const groupCategories = categories.filter(c => c.group_id === group.id)
             if (groupCategories.length === 0) return null
 
             return (
@@ -57,9 +78,9 @@ export default function CategoryMegaMenu({ onClose }) {
                       {cat.name}
                     </Link>
 
-                    {cat.subcategories.length > 0 && (
+                    {cat.sub_categories.length > 0 && (
                       <div className={styles.subList}>
-                        {cat.subcategories.map((sub) => (
+                        {cat.sub_categories.map((sub) => (
                           <Link
                             key={sub.id}
                             to={`/category/${cat.slug}/${sub.slug}`}
@@ -77,6 +98,7 @@ export default function CategoryMegaMenu({ onClose }) {
             )
           })}
         </div>
+        )}
 
         <div className={styles.menuFooter}>
           <Link
