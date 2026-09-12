@@ -1,0 +1,52 @@
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 999px;
+  text-transform: capitalize;
+}
+
+.active {
+  color: #15803d;
+  background: #dcfce7;
+}
+
+.pending {
+  color: #a16207;
+  background: #fef9c3;
+}
+
+.approved {
+  color: #15803d;
+  background: #dcfce7;
+}
+
+.rejected {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.suspended {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+/* Dark mode */
+:global(html.dark) .badge {
+  color: var(--color-text);
+}
+
+:global(html.dark) .active,
+:global(html.dark) .approved {
+  background: #14532d;
+}
+
+:global(html.dark) .pending {
+  background: #713f12;
+}
+
+:global(html.dark) .rejected,
+:global(html.dark) .suspended {
+  background: #7f1d1d;
+}

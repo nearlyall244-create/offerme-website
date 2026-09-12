@@ -1,0 +1,114 @@
+.section {
+  padding: 2rem 0 3rem;
+}
+
+.row {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 0.75rem 0;
+}
+
+.row::-webkit-scrollbar {
+  display: none;
+}
+
+.track {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  width: max-content;
+  padding: 0 1.5rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 88px;
+  flex-shrink: 0;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+.iconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 1.125rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  font-size: 1.875rem;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.card:hover .iconWrap {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  transform: scale(1.05);
+}
+
+.icon {
+  line-height: 1;
+}
+
+.name {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #475569;
+  text-align: center;
+  line-height: 1.25;
+  max-width: 88px;
+  word-break: break-word;
+}
+
+/* ── Popular Categories Button ─────────────────────── */
+.allCard {
+  opacity: 1;
+}
+
+.allCard:hover {
+  transform: translateY(-3px);
+}
+
+.allIconWrap {
+  background: #f1f5f9;
+  border-color: #d1d5db;
+  color: #3b82f6;
+}
+
+.allCard:hover .allIconWrap {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+/* ── Responsive ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  .section {
+    padding: 1.5rem 0 2rem;
+  }
+
+  .card {
+    width: 80px;
+  }
+
+  .iconWrap {
+    width: 64px;
+    height: 64px;
+    font-size: 1.625rem;
+  }
+
+  .name {
+    font-size: 0.625rem;
+    max-width: 80px;
+  }
+}

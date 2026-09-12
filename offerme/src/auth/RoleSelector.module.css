@@ -1,0 +1,114 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+}
+
+.card {
+  width: 100%;
+  max-width: 600px;
+  padding: 2.5rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+
+.title {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--color-text);
+}
+
+.subtitle {
+  margin: 0 0 2rem;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.roles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.roleCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 1rem;
+  border: 2px solid var(--color-border);
+  border-radius: 0.75rem;
+  text-decoration: none;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+  text-align: center;
+}
+
+.roleCard:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--color-primary) 12%, transparent);
+  transform: translateY(-2px);
+}
+
+.roleIcon {
+  font-size: 2.5rem;
+}
+
+.roleName {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.roleDesc {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+.roleBtn {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: 0.375rem;
+  transition: background 0.15s, color 0.15s;
+}
+
+.roleCard:hover .roleBtn {
+  background: var(--color-primary);
+  color: white;
+}
+
+.loginText {
+  margin: 1.5rem 0 0;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.loginLink {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.loginLink:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .roles {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,50 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: clip;
+}
+
+.desktopNav {
+  display: contents; /* rendered inline on desktop, hidden by media query */
+}
+
+.desktopSidebar {
+  display: contents; /* rendered inline on desktop, hidden by media query */
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  overflow: clip;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 1.5rem;
+  background: var(--color-surface-alt);
+  box-sizing: border-box;
+  isolation: isolate;
+}
+
+@media (max-width: 768px) {
+  .desktopNav {
+    display: none;
+  }
+
+  .desktopSidebar {
+    display: none;
+  }
+
+  .body {
+    flex-direction: column;
+    overflow: visible;
+  }
+
+  .main {
+    padding: 1rem;
+    padding-bottom: 2rem;
+  }
+}

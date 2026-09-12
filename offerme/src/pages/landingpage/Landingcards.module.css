@@ -1,0 +1,333 @@
+/* ── Landing Cards Section ─────────────────────────────────────── */
+
+.landingCards {
+  width: 100%;
+  padding: 4rem 0;
+  background: var(--color-warm-bg);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* ── Shop Watermark (right side, faint) ───────────────────────── */
+
+.watermark {
+  position: absolute;
+  right: -2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 380px;
+  height: 380px;
+  color: rgba(253, 186, 102, 0.18);
+  pointer-events: none;
+  z-index: 0;
+}
+
+:global(html.dark) .watermark {
+  color: rgba(253, 186, 102, 0.06);
+}
+
+.watermarkSvg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Container (text left, gallery right) ─────────────────────── */
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 3rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  position: relative;
+  z-index: 1;
+  transform-style: flat;
+}
+
+/* ── Text Content (left) ──────────────────────────────────────── */
+
+.textContent {
+  flex: 1;
+  min-width: 0;
+  max-width: 520px;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1rem;
+  background: #f97316;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  border-radius: 2rem;
+  margin-bottom: 1.25rem;
+}
+
+.badgeIcon {
+  font-size: 0.875rem;
+}
+
+.heading {
+  font-size: 1.875rem;
+  font-weight: 600;
+  color: var(--color-text-heading);
+  margin: 0 0 1rem;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+
+.headingAccent {
+  color: #f97316;
+}
+
+.description {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: 1.625;
+}
+
+/* ── Gallery Wrap (right) ─────────────────────────────────────── */
+
+.galleryWrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── 3D Stage ─────────────────────────────────────────────────── */
+
+.stage {
+  width: 100%;
+  height: 340px;
+  perspective: 1200px;
+  perspective-origin: 50% 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+
+.stage:active {
+  cursor: grabbing;
+}
+
+/* ── Ring (rotating container) ────────────────────────────────── */
+
+.ring {
+  position: relative;
+  width: 100px;
+  height: 200px;
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: none;
+}
+
+/* ── Individual Card ──────────────────────────────────────────── */
+
+.card {
+  position: absolute;
+  width: 180px;
+  height: 240px;
+  left: -90px;
+  top: -20px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: var(--color-surface);
+  box-shadow:
+    0 8px 24px -4px rgba(0, 0, 0, 0.1),
+    0 2px 8px -2px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow:
+    0 12px 32px -4px rgba(249, 115, 22, 0.2),
+    0 4px 12px -2px rgba(0, 0, 0, 0.08);
+}
+
+.cardImage {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+  display: block;
+}
+
+.cardLabel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-heading);
+  padding: 0 0.75rem;
+  text-align: center;
+  background: var(--color-surface);
+}
+
+/* ── Responsive ────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .container {
+    padding: 0 2rem;
+  }
+
+  .heading {
+    font-size: 1.75rem;
+  }
+
+  .description {
+    font-size: 0.9375rem;
+  }
+
+  .stage {
+    height: 300px;
+    perspective: 1000px;
+  }
+
+  .card {
+    width: 160px;
+    height: 215px;
+    left: -80px;
+    top: -10px;
+  }
+
+  .cardImage {
+    height: 145px;
+  }
+
+  .watermark {
+    width: 300px;
+    height: 300px;
+    right: -3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .landingCards {
+    padding: 3rem 0;
+  }
+
+  .container {
+    flex-direction: column;
+    padding: 0 1.5rem;
+    gap: 2rem;
+  }
+
+  .textContent {
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .badge {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .heading {
+    font-size: 1.625rem;
+  }
+
+  .description {
+    font-size: 0.9rem;
+  }
+
+  .galleryWrap {
+    width: 100%;
+  }
+
+  .stage {
+    height: 240px;
+    perspective: 800px;
+  }
+
+  .card {
+    width: 140px;
+    height: 190px;
+    left: -70px;
+    top: -5px;
+  }
+
+  .cardImage {
+    height: 125px;
+  }
+
+  .cardLabel {
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+
+  .watermark {
+    width: 220px;
+    height: 220px;
+    right: -4rem;
+    opacity: 0.6;
+  }
+}
+
+@media (max-width: 480px) {
+  .landingCards {
+    padding: 2.5rem 0;
+  }
+
+  .container {
+    padding: 0 1rem;
+  }
+
+  .heading {
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .description {
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  .stage {
+    height: 210px;
+    perspective: 600px;
+  }
+
+  .card {
+    width: 120px;
+    height: 165px;
+    left: -60px;
+    top: 0;
+  }
+
+  .cardImage {
+    height: 105px;
+  }
+
+  .cardLabel {
+    font-size: 0.75rem;
+    padding: 0 0.5rem;
+  }
+
+  .watermark {
+    width: 160px;
+    height: 160px;
+    right: -5rem;
+    opacity: 0.4;
+  }
+}
