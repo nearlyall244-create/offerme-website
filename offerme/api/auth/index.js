@@ -22,9 +22,11 @@ export default async function handler(req, res) {
 
       if (email && ADMIN_EMAILS.includes(email)) {
         const { data: adminRecord } = await supabaseAdmin
-          .from('admin_log')
+          .from('admin_logs')
           .select('name')
-          .eq('firebase_uid', uid)
+          .eq('admin_uid', uid)
+          .order('created_at', { ascending: false })
+          .limit(1)
           .maybeSingle()
 
         const adminName = adminRecord?.name || email.split('@')[0]
@@ -134,29 +136,32 @@ export default async function handler(req, res) {
 
       if (isAdmin) {
         const { data: existingAdmin } = await supabaseAdmin
-          .from('admin_log')
+          .from('admin_logs')
           .select('id')
-          .eq('firebase_uid', uid)
+          .eq('admin_uid', uid)
+          .eq('action', 'profile_update')
+          .order('created_at', { ascending: false })
+          .limit(1)
           .maybeSingle()
 
         if (existingAdmin) {
           const { data: updated, error: updErr } = await supabaseAdmin
-            .from('admin_log')
+            .from('admin_logs')
             .update({ name: trimmedName })
             .eq('id', existingAdmin.id)
             .select()
             .single()
           if (updErr) return res.status(500).json({ error: updErr.message })
-          return res.status(200).json({ success: true, profile: updated })
+          return res.status(200).json({ success: true, profile: { firebase_uid: uid, email, name: trimmedName } })
         }
 
         const { data: newAdmin, error: insErr } = await supabaseAdmin
-          .from('admin_log')
-          .insert({ firebase_uid: uid, name: trimmedName, email })
+          .from('admin_logs')
+          .insert({ admin_uid: uid, action: 'profile_update', name: trimmedName, email })
           .select()
           .single()
         if (insErr) return res.status(500).json({ error: insErr.message })
-        return res.status(200).json({ success: true, profile: newAdmin })
+        return res.status(200).json({ success: true, profile: { firebase_uid: uid, email, name: trimmedName } })
       }
 
       return res.status(404).json({ error: 'User profile not found' })
