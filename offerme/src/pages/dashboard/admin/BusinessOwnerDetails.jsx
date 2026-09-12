@@ -1,15 +1,40 @@
-import { useState, useMemo } from 'react'
-import { getAllOwners, getAllSubmissions, updateOwnerStatus } from '@/data/mockSubmissions'
+import { useState, useEffect, useMemo } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
 import { formatDate, formatDateTime } from '@/utils/date'
 import StatusBadge from '@/components/shared/StatusBadge'
 import styles from './BusinessOwnerDetails.module.css'
 
 export default function BusinessOwnerDetails() {
-  const [owners, setOwners] = useState(() => getAllOwners())
-  const [submissions] = useState(() => getAllSubmissions())
+  const { user } = useAuth()
+  const [owners, setOwners] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [selectedOwner, setSelectedOwner] = useState(null)
+
+  useEffect(() => {
+    fetchOwners()
+  }, [])
+
+  const fetchOwners = async () => {
+    if (!user) return
+    try {
+      setLoading(true)
+      setError(null)
+      const token = await user.getIdToken()
+      const res = await fetch('/api/admin?type=owners', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+      setOwners(data.owners || [])
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const filtered = useMemo(() => {
     let result = [...owners]
@@ -18,32 +43,40 @@ export default function BusinessOwnerDetails() {
       const q = searchQuery.toLowerCase()
       result = result.filter(
         (o) =>
-          `${o.firstName} ${o.lastName}`.toLowerCase().includes(q) ||
-          o.email.toLowerCase().includes(q) ||
-          o.phone.includes(q)
+          (o.owner_name || '').toLowerCase().includes(q) ||
+          (o.email || '').toLowerCase().includes(q) ||
+          (o.phone || '').includes(q)
       )
     }
 
     if (statusFilter !== 'all') {
-      result = result.filter((o) => o.accountStatus === statusFilter)
+      result = result.filter((o) => o.account_status === statusFilter)
     }
 
-    return result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    return result.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
   }, [owners, searchQuery, statusFilter])
 
-  const getOwnerSubmissions = (ownerId) => {
-    return submissions.filter((s) => s.ownerId === ownerId)
-  }
-
-  const handleStatusChange = (ownerId, newStatus) => {
-    updateOwnerStatus(ownerId, newStatus)
-    setOwners((prev) => prev.map((o) => (o.id === ownerId ? { ...o, accountStatus: newStatus, updatedAt: new Date().toISOString() } : o)))
-    if (selectedOwner?.id === ownerId) {
-      setSelectedOwner((prev) => ({ ...prev, accountStatus: newStatus }))
+  const handleStatusChange = async (ownerId, newStatus) => {
+    try {
+      const token = await user.getIdToken()
+      const res = await fetch('/api/admin', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ owner_id: ownerId, account_status: newStatus })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+      setOwners((prev) => prev.map((o) => (o.id === ownerId ? { ...o, account_status: newStatus } : o)))
+      if (selectedOwner?.id === ownerId) {
+        setSelectedOwner((prev) => ({ ...prev, account_status: newStatus }))
+      }
+    } catch (err) {
+      alert('Failed to update status: ' + err.message)
     }
   }
-
-  const selectedSubmissions = selectedOwner ? getOwnerSubmissions(selectedOwner.id) : []
 
   return (
     <div className={styles.page}>
@@ -85,11 +118,11 @@ export default function BusinessOwnerDetails() {
             <tbody>
               {filtered.map((owner) => (
                 <tr key={owner.id} className={selectedOwner?.id === owner.id ? styles.rowActive : ''}>
-                  <td className={styles.ownerName}>{owner.firstName} {owner.lastName}</td>
+                  <td className={styles.ownerName}>{owner.owner_name}</td>
                   <td>{owner.email}</td>
                   <td>{owner.phone}</td>
-                  <td><StatusBadge status={owner.accountStatus} /></td>
-                  <td>{formatDate(owner.createdAt)}</td>
+                  <td><StatusBadge status={owner.account_status} /></td>
+                  <td>{formatDate(owner.created_at)}</td>
                   <td>
                     <button className={styles.viewBtn} onClick={() => setSelectedOwner(owner)}>
                       View
@@ -97,9 +130,11 @@ export default function BusinessOwnerDetails() {
                   </td>
                 </tr>
               ))}
-              {filtered.length === 0 && (
+              {filtered.length === 0 && !loading && (
                 <tr>
-                  <td colSpan={6} className={styles.emptyCell}>No owners found.</td>
+                  <td colSpan={6} className={styles.emptyCell}>
+                    {error ? `Error: ${error}` : 'No owners found.'}
+                  </td>
                 </tr>
               )}
             </tbody>
@@ -119,7 +154,7 @@ export default function BusinessOwnerDetails() {
                 <div className={styles.fieldGroup}>
                   <div className={styles.field}>
                     <span className={styles.fieldLabel}>Full Name</span>
-                    <span className={styles.fieldValue}>{selectedOwner.firstName} {selectedOwner.lastName}</span>
+                    <span className={styles.fieldValue}>{selectedOwner.owner_name}</span>
                   </div>
                   <div className={styles.field}>
                     <span className={styles.fieldLabel}>Email</span>
@@ -134,21 +169,7 @@ export default function BusinessOwnerDetails() {
 
               <section className={styles.section}>
                 <h3 className={styles.sectionTitle}>Business Submissions</h3>
-                {selectedSubmissions.length > 0 ? (
-                  <div className={styles.submissionList}>
-                    {selectedSubmissions.map((sub) => (
-                      <div key={sub.id} className={styles.submissionItem}>
-                        <div className={styles.submissionInfo}>
-                          <span className={styles.submissionName}>{sub.businessName}</span>
-                          <span className={styles.submissionCategory}>{sub.category.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}</span>
-                        </div>
-                        <StatusBadge status={sub.status} />
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className={styles.noSubmissions}>No submissions yet.</p>
-                )}
+                <p className={styles.noSubmissions}>Submissions will appear here once businesses are added.</p>
               </section>
 
               <section className={styles.section}>
@@ -160,7 +181,7 @@ export default function BusinessOwnerDetails() {
                       {['active', 'pending', 'suspended'].map((s) => (
                         <button
                           key={s}
-                          className={`${styles.statusBtn} ${selectedOwner.accountStatus === s ? styles.statusBtnActive : ''} ${styles[s]}`}
+                          className={`${styles.statusBtn} ${selectedOwner.account_status === s ? styles.statusBtnActive : ''} ${styles[s]}`}
                           onClick={() => handleStatusChange(selectedOwner.id, s)}
                         >
                           {s.charAt(0).toUpperCase() + s.slice(1)}
@@ -170,15 +191,11 @@ export default function BusinessOwnerDetails() {
                   </div>
                   <div className={styles.field}>
                     <span className={styles.fieldLabel}>Created Date</span>
-                    <span className={styles.fieldValue}>{formatDateTime(selectedOwner.createdAt)}</span>
+                    <span className={styles.fieldValue}>{formatDateTime(selectedOwner.created_at)}</span>
                   </div>
                   <div className={styles.field}>
-                    <span className={styles.fieldLabel}>Updated Date</span>
-                    <span className={styles.fieldValue}>{formatDateTime(selectedOwner.updatedAt)}</span>
-                  </div>
-                  <div className={styles.field}>
-                    <span className={styles.fieldLabel}>Last Login</span>
-                    <span className={styles.fieldValue}>{formatDateTime(selectedOwner.lastLogin)}</span>
+                    <span className={styles.fieldLabel}>Firebase UID</span>
+                    <span className={styles.fieldValue} style={{ fontSize: '0.75rem', wordBreak: 'break-all' }}>{selectedOwner.firebase_uid}</span>
                   </div>
                 </div>
               </section>

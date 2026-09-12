@@ -21,6 +21,25 @@ export default async function handler(req, res) {
       const { type, status, page = 1, limit = 20 } = req.query
       const offset = (page - 1) * limit
 
+      if (type === 'owners') {
+        const { data, count, error } = await supabaseAdmin
+          .from('business_owners')
+          .select('*', { count: 'exact' })
+          .order('created_at', { ascending: false })
+          .range(offset, offset + limit - 1)
+
+        if (error) {
+          return res.status(500).json({ error: error.message })
+        }
+
+        return res.status(200).json({
+          owners: data,
+          total: count,
+          page: Number(page),
+          limit: Number(limit),
+        })
+      }
+
       if (type === 'shops') {
         let query = supabaseAdmin
           .from('businesses')
@@ -78,11 +97,35 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'type=shops or type=offers is required' })
     }
 
-    // ── PUT → admin toggles business active/inactive ──
+    // ── PUT → admin toggles business active/inactive OR update owner status ──
     if (req.method === 'PUT') {
-      const { shop_id } = req.body
+      const { shop_id, owner_id, account_status } = req.body
+
+      if (owner_id && account_status) {
+        const { data, error } = await supabaseAdmin
+          .from('business_owners')
+          .update({ account_status })
+          .eq('id', owner_id)
+          .select()
+          .single()
+
+        if (error) {
+          return res.status(500).json({ error: error.message })
+        }
+
+        await supabaseAdmin.from('admin_logs').insert({
+          admin_uid: decodedToken.uid,
+          action: 'update_owner_status',
+          target_type: 'business_owner',
+          target_id: String(owner_id),
+          details: { account_status },
+        })
+
+        return res.status(200).json({ message: 'Owner status updated', owner: data })
+      }
+
       if (!shop_id) {
-        return res.status(400).json({ error: 'shop_id is required' })
+        return res.status(400).json({ error: 'shop_id or owner_id is required' })
       }
 
       const { data: business, error: fetchError } = await supabaseAdmin

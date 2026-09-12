@@ -1,18 +1,45 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { getAllSubmissions, getSubmissionsByStatus } from '@/data/mockSubmissions'
+import { useAuth } from '@/contexts/AuthContext'
 import { formatDate } from '@/utils/date'
 import StatusBadge from '@/components/shared/StatusBadge'
 import styles from './AdminDashboardHome.module.css'
 
 export default function AdminDashboardHome() {
-  const submissions = getAllSubmissions()
-  const pendingCount = getSubmissionsByStatus('pending').length
-  const approvedCount = getSubmissionsByStatus('approved').length
-  const rejectedCount = getSubmissionsByStatus('rejected').length
+  const { user } = useAuth()
+  const [owners, setOwners] = useState([])
+  const [shops, setShops] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  const recentSubmissions = [...submissions]
-    .sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt))
-    .slice(0, 5)
+  useEffect(() => {
+    if (!user) return
+    const fetchData = async () => {
+      try {
+        const token = await user.getIdToken()
+        const headers = { Authorization: `Bearer ${token}` }
+
+        const [ownersRes, shopsRes] = await Promise.all([
+          fetch('/api/admin?type=owners', { headers }),
+          fetch('/api/admin?type=shops', { headers }),
+        ])
+
+        const ownersData = await ownersRes.json()
+        const shopsData = await shopsRes.json()
+
+        if (ownersRes.ok) setOwners(ownersData.owners || [])
+        if (shopsRes.ok) setShops(shopsData.shops || [])
+      } catch (err) {
+        console.error('Failed to fetch dashboard data:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [user])
+
+  const pendingCount = shops.filter((s) => s.status === 'pending').length
+  const approvedCount = shops.filter((s) => s.status === 'approved' || s.is_active).length
+  const rejectedCount = shops.filter((s) => s.status === 'rejected').length
 
   return (
     <div className={styles.page}>
@@ -22,35 +49,35 @@ export default function AdminDashboardHome() {
         <Link to="/admin/dashboard/submissions" className={`${styles.statCard} ${styles.pendingCard}`}>
           <span className={styles.statIcon}>⏳</span>
           <div className={styles.statInfo}>
-            <span className={styles.statValue}>{pendingCount}</span>
+            <span className={styles.statValue}>{loading ? '—' : pendingCount}</span>
             <span className={styles.statLabel}>Pending</span>
           </div>
         </Link>
         <Link to="/admin/dashboard/submissions" className={`${styles.statCard} ${styles.approvedCard}`}>
           <span className={styles.statIcon}>✅</span>
           <div className={styles.statInfo}>
-            <span className={styles.statValue}>{approvedCount}</span>
+            <span className={styles.statValue}>{loading ? '—' : approvedCount}</span>
             <span className={styles.statLabel}>Approved</span>
           </div>
         </Link>
         <Link to="/admin/dashboard/submissions" className={`${styles.statCard} ${styles.rejectedCard}`}>
           <span className={styles.statIcon}>❌</span>
           <div className={styles.statInfo}>
-            <span className={styles.statValue}>{rejectedCount}</span>
+            <span className={styles.statValue}>{loading ? '—' : rejectedCount}</span>
             <span className={styles.statLabel}>Rejected</span>
           </div>
         </Link>
         <Link to="/admin/dashboard/owners" className={`${styles.statCard} ${styles.totalCard}`}>
           <span className={styles.statIcon}>👤</span>
           <div className={styles.statInfo}>
-            <span className={styles.statValue}>{submissions.length}</span>
-            <span className={styles.statLabel}>Total Submissions</span>
+            <span className={styles.statValue}>{loading ? '—' : owners.length}</span>
+            <span className={styles.statLabel}>Business Owners</span>
           </div>
         </Link>
       </div>
 
       <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>Recent Submissions</h2>
+        <h2 className={styles.sectionTitle}>Recent Shops</h2>
         <Link to="/admin/dashboard/submissions" className={styles.viewAll}>View All →</Link>
       </div>
 
@@ -58,23 +85,27 @@ export default function AdminDashboardHome() {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Business Name</th>
-              <th>Category</th>
+              <th>Shop Name</th>
               <th>Owner</th>
-              <th>Submitted</th>
               <th>Status</th>
+              <th>Created</th>
             </tr>
           </thead>
           <tbody>
-            {recentSubmissions.map((sub) => (
-              <tr key={sub.id}>
-                <td className={styles.businessName}>{sub.businessName}</td>
-                <td>{sub.category.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}</td>
-                <td>{sub.ownerName}</td>
-                <td>{formatDate(sub.submittedAt)}</td>
-                <td><StatusBadge status={sub.status} /></td>
-              </tr>
-            ))}
+            {loading ? (
+              <tr><td colSpan={4} className={styles.emptyCell}>Loading...</td></tr>
+            ) : shops.length === 0 ? (
+              <tr><td colSpan={4} className={styles.emptyCell}>No shops yet.</td></tr>
+            ) : (
+              shops.slice(0, 5).map((shop) => (
+                <tr key={shop.id}>
+                  <td className={styles.businessName}>{shop.shop_name}</td>
+                  <td>{shop.business_owners?.owner_name || '—'}</td>
+                  <td><StatusBadge status={shop.is_active ? 'active' : 'pending'} /></td>
+                  <td>{formatDate(shop.created_at)}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
