@@ -21,7 +21,14 @@ export default async function handler(req, res) {
       const ADMIN_EMAILS = ['nearlyall244@gmail.com', 'delivery.adbricks@gmail.com']
 
       if (email && ADMIN_EMAILS.includes(email)) {
-        return res.status(200).json({ role: 'admin', profile: { firebase_uid: uid, email, name: email.split('@')[0] } })
+        const { data: adminRecord } = await supabaseAdmin
+          .from('admin_log')
+          .select('name')
+          .eq('firebase_uid', uid)
+          .maybeSingle()
+
+        const adminName = adminRecord?.name || email.split('@')[0]
+        return res.status(200).json({ role: 'admin', profile: { firebase_uid: uid, email, name: adminName } })
       }
 
       const { data: customer } = await supabaseAdmin
@@ -127,15 +134,15 @@ export default async function handler(req, res) {
 
       if (isAdmin) {
         const { data: existingAdmin } = await supabaseAdmin
-          .from('public_users')
+          .from('admin_log')
           .select('id')
           .eq('firebase_uid', uid)
           .maybeSingle()
 
         if (existingAdmin) {
           const { data: updated, error: updErr } = await supabaseAdmin
-            .from('public_users')
-            .update({ name: trimmedName, updated_at: new Date().toISOString() })
+            .from('admin_log')
+            .update({ name: trimmedName })
             .eq('id', existingAdmin.id)
             .select()
             .single()
@@ -144,7 +151,7 @@ export default async function handler(req, res) {
         }
 
         const { data: newAdmin, error: insErr } = await supabaseAdmin
-          .from('public_users')
+          .from('admin_log')
           .insert({ firebase_uid: uid, name: trimmedName, email })
           .select()
           .single()
