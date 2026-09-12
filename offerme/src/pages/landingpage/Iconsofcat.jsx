@@ -1,62 +1,91 @@
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import styles from './Iconsofcat.module.css'
 import { CATEGORIES } from '@/data/categories'
 
-export default function Iconsofcat({ onSelect }) {
-  const scrollRef = useRef(null)
+const SPEED = 0.5
 
-  const scroll = (direction) => {
-    if (!scrollRef.current) return
-    const amount = 200
-    scrollRef.current.scrollBy({
-      left: direction === 'left' ? -amount : amount,
-      behavior: 'smooth',
-    })
+export default function Iconsofcat() {
+  const navigate = useNavigate()
+  const scrollRef = useRef(null)
+  const isPaused = useRef(false)
+  const animRef = useRef(null)
+  const scrollPos = useRef(0)
+
+  useEffect(() => {
+    function autoScroll() {
+      if (!scrollRef.current || isPaused.current) {
+        animRef.current = requestAnimationFrame(autoScroll)
+        return
+      }
+
+      const el = scrollRef.current
+      scrollPos.current += SPEED
+
+      if (scrollPos.current >= el.scrollWidth - el.clientWidth) {
+        scrollPos.current = 0
+        el.scrollLeft = 0
+      } else {
+        el.scrollLeft = scrollPos.current
+      }
+
+      animRef.current = requestAnimationFrame(autoScroll)
+    }
+
+    animRef.current = requestAnimationFrame(autoScroll)
+    return () => {
+      if (animRef.current) cancelAnimationFrame(animRef.current)
+    }
+  }, [])
+
+  const handleMouseEnter = () => {
+    isPaused.current = true
+    if (scrollRef.current) {
+      scrollPos.current = scrollRef.current.scrollLeft
+    }
+  }
+
+  const handleMouseLeave = () => {
+    isPaused.current = false
+  }
+
+  const handleClick = (cat) => {
+    navigate(`/category/${cat.slug}`)
   }
 
   return (
     <section className={styles.section}>
-      <div className={styles.wrapper}>
-        <button
-          className={`${styles.arrow} ${styles.arrowLeft}`}
-          onClick={() => scroll('left')}
-          aria-label="Scroll left"
-        >
-          ‹
-        </button>
-
-        <div className={styles.scrollContainer} ref={scrollRef}>
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              className={styles.categoryItem}
-              onClick={() => onSelect?.(cat)}
-            >
-              <span className={styles.iconCircle}>
-                <span className={styles.icon}>{cat.icon}</span>
-              </span>
-              <span className={styles.label}>{cat.name}</span>
-            </button>
-          ))}
-
-          <button className={styles.categoryItem} onClick={() => onSelect?.(null)}>
-            <span className={`${styles.iconCircle} ${styles.popularCircle}`}>
-              <span className={styles.popularIcon}>
-                <span></span>
-                <span></span>
-                <span></span>
-              </span>
+      <div
+        className={styles.scrollContainer}
+        ref={scrollRef}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        {CATEGORIES.map((cat) => (
+          <button
+            key={cat.id}
+            className={styles.categoryItem}
+            onClick={() => handleClick(cat)}
+          >
+            <span className={styles.iconCircle}>
+              <span className={styles.icon}>{cat.icon}</span>
             </span>
-            <span className={styles.label}>Popular Categories</span>
+            <span className={styles.label}>{cat.name}</span>
           </button>
-        </div>
+        ))}
 
         <button
-          className={`${styles.arrow} ${styles.arrowRight}`}
-          onClick={() => scroll('right')}
-          aria-label="Scroll right"
+          className={styles.categoryItem}
+          onClick={() => navigate('/categories')}
         >
-          ›
+          <span className={`${styles.iconCircle} ${styles.popularCircle}`}>
+            <span className={styles.popularIcon}>
+              <span></span>
+              <span></span>
+              <span></span>
+            </span>
+          </span>
+          <span className={styles.label}>Popular Categories</span>
         </button>
       </div>
     </section>

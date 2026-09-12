@@ -5,26 +5,15 @@
   padding: 1rem 0 2rem;
 }
 
-/* ── Wrapper with arrows ──────────────────────────────────────── */
-
-.wrapper {
-  position: relative;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 3rem;
-}
-
 /* ── Scroll Container ────────────────────────────────────────── */
 
 .scrollContainer {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1rem 0.5rem;
   display: flex;
   gap: 0.75rem;
   overflow-x: auto;
-  scroll-behavior: smooth;
-  padding: 1rem 0.5rem;
-  border: 1.5px solid var(--color-border, #e5e7eb);
-  border-radius: 1rem;
-  background: var(--color-surface, #ffffff);
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -42,7 +31,7 @@
   gap: 0.5rem;
   min-width: 80px;
   padding: 0.75rem 0.5rem;
-  border: none;
+  border: 2px solid transparent;
   border-radius: 0.75rem;
   background: transparent;
   cursor: pointer;
@@ -51,12 +40,12 @@
 }
 
 .categoryItem:hover {
+  border-color: var(--color-orange, #f97316);
   background: var(--color-orange-light, #fff7ed);
-  transform: translateY(-2px);
 }
 
 .categoryItem:active {
-  transform: translateY(0);
+  transform: scale(0.97);
 }
 
 /* ── Icon Circle ─────────────────────────────────────────────── */
@@ -122,54 +111,10 @@
   border-radius: 2px;
 }
 
-/* ── Arrow Buttons ───────────────────────────────────────────── */
-
-.arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1.5px solid var(--color-border, #e5e7eb);
-  background: var(--color-surface, #ffffff);
-  color: var(--color-text, #374151);
-  font-size: 1.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 2;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: all 0.2s ease;
-  line-height: 1;
-  padding-bottom: 2px;
-}
-
-.arrow:hover {
-  background: var(--color-orange, #f97316);
-  color: #ffffff;
-  border-color: var(--color-orange, #f97316);
-  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
-}
-
-.arrowLeft {
-  left: 0.5rem;
-}
-
-.arrowRight {
-  right: 0.5rem;
-}
-
 /* ── Responsive ──────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
-  .wrapper {
-    padding: 0 1rem;
-  }
-
   .scrollContainer {
-    gap: 0.5rem;
     padding: 0.75rem 0.25rem;
   }
 
@@ -190,10 +135,6 @@
   .label {
     font-size: 0.625rem;
     max-width: 68px;
-  }
-
-  .arrow {
-    display: none;
   }
 }
 
