@@ -52,7 +52,7 @@ export default async function handler(req, res) {
         address: shop.shop_address,
         description: shop.shop_description,
         offers: (shop.offers_post || [])
-          .filter(o => o.is_active && o.listing_type === 'offer')
+          .filter(o => o.is_active)
           .map(o => o.title),
         openingTime: shop.opening_time,
         closingTime: shop.closing_time,

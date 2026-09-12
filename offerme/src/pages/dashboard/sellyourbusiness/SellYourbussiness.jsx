@@ -279,7 +279,7 @@ export default function SellYourbussiness({ onSuccess, onCancel }) {
         businessSubcategory: form.subcategory,
         phoneNumber: form.enquiryNumber.trim(),
         shopAddress: form.shopAddress.trim(),
-        description: `Opening: ${form.openingTime} | Closing: ${form.closingTime}`,
+        description: '',
         imageUrl: uploadedImageUrl,
         openingTime: form.openingTime,
         closingTime: form.closingTime,

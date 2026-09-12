@@ -221,6 +221,11 @@ export default function CategoryDetailPage() {
           ) : listings.length > 0 ? (
             listings.map((biz) => (
               <div key={biz.id} className={styles.listingCard}>
+                {biz.image && (
+                  <div className={styles.listingImageWrap}>
+                    <img src={biz.image} alt={biz.name} className={styles.listingImage} />
+                  </div>
+                )}
                 <div className={styles.listingTop}>
                   <h3 className={styles.listingName}>{biz.name}</h3>
                   <span className={`${styles.listingBadge} ${biz.isOpen ? styles.badgeOpen : styles.badgeClosed}`}>

@@ -354,6 +354,11 @@ export default function UserDashboardHome() {
           <div className={styles.grid}>
             {results.map((listing) => (
               <div key={listing.id} className={styles.card}>
+                {listing.image && (
+                  <div className={styles.cardImageWrap}>
+                    <img src={listing.image} alt={listing.name} className={styles.cardImage} />
+                  </div>
+                )}
                 <div className={styles.cardHeader}>
                   <span className={styles.cardCategory}>{listing.category.replace(/-/g, ' ')}</span>
                   {listing.isOpen ? (
