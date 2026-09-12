@@ -2,7 +2,6 @@ import { useState, useMemo, useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Search, X, Star, MapPin, ChevronDown } from 'lucide-react'
-import { getAllListings } from '@/data/mockListings'
 import styles from './HeroSection.module.css'
 
 const LOCATIONS = [
@@ -34,7 +33,14 @@ export default function HeroSection() {
   const locationRef = useRef(null)
   const navigate = useNavigate()
 
-  const allListings = useMemo(() => getAllListings(), [])
+  const [allListings, setAllListings] = useState([])
+
+  useEffect(() => {
+    fetch('/api/shops?limit=100')
+      .then(r => r.json())
+      .then(d => setAllListings(d.shops || []))
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     function handleClickOutside(e) {

@@ -327,7 +327,7 @@ export default async function handler(req, res) {
         if (cat) categoryId = cat.id
       }
 
-      const { data, error } = await supabaseAdmin
+      const { data, error: bizInsertErr } = await supabaseAdmin
         .from('sell_your_bussiness')
         .insert({
           owner_id: ownerId,
@@ -339,8 +339,9 @@ export default async function handler(req, res) {
         .select()
         .single()
 
-      if (error) {
-        return res.status(500).json({ error: `Insert error: ${error.message}` })
+      if (bizInsertErr) {
+        console.error('[auth] sell_your_bussiness insert error:', bizInsertErr)
+        return res.status(500).json({ error: `Insert error: ${bizInsertErr.message}` })
       }
 
       try {

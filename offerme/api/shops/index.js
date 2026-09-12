@@ -1,3 +1,17 @@
+function computeIsOpen(openingTime, closingTime) {
+  if (!openingTime || !closingTime) return false
+  const now = new Date()
+  const [oh, om] = openingTime.split(':').map(Number)
+  const [ch, cm] = closingTime.split(':').map(Number)
+  const currentMinutes = now.getHours() * 60 + now.getMinutes()
+  const openMinutes = oh * 60 + om
+  const closeMinutes = ch * 60 + cm
+  if (closeMinutes < openMinutes) {
+    return currentMinutes >= openMinutes || currentMinutes <= closeMinutes
+  }
+  return currentMinutes >= openMinutes && currentMinutes <= closeMinutes
+}
+
 export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
@@ -8,11 +22,12 @@ export default async function handler(req, res) {
 
       let query = supabaseAdmin
         .from('sell_your_bussiness')
-        .select('*, business_owners(owner_name, email)', { count: 'exact' })
+        .select('*, business_owners(owner_name, email), offers_post(id, title, listing_type, is_active)', { count: 'exact' })
         .eq('is_active', true)
+        .eq('status', 'approved')
 
       if (category) {
-        query = query.eq('categories.slug', category)
+        query = query.eq('category_id', category)
       }
 
       if (search) {
@@ -27,8 +42,26 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: error.message })
       }
 
+      const listings = (data || []).map(shop => ({
+        id: shop.id,
+        name: shop.shop_name,
+        category: shop.category_id,
+        subcategory: shop.subcategory_id,
+        rating: 0,
+        reviewCount: 0,
+        address: shop.shop_address,
+        description: shop.shop_description,
+        offers: (shop.offers_post || [])
+          .filter(o => o.is_active && o.listing_type === 'offer')
+          .map(o => o.title),
+        openingTime: shop.opening_time,
+        closingTime: shop.closing_time,
+        isOpen: computeIsOpen(shop.opening_time, shop.closing_time),
+        image: shop.shop_image_url,
+      }))
+
       return res.status(200).json({
-        shops: data,
+        shops: listings,
         total: count,
         page: Number(page),
         limit: Number(limit),

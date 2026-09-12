@@ -1,7 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { Search, X, SlidersHorizontal, MapPin, Star, Clock, ChevronDown } from 'lucide-react'
-import { getAllListings } from '@/data/mockListings'
-
 import styles from './UserDashboardHome.module.css'
 
 const RECENT_KEY = 'offerme_recent_searches'
@@ -68,7 +66,20 @@ export default function UserDashboardHome() {
     fetchCategories()
   }, [])
 
-  const allListings = useMemo(() => getAllListings(), [])
+  const [allListings, setAllListings] = useState([])
+  const [listingsLoading, setListingsLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchListings() {
+      try {
+        const res = await fetch('/api/shops?limit=100')
+        const data = await res.json()
+        setAllListings(data.shops || [])
+      } catch { /* silent */ }
+      finally { setListingsLoading(false) }
+    }
+    fetchListings()
+  }, [])
 
   // Close suggestions on outside click
   useEffect(() => {
@@ -327,7 +338,13 @@ export default function UserDashboardHome() {
           </p>
         )}
 
-        {results.length === 0 ? (
+        {listingsLoading ? (
+          <div className={styles.emptyState}>
+            <span className={styles.emptyIcon}>⏳</span>
+            <h3 className={styles.emptyTitle}>Loading businesses...</h3>
+            <p className={styles.emptyDesc}>Fetching latest listings</p>
+          </div>
+        ) : results.length === 0 ? (
           <div className={styles.emptyState}>
             <span className={styles.emptyIcon}>🔍</span>
             <h3 className={styles.emptyTitle}>No results found</h3>

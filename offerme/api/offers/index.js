@@ -197,15 +197,19 @@ export default async function handler(req, res) {
           if (openingTime) updateFields.opening_time = openingTime
           if (closingTime) updateFields.closing_time = closingTime
           if (Object.keys(updateFields).length > 0) {
-            await supabaseAdmin
+            const { error: updateErr } = await supabaseAdmin
               .from('sell_your_bussiness')
               .update(updateFields)
               .eq('id', businessId)
+            if (updateErr) {
+              console.error('[offers] sell-business update error:', updateErr)
+              return res.status(500).json({ error: `Failed to update business: ${updateErr.message}` })
+            }
           }
         }
 
         if (!businessId && shopName && owner) {
-          const { data: newB } = await supabaseAdmin
+          const { data: newB, error: insertBizErr } = await supabaseAdmin
             .from('sell_your_bussiness')
             .insert({
               owner_id: owner.id,
@@ -224,6 +228,10 @@ export default async function handler(req, res) {
             })
             .select()
             .single()
+          if (insertBizErr) {
+            console.error('[offers] sell-business insert error:', insertBizErr)
+            return res.status(500).json({ error: `Failed to create business: ${insertBizErr.message}` })
+          }
           if (newB) businessId = newB.id
         }
 

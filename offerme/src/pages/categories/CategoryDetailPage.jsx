@@ -1,6 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { getListingsByCategory } from '@/data/mockListings'
 import Navbar from '@/components/navbar/Navbar'
 import Footer from '@/pages/footer/Footer'
 import styles from './CategoryDetailPage.module.css'
@@ -22,6 +21,8 @@ export default function CategoryDetailPage() {
   const [sortBy, setSortBy] = useState('rating')
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
+  const [rawListings, setRawListings] = useState([])
+  const [listingsLoading, setListingsLoading] = useState(true)
 
   useEffect(() => {
     async function fetchCategories() {
@@ -37,6 +38,21 @@ export default function CategoryDetailPage() {
     }
     fetchCategories()
   }, [])
+
+  useEffect(() => {
+    async function fetchListings() {
+      try {
+        const res = await fetch(`/api/shops?category=${slug}&limit=100`)
+        const data = await res.json()
+        setRawListings(data.shops || [])
+      } catch {
+        setRawListings([])
+      } finally {
+        setListingsLoading(false)
+      }
+    }
+    if (slug) fetchListings()
+  }, [slug])
 
   const category = categories.find((c) => c.slug === slug)
 
@@ -76,12 +92,15 @@ export default function CategoryDetailPage() {
   const subcategory = subSlug ? category?.sub_categories?.find((s) => s.slug === subSlug) : null
   const hasSubcategories = category.sub_categories?.length > 0
 
-  // Get listings filtered by category and optional subcategory
-  const rawListings = getListingsByCategory(slug, subSlug || null)
+  // Filter by subcategory client-side if subSlug is present
+  const categoryListings = useMemo(() => {
+    if (!subSlug) return rawListings
+    return rawListings.filter((l) => l.subcategory === subSlug)
+  }, [rawListings, subSlug])
 
   // Search and sort
   const listings = useMemo(() => {
-    let result = rawListings
+    let result = categoryListings
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase()
@@ -101,7 +120,7 @@ export default function CategoryDetailPage() {
     })
 
     return result
-  }, [rawListings, searchQuery, sortBy])
+  }, [categoryListings, searchQuery, sortBy])
 
   return (
     <div>
@@ -193,7 +212,13 @@ export default function CategoryDetailPage() {
 
         {/* Business Listing Cards */}
         <div className={styles.listings}>
-          {listings.length > 0 ? (
+          {listingsLoading ? (
+            <div className={styles.emptyState}>
+              <div className={styles.emptyIcon}>⏳</div>
+              <h3 className={styles.emptyTitle}>Loading businesses...</h3>
+              <p className={styles.emptyText}>Fetching latest listings</p>
+            </div>
+          ) : listings.length > 0 ? (
             listings.map((biz) => (
               <div key={biz.id} className={styles.listingCard}>
                 <div className={styles.listingTop}>
