@@ -95,66 +95,23 @@ export default async function handler(req, res) {
           categoryId = cat.id
         }
 
-        // --- Find or Create Business Owner ---
-        let owner = null
-
-        // 1. Search by phone number first (most reliable)
-        const { data: ownerByPhone } = await supabaseAdmin
-          .from('business_owners')
-          .select('id, owner_name, email, firebase_uid')
-          .eq('enquiry_number', digits)
-          .maybeSingle()
-        if (ownerByPhone) owner = ownerByPhone
-
-        // 2. If not found, search by name (fuzzy match)
-        if (!owner) {
-          const { data: ownersByName } = await supabaseAdmin
-            .from('business_owners')
-            .select('id, owner_name, email, firebase_uid')
-            .ilike('owner_name', `%${shopName.trim()}%`)
-            .limit(5)
-
-          if (ownersByName && ownersByName.length === 1) {
-            owner = ownersByName[0]
-          }
-        }
-
-        // 3. If still not found, create new owner record
-        if (!owner) {
-          const { data: newOwner, error: ownerError } = await supabaseAdmin
-            .from('business_owners')
-            .insert({
-              firebase_uid: null,
-              owner_name: shopName.trim(),
-              email: shopEmail.trim(),
-              enquiry_number: digits,
-            })
-            .select()
-            .single()
-
-          if (ownerError) {
-            return res.status(500).json({ error: `Failed to create owner: ${ownerError.message}` })
-          }
-          owner = newOwner
-        }
-
-        // --- Duplicate Check ---
+        // --- Duplicate Check (by shop_name + business_email) ---
         const { data: existing } = await supabaseAdmin
           .from('sell_your_bussiness')
           .select('id')
           .eq('shop_name', shopName.trim())
-          .eq('owner_id', owner.id)
+          .eq('business_email', shopEmail.trim())
           .maybeSingle()
 
         if (existing) {
-          return res.status(409).json({ error: 'A listing with this shop name already exists for this owner' })
+          return res.status(409).json({ error: 'A listing with this shop name and email already exists' })
         }
 
-        // --- Insert into sell_your_bussiness ---
+        // --- Insert into sell_your_bussiness (no business_owners required) ---
         const { data: newBusiness, error: businessError } = await supabaseAdmin
           .from('sell_your_bussiness')
           .insert({
-            owner_id: owner.id,
+            owner_id: null,
             category_id: categoryId,
             subcategory_id: businessSubcategory || null,
             shop_name: shopName.trim(),
@@ -207,7 +164,6 @@ export default async function handler(req, res) {
           details: {
             shop_name: shopName.trim(),
             business_email: shopEmail.trim(),
-            owner_id: owner.id,
             category_id: categoryId,
             created_at: new Date().toISOString(),
           },
