@@ -119,7 +119,7 @@ export default async function handler(req, res) {
           const { data: newOwner, error: ownerError } = await supabaseAdmin
             .from('business_owners')
             .insert({
-              firebase_uid: null,
+              firebase_uid: '00000000-0000-0000-0000-000000000000',
               owner_name: 'Admin Created Listing',
               email: PLACEHOLDER_EMAIL,
             })
