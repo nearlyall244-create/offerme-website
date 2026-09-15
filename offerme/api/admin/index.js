@@ -504,6 +504,11 @@ export default async function handler(req, res) {
         return res.status(404).json({ error: 'Business not found' })
       }
 
+      await supabaseAdmin
+        .from('offers_post')
+        .delete()
+        .eq('business_id', shop_id)
+
       const { error } = await supabaseAdmin
         .from('sell_your_bussiness')
         .delete()

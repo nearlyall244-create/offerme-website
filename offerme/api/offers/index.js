@@ -141,6 +141,36 @@ export default async function handler(req, res) {
           return res.status(400).json({ error: 'Title or Shop name is required' })
         }
 
+        if (shopName && (shopName.trim().length < 3 || shopName.trim().length > 200)) {
+          return res.status(400).json({ error: 'Shop name must be 3-200 characters' })
+        }
+
+        if (businessEmail) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+          if (!emailRegex.test(businessEmail.trim())) {
+            return res.status(400).json({ error: 'Valid email is required' })
+          }
+        }
+
+        if (phoneNumber) {
+          const digits = phoneNumber.replace(/\D/g, '')
+          if (digits.length !== 10 || !/^[6-9]\d{9}$/.test(digits)) {
+            return res.status(400).json({ error: 'Valid 10-digit Indian phone number required' })
+          }
+        }
+
+        if (shopAddress) {
+          if (shopAddress.trim().length < 10 || shopAddress.trim().length > 200) {
+            return res.status(400).json({ error: 'Address must be 10-200 characters' })
+          }
+        }
+
+        if (description) {
+          if (description.trim().length < 10 || description.trim().length > 500) {
+            return res.status(400).json({ error: 'Description must be 10-500 characters' })
+          }
+        }
+
         // Find business owner
         let { data: owner } = await supabaseAdmin
           .from('business_owners')

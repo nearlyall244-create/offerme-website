@@ -88,9 +88,13 @@ export default function BusinessSubmissionApproval() {
       })
       if (res.ok) {
         setSubmissions((prev) => prev.filter((s) => s.id !== id))
+      } else {
+        const data = await res.json()
+        alert(data.error || 'Failed to delete business listing')
       }
     } catch (err) {
       console.error('Failed to delete:', err)
+      alert('Failed to delete business listing')
     }
   }
 
