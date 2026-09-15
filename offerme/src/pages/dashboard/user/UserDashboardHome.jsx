@@ -99,10 +99,10 @@ export default function UserDashboardHome() {
     return allListings
       .filter(
         (l) =>
-          l.name.toLowerCase().includes(q) ||
-          l.description.toLowerCase().includes(q) ||
-          l.category.toLowerCase().includes(q) ||
-          l.address.toLowerCase().includes(q)
+          (l.name || '').toLowerCase().includes(q) ||
+          (l.description || '').toLowerCase().includes(q) ||
+          (l.category || '').toLowerCase().includes(q) ||
+          (l.address || '').toLowerCase().includes(q)
       )
       .slice(0, 6)
   }, [search, allListings])
@@ -121,19 +121,19 @@ export default function UserDashboardHome() {
     if (q) {
       filtered = filtered.filter(
         (l) =>
-          l.name.toLowerCase().includes(q) ||
-          l.description.toLowerCase().includes(q) ||
-          l.category.toLowerCase().includes(q) ||
-          l.address.toLowerCase().includes(q) ||
-          (l.offers && l.offers.some((o) => o.toLowerCase().includes(q)))
+          (l.name || '').toLowerCase().includes(q) ||
+          (l.description || '').toLowerCase().includes(q) ||
+          (l.category || '').toLowerCase().includes(q) ||
+          (l.address || '').toLowerCase().includes(q) ||
+          (l.offers && l.offers.some((o) => (o || '').toLowerCase().includes(q)))
       )
     }
 
     // Location filter
     if (locationFilter === 'nearby') {
-      filtered = filtered.filter((l) => l.address.toLowerCase().includes('t. nagar'))
+      filtered = filtered.filter((l) => (l.address || '').toLowerCase().includes('t. nagar'))
     } else if (locationFilter === 'city') {
-      filtered = filtered.filter((l) => l.address.toLowerCase().includes('chennai'))
+      filtered = filtered.filter((l) => (l.address || '').toLowerCase().includes('chennai'))
     }
 
     // Sort

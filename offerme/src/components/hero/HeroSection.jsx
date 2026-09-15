@@ -20,7 +20,7 @@ const AREA_KEYWORDS = {
 function matchesLocation(listing, locationValue) {
   if (locationValue === 'all') return true
   const keywords = AREA_KEYWORDS[locationValue] || []
-  const addr = listing.address.toLowerCase()
+  const addr = (listing.address || '').toLowerCase()
   return keywords.some((kw) => addr.includes(kw))
 }
 
@@ -34,11 +34,16 @@ export default function HeroSection() {
   const navigate = useNavigate()
 
   const [allListings, setAllListings] = useState([])
+  const [allCategories, setAllCategories] = useState([])
 
   useEffect(() => {
     fetch('/api/shops?limit=100')
       .then(r => r.json())
       .then(d => setAllListings(d.shops || []))
+      .catch(() => {})
+    fetch('/api/categories')
+      .then(r => r.json())
+      .then(d => setAllCategories(d.categories || []))
       .catch(() => {})
   }, [])
 
@@ -59,29 +64,50 @@ export default function HeroSection() {
 
   const suggestions = useMemo(() => {
     const q = query.trim().toLowerCase()
+    if (!q || q.length < 2) return []
+
     const allAreas = ['t nagar', 'vadapalani', 'porur']
-    const matchedAreas = allAreas.filter((area) => area.includes(q) && q.length >= 2)
+    const matchedAreas = allAreas.filter((area) => area.includes(q))
     let results = []
+
     matchedAreas.forEach((area) => {
       const locEntry = LOCATIONS.find((l) => l.label.toLowerCase() === area)
       if (locEntry) {
         results.push({ type: 'area', id: `area-${locEntry.value}`, label: locEntry.label, locationValue: locEntry.value })
       }
     })
+
+    allCategories.forEach((cat) => {
+      if (results.length >= 6) return
+      if ((cat.name || '').toLowerCase().includes(q)) {
+        results.push({ type: 'category', id: `cat-${cat.id}`, name: cat.name, icon: cat.icon, slug: cat.slug })
+      }
+      if (cat.sub_categories && Array.isArray(cat.sub_categories)) {
+        cat.sub_categories.forEach((sub) => {
+          if (results.length >= 6) return
+          if ((sub.name || '').toLowerCase().includes(q)) {
+            results.push({ type: 'subcategory', id: `sub-${sub.id || sub.slug}`, name: sub.name, icon: sub.icon, parentSlug: cat.slug, subSlug: sub.slug })
+          }
+        })
+      }
+    })
+
     const filteredListings = allListings
       .filter((l) => matchesLocation(l, location))
       .filter((l) =>
-        l.name.toLowerCase().includes(q) ||
-        l.description.toLowerCase().includes(q) ||
-        l.category.toLowerCase().includes(q) ||
-        l.address.toLowerCase().includes(q)
+        (l.name || '').toLowerCase().includes(q) ||
+        (l.description || '').toLowerCase().includes(q) ||
+        (l.category || '').toLowerCase().includes(q) ||
+        (l.address || '').toLowerCase().includes(q)
       )
-      .slice(0, 5 - results.length)
+      .slice(0, Math.max(0, 6 - results.length))
     filteredListings.forEach((l) => {
+      if (results.length >= 6) return
       results.push({ type: 'business', id: l.id, name: l.name, category: l.category, rating: l.rating, address: l.address })
     })
+
     return results.slice(0, 6)
-  }, [query, location, allListings])
+  }, [query, location, allListings, allCategories])
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -94,6 +120,12 @@ export default function HeroSection() {
   const handleSuggestionClick = (item) => {
     if (item.type === 'area') {
       setLocation(item.locationValue)
+      setQuery('')
+    } else if (item.type === 'category') {
+      navigate(`/category/${item.slug}`)
+      setQuery('')
+    } else if (item.type === 'subcategory') {
+      navigate(`/category/${item.parentSlug}/${item.subSlug}`)
       setQuery('')
     } else {
       setQuery(item.name)
@@ -202,13 +234,37 @@ export default function HeroSection() {
                         </button>
                       )
                     }
+                    if (item.type === 'category') {
+                      return (
+                        <button key={item.id} className={styles.suggestionItem} onClick={() => handleSuggestionClick(item)}>
+                          <div className={styles.suggestionInfo}>
+                            <span className={styles.suggestionName}>
+                              <span>{item.icon}</span> {item.name}
+                            </span>
+                            <span className={styles.suggestionType}>Category</span>
+                          </div>
+                        </button>
+                      )
+                    }
+                    if (item.type === 'subcategory') {
+                      return (
+                        <button key={item.id} className={styles.suggestionItem} onClick={() => handleSuggestionClick(item)}>
+                          <div className={styles.suggestionInfo}>
+                            <span className={styles.suggestionName}>
+                              <span>{item.icon}</span> {item.name}
+                            </span>
+                            <span className={styles.suggestionType}>Subcategory</span>
+                          </div>
+                        </button>
+                      )
+                    }
                     return (
                       <button key={item.id} className={styles.suggestionItem} onClick={() => handleSuggestionClick(item)}>
                         <div className={styles.suggestionInfo}>
                           <span className={styles.suggestionName}>{item.name}</span>
                           <span className={styles.suggestionMeta}>
                             <Star size={12} />
-                            {item.rating} · {item.category.replace(/-/g, ' ')}
+                            {item.rating} · {(item.category || '').replace(/-/g, ' ')}
                           </span>
                         </div>
                       </button>

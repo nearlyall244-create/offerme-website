@@ -33,7 +33,7 @@ function SearchableSelect({ label, required, options, value, onChange, placehold
   const filtered = useMemo(() => {
     if (!query) return options
     const q = query.toLowerCase()
-    return options.filter((o) => o.name.toLowerCase().includes(q))
+    return options.filter((o) => (o.name || '').toLowerCase().includes(q))
   }, [query, options])
 
   useEffect(() => {

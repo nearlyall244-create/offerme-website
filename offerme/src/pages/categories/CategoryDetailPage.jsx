@@ -74,9 +74,9 @@ export default function CategoryDetailPage() {
       const q = debouncedSearch.toLowerCase()
       result = result.filter(
         (l) =>
-          l.name.toLowerCase().includes(q) ||
-          l.description.toLowerCase().includes(q) ||
-          l.address.toLowerCase().includes(q)
+          (l.name || '').toLowerCase().includes(q) ||
+          (l.description || '').toLowerCase().includes(q) ||
+          (l.address || '').toLowerCase().includes(q)
       )
     }
 
