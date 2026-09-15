@@ -64,7 +64,9 @@ export default async function handler(req, res) {
           validationErrors.shopAddress = 'Address must be less than 200 characters'
         }
 
-        if (shopDescription && shopDescription.trim().length > 500) {
+        if (!shopDescription || shopDescription.trim().length < 10) {
+          validationErrors.shopDescription = 'Description must be at least 10 characters'
+        } else if (shopDescription.trim().length > 500) {
           validationErrors.shopDescription = 'Description must be less than 500 characters'
         }
 

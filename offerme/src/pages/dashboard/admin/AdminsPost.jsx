@@ -230,6 +230,7 @@ export default function AdminsPost() {
     else if (form.shopAddress.trim().length < 10) errs.shopAddress = 'Enter at least 10 characters.'
     else if (form.shopAddress.trim().length > 200) errs.shopAddress = 'Maximum 200 characters allowed.'
     if (form.shopDescription.trim().length > 500) errs.shopDescription = 'Maximum 500 characters allowed.'
+    if (!form.shopDescription.trim()) errs.shopDescription = 'Shop description is required.'
     return errs
   }
 
@@ -480,7 +481,7 @@ export default function AdminsPost() {
 
             {/* Shop Description */}
             <div className={styles.field}>
-              <label>Shop Description <span className={styles.textareaHint}>(Optional)</span></label>
+              <label>Shop Description <span className={styles.requiredStar}>*</span></label>
               <div className={styles.inputWithIcon}>
                 <span className={styles.inputIcon}>📝</span>
                 <textarea
