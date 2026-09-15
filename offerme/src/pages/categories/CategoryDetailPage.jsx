@@ -234,17 +234,12 @@ export default function CategoryDetailPage() {
                   )}
                 </div>
                 <div className={styles.cardBody}>
-                  <div className={styles.listingTop}>
-                    <div className={styles.listingNameRow}>
+                  <div className={styles.listingNameRow}>
                       <h3 className={styles.listingName}>{biz.name}</h3>
                       {biz.isVerified && (
                         <span className={styles.verifiedBadge}>✓ Verified Business</span>
                       )}
                     </div>
-                    <span className={`${styles.listingBadge} ${biz.isOpen ? styles.badgeOpen : styles.badgeClosed}`}>
-                      {biz.isOpen ? '● Open' : '● Closed'}
-                    </span>
-                  </div>
 
                   <div className={styles.listingRating}>
                     <StarRating rating={biz.rating} />
