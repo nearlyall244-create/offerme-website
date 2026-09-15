@@ -234,27 +234,9 @@ export default function CategoryDetailPage() {
                   )}
                 </div>
                 <div className={styles.cardBody}>
-                  <div className={styles.listingNameRow}>
-                      <h3 className={styles.listingName}>{biz.name}</h3>
-                      {biz.isVerified && (
-                        <span className={styles.verifiedBadge}>✓ Verified Business</span>
-                      )}
-                    </div>
-
-                  <div className={styles.listingRating}>
-                    <StarRating rating={biz.rating} />
-                    <span className={styles.ratingValue}>{biz.rating}</span>
-                    <span className={styles.reviewCount}>({biz.reviewCount} reviews)</span>
-                  </div>
+                  <h3 className={styles.listingName}>{biz.name}</h3>
 
                   <p className={styles.listingAddress}>📍 {biz.address}</p>
-
-                  <div className={styles.listingTags}>
-                    <span className={styles.tag}>{category.name}</span>
-                    {subcategory && (
-                      <span className={styles.tag}>{subcategory.name}</span>
-                    )}
-                  </div>
 
                   <p className={styles.listingDesc}>{biz.description}</p>
 

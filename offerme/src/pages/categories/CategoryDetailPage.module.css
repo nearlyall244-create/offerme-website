@@ -517,7 +517,7 @@
 
 .footerTime,
 .footerPhone {
-  font-size: 0.8rem;
+  font-size: 3rem;
   color: var(--color-text-muted);
   display: flex;
   align-items: center;
