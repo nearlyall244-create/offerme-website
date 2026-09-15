@@ -137,6 +137,10 @@
   line-height: 1.5;
 }
 
+.inputLarge {
+  font-size: 1.5rem;
+}
+
 .textareaFooter {
   display: flex;
   justify-content: space-between;
