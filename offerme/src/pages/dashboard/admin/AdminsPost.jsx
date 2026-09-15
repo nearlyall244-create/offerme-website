@@ -319,7 +319,8 @@ export default function AdminsPost() {
     <div className={styles.page}>
       <div className={styles.container}>
         <div className={styles.pageHeader}>
-          <h1 className={styles.pageTitle}>My Post</h1>
+          <h1 className={styles.pageTitle}>
+            + Post</h1>
           <p className={styles.pageSubtitle}>Create a business listing on behalf of a business owner. Fill in their details below.</p>
         </div>
 

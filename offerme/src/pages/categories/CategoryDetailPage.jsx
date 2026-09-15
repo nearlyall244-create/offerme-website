@@ -18,11 +18,17 @@ function StarRating({ rating }) {
 export default function CategoryDetailPage() {
   const { slug, subSlug } = useParams()
   const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [sortBy, setSortBy] = useState('rating')
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [rawListings, setRawListings] = useState([])
   const [listingsLoading, setListingsLoading] = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 300)
+    return () => clearTimeout(timer)
+  }, [searchQuery])
 
   useEffect(() => {
     async function fetchCategories() {
@@ -55,6 +61,34 @@ export default function CategoryDetailPage() {
   }, [slug])
 
   const category = categories.find((c) => c.slug === slug)
+
+  const categoryListings = useMemo(() => {
+    if (!subSlug) return rawListings
+    return rawListings.filter((l) => l.subcategory === subSlug)
+  }, [rawListings, subSlug])
+
+  const listings = useMemo(() => {
+    let result = categoryListings
+
+    if (debouncedSearch.trim()) {
+      const q = debouncedSearch.toLowerCase()
+      result = result.filter(
+        (l) =>
+          l.name.toLowerCase().includes(q) ||
+          l.description.toLowerCase().includes(q) ||
+          l.address.toLowerCase().includes(q)
+      )
+    }
+
+    result = [...result].sort((a, b) => {
+      if (sortBy === 'rating') return b.rating - a.rating
+      if (sortBy === 'name') return a.name.localeCompare(b.name)
+      if (sortBy === 'reviews') return b.reviewCount - a.reviewCount
+      return 0
+    })
+
+    return result
+  }, [categoryListings, debouncedSearch, sortBy])
 
   if (loading) {
     return (
@@ -91,36 +125,6 @@ export default function CategoryDetailPage() {
 
   const subcategory = subSlug ? category?.sub_categories?.find((s) => s.slug === subSlug) : null
   const hasSubcategories = category.sub_categories?.length > 0
-
-  // Filter by subcategory client-side if subSlug is present
-  const categoryListings = useMemo(() => {
-    if (!subSlug) return rawListings
-    return rawListings.filter((l) => l.subcategory === subSlug)
-  }, [rawListings, subSlug])
-
-  // Search and sort
-  const listings = useMemo(() => {
-    let result = categoryListings
-
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase()
-      result = result.filter(
-        (l) =>
-          l.name.toLowerCase().includes(q) ||
-          l.description.toLowerCase().includes(q) ||
-          l.address.toLowerCase().includes(q)
-      )
-    }
-
-    result = [...result].sort((a, b) => {
-      if (sortBy === 'rating') return b.rating - a.rating
-      if (sortBy === 'name') return a.name.localeCompare(b.name)
-      if (sortBy === 'reviews') return b.reviewCount - a.reviewCount
-      return 0
-    })
-
-    return result
-  }, [categoryListings, searchQuery, sortBy])
 
   return (
     <div>
