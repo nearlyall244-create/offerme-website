@@ -150,6 +150,7 @@ export default function AdminsPost() {
     openingTime: '',
     closingTime: '',
     shopAddress: '',
+    shopDescription: '',
   })
   const [errors, setErrors] = useState({})
   const [imageFile, setImageFile] = useState(null)
@@ -227,6 +228,8 @@ export default function AdminsPost() {
     if (!imageFile && !imagePreview) errs.image = 'Shop image is required.'
     if (!form.shopAddress.trim()) errs.shopAddress = 'Shop address is required.'
     else if (form.shopAddress.trim().length < 10) errs.shopAddress = 'Enter at least 10 characters.'
+    else if (form.shopAddress.trim().length > 200) errs.shopAddress = 'Maximum 200 characters allowed.'
+    if (form.shopDescription.trim().length > 500) errs.shopDescription = 'Maximum 500 characters allowed.'
     return errs
   }
 
@@ -279,7 +282,7 @@ export default function AdminsPost() {
         closingTime: form.closingTime,
         shopAddress: form.shopAddress.trim(),
         imageUrl: uploadedImageUrl,
-        description: '',
+        shopDescription: form.shopDescription.trim(),
       }
 
       const res = await fetch('/api/admin?action=create-post', {
@@ -307,6 +310,7 @@ export default function AdminsPost() {
       openingTime: '',
       closingTime: '',
       shopAddress: '',
+      shopDescription: '',
     })
     setImageFile(null)
     setImagePreview('')
@@ -353,7 +357,7 @@ export default function AdminsPost() {
                 <label>Enquiry Number <span className={styles.requiredStar}>*</span></label>
                 <div className={styles.inputWithIcon}>
                   <span className={styles.inputIcon}>📞</span>
-                  <input name="enquiryNumber" type="tel" placeholder="Enter enquiry contact number" maxLength={10} value={form.enquiryNumber} onChange={handleChange} className={errors.enquiryNumber ? styles.fieldError : ''} />
+                  <input name="enquiryNumber" type="tel" placeholder="Enter enquiry contact number" maxLength={10} value={form.enquiryNumber} onChange={handleChange} className={`${errors.enquiryNumber ? styles.fieldError : ''} ${styles.inputLarge}`} />
                 </div>
                 {errors.enquiryNumber && <span className={styles.errorText}>{errors.enquiryNumber}</span>}
               </div>
@@ -461,17 +465,39 @@ export default function AdminsPost() {
                   name="shopAddress"
                   placeholder="Enter complete shop address..."
                   rows={3}
-                  maxLength={500}
+                  maxLength={200}
                   value={form.shopAddress}
                   onChange={handleChange}
-                  className={`${errors.shopAddress ? styles.fieldError : ''} ${styles.addressTextarea}`}
+                  className={`${errors.shopAddress ? styles.fieldError : ''} ${styles.addressTextarea} ${styles.inputLarge}`}
                 />
               </div>
               <div className={styles.textareaFooter}>
                 <span className={styles.textareaHint}>Add detailed address with landmarks, area, city etc. (Minimum 10 characters)</span>
-                <span className={styles.charCount}>{form.shopAddress.length} / 500 words</span>
+                <span className={styles.charCount}>{form.shopAddress.length} / 200 words</span>
               </div>
               {errors.shopAddress && <span className={styles.errorText}>{errors.shopAddress}</span>}
+            </div>
+
+            {/* Shop Description */}
+            <div className={styles.field}>
+              <label>Shop Description <span className={styles.textareaHint}>(Optional)</span></label>
+              <div className={styles.inputWithIcon}>
+                <span className={styles.inputIcon}>📝</span>
+                <textarea
+                  name="shopDescription"
+                  placeholder="Describe the business, services offered, specialties..."
+                  rows={4}
+                  maxLength={500}
+                  value={form.shopDescription}
+                  onChange={handleChange}
+                  className={`${errors.shopDescription ? styles.fieldError : ''} ${styles.inputLarge}`}
+                />
+              </div>
+              <div className={styles.textareaFooter}>
+                <span className={styles.textareaHint}>Tell customers about the business (Max 500 characters)</span>
+                <span className={styles.charCount}>{form.shopDescription.length} / 500 words</span>
+              </div>
+              {errors.shopDescription && <span className={styles.errorText}>{errors.shopDescription}</span>}
             </div>
 
             {/* Submit Error */}

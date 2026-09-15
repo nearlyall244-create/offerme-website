@@ -32,7 +32,7 @@ export default async function handler(req, res) {
           closingTime,
           shopAddress,
           imageUrl,
-          description,
+          shopDescription,
         } = body
 
         // --- Input Validation ---
@@ -60,8 +60,12 @@ export default async function handler(req, res) {
 
         if (!shopAddress || shopAddress.trim().length < 10) {
           validationErrors.shopAddress = 'Address must be at least 10 characters'
-        } else if (shopAddress.trim().length > 500) {
-          validationErrors.shopAddress = 'Address must be less than 500 characters'
+        } else if (shopAddress.trim().length > 200) {
+          validationErrors.shopAddress = 'Address must be less than 200 characters'
+        }
+
+        if (shopDescription && shopDescription.trim().length > 500) {
+          validationErrors.shopDescription = 'Description must be less than 500 characters'
         }
 
         if (Object.keys(validationErrors).length > 0) {
@@ -144,7 +148,7 @@ export default async function handler(req, res) {
             enquiry_number: digits,
             shop_address: shopAddress.trim(),
             shop_image_url: imageUrl || null,
-            shop_description: description || null,
+            shop_description: shopDescription || null,
             opening_time: openingTime || null,
             closing_time: closingTime || null,
             status: 'pending',
@@ -163,7 +167,7 @@ export default async function handler(req, res) {
           .from('offers_post')
           .insert({
             title: shopName.trim(),
-            description: description || null,
+            description: shopDescription || null,
             image_url: imageUrl || null,
             valid_from: todayStr,
             is_active: true,
