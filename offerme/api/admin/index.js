@@ -107,11 +107,36 @@ export default async function handler(req, res) {
           return res.status(409).json({ error: 'A listing with this shop name and email already exists' })
         }
 
-        // --- Insert into sell_your_bussiness (no business_owners required) ---
+        // --- Find or Create Placeholder Owner (required by database constraint) ---
+        const PLACEHOLDER_EMAIL = 'admin-created@offerme.in'
+        let { data: placeholderOwner } = await supabaseAdmin
+          .from('business_owners')
+          .select('id')
+          .eq('email', PLACEHOLDER_EMAIL)
+          .maybeSingle()
+
+        if (!placeholderOwner) {
+          const { data: newOwner, error: ownerError } = await supabaseAdmin
+            .from('business_owners')
+            .insert({
+              firebase_uid: null,
+              owner_name: 'Admin Created Listing',
+              email: PLACEHOLDER_EMAIL,
+            })
+            .select()
+            .single()
+
+          if (ownerError) {
+            return res.status(500).json({ error: `Failed to create placeholder owner: ${ownerError.message}` })
+          }
+          placeholderOwner = newOwner
+        }
+
+        // --- Insert into sell_your_bussiness ---
         const { data: newBusiness, error: businessError } = await supabaseAdmin
           .from('sell_your_bussiness')
           .insert({
-            owner_id: null,
+            owner_id: placeholderOwner.id,
             category_id: categoryId,
             subcategory_id: businessSubcategory || null,
             shop_name: shopName.trim(),
@@ -165,6 +190,7 @@ export default async function handler(req, res) {
             shop_name: shopName.trim(),
             business_email: shopEmail.trim(),
             category_id: categoryId,
+            placeholder_owner_id: placeholderOwner.id,
             created_at: new Date().toISOString(),
           },
         })
