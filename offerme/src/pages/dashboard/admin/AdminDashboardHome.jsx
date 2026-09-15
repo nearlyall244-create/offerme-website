@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
-import { formatDate } from '@/utils/date'
-import StatusBadge from '@/components/shared/StatusBadge'
 import styles from './AdminDashboardHome.module.css'
 
 export default function AdminDashboardHome() {
@@ -76,39 +74,6 @@ export default function AdminDashboardHome() {
         </Link>
       </div>
 
-      <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>Recent Shops</h2>
-        <Link to="/admin/dashboard/submissions" className={styles.viewAll}>View All →</Link>
-      </div>
-
-      <div className={styles.tableWrapper}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Shop Name</th>
-              <th>Owner</th>
-              <th>Status</th>
-              <th>Created</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr><td colSpan={4} className={styles.emptyCell}>Loading...</td></tr>
-            ) : shops.length === 0 ? (
-              <tr><td colSpan={4} className={styles.emptyCell}>No shops yet.</td></tr>
-            ) : (
-              shops.slice(0, 5).map((shop) => (
-                <tr key={shop.id}>
-                  <td className={styles.businessName}>{shop.shop_name}</td>
-                  <td>{shop.business_owners?.owner_name || '—'}</td>
-                  <td><StatusBadge status={shop.is_active ? 'active' : 'pending'} /></td>
-                  <td>{formatDate(shop.created_at)}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
     </div>
   )
 }
