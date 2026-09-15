@@ -38,6 +38,7 @@ import AdminDashboardHome from '@/pages/dashboard/admin/AdminDashboardHome'
 import BusinessOwnerDetails from '@/pages/dashboard/admin/BusinessOwnerDetails'
 import BusinessSubmissionApproval from '@/pages/dashboard/admin/BusinessSubmissionApproval'
 import PostDetailsPage from '@/pages/dashboard/admin/PostDetailsPage'
+import AdminsPost from '@/pages/dashboard/admin/AdminsPost'
 import AdminSettings from '@/pages/dashboard/admin/AdminSettings'
 
 import PrivacyPolicy from '@/pages/footer/PrivacyPolicy'
@@ -111,6 +112,7 @@ export default function App() {
             <Route index element={<AdminDashboardHome />} />
             <Route path="owners" element={<BusinessOwnerDetails />} />
             <Route path="submissions" element={<BusinessSubmissionApproval />} />
+            <Route path="my-post" element={<AdminsPost />} />
             <Route path="post-details" element={<PostDetailsPage />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>

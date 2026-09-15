@@ -30,6 +30,7 @@ const adminLinks = [
   { to: '/admin/dashboard', label: 'Overview', icon: '📊' },
   { to: '/admin/dashboard/owners', label: 'Business Owners', icon: '👤' },
   { to: '/admin/dashboard/submissions', label: 'Submissions', icon: '📋', showBadge: true },
+  { to: '/admin/dashboard/my-post', label: 'My Post', icon: '📝' },
   { to: '/admin/dashboard/post-details', label: 'Post Details', icon: '📄' },
   { to: '/admin/dashboard/offers', label: 'Offers Details', icon: '📊' },
   { to: '/admin/dashboard/settings', label: 'Settings', icon: '⚙️' },

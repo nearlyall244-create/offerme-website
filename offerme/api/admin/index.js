@@ -16,6 +16,214 @@ export default async function handler(req, res) {
       return res.status(403).json({ error: 'Forbidden: admin role required' })
     }
 
+    // ── POST → create post on behalf of business owner ──
+    if (req.method === 'POST') {
+      const { action } = req.query
+
+      if (action === 'create-post') {
+        const body = req.body || {}
+        const {
+          shopName,
+          shopEmail,
+          phoneNumber,
+          businessCategory,
+          businessSubcategory,
+          openingTime,
+          closingTime,
+          shopAddress,
+          imageUrl,
+          description,
+        } = body
+
+        // --- Input Validation ---
+        const validationErrors = {}
+
+        if (!shopName || shopName.trim().length < 3) {
+          validationErrors.shopName = 'Shop name must be at least 3 characters'
+        } else if (shopName.trim().length > 200) {
+          validationErrors.shopName = 'Shop name must be less than 200 characters'
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!shopEmail || !emailRegex.test(shopEmail.trim())) {
+          validationErrors.shopEmail = 'Valid email is required'
+        }
+
+        const digits = (phoneNumber || '').replace(/\D/g, '')
+        if (digits.length !== 10 || !/^[6-9]\d{9}$/.test(digits)) {
+          validationErrors.phoneNumber = 'Valid 10-digit Indian phone number required'
+        }
+
+        if (!businessCategory) {
+          validationErrors.businessCategory = 'Category is required'
+        }
+
+        if (!shopAddress || shopAddress.trim().length < 10) {
+          validationErrors.shopAddress = 'Address must be at least 10 characters'
+        } else if (shopAddress.trim().length > 500) {
+          validationErrors.shopAddress = 'Address must be less than 500 characters'
+        }
+
+        if (Object.keys(validationErrors).length > 0) {
+          return res.status(400).json({ error: 'Validation failed', details: validationErrors })
+        }
+
+        // --- Rate Limiting: 20 posts per admin per day ---
+        const oneDayAgo = new Date(Date.now() - 86400000).toISOString()
+        const { count: recentPosts } = await supabaseAdmin
+          .from('admin_logs')
+          .select('*', { count: 'exact', head: true })
+          .eq('admin_uid', decodedToken.uid)
+          .eq('action', 'create_post_on_behalf')
+          .gte('created_at', oneDayAgo)
+
+        if ((recentPosts || 0) >= 20) {
+          return res.status(429).json({ error: 'Daily post limit reached. Maximum 20 posts per day.' })
+        }
+
+        // --- Validate category exists ---
+        let categoryId = null
+        if (businessCategory) {
+          const { data: cat } = await supabaseAdmin
+            .from('categories')
+            .select('id')
+            .eq('id', businessCategory)
+            .maybeSingle()
+          if (!cat) {
+            return res.status(400).json({ error: 'Invalid category' })
+          }
+          categoryId = cat.id
+        }
+
+        // --- Find or Create Business Owner ---
+        let owner = null
+
+        // 1. Search by phone number first (most reliable)
+        const { data: ownerByPhone } = await supabaseAdmin
+          .from('business_owners')
+          .select('id, owner_name, email, firebase_uid')
+          .eq('enquiry_number', digits)
+          .maybeSingle()
+        if (ownerByPhone) owner = ownerByPhone
+
+        // 2. If not found, search by name (fuzzy match)
+        if (!owner) {
+          const { data: ownersByName } = await supabaseAdmin
+            .from('business_owners')
+            .select('id, owner_name, email, firebase_uid')
+            .ilike('owner_name', `%${shopName.trim()}%`)
+            .limit(5)
+
+          if (ownersByName && ownersByName.length === 1) {
+            owner = ownersByName[0]
+          }
+        }
+
+        // 3. If still not found, create new owner record
+        if (!owner) {
+          const { data: newOwner, error: ownerError } = await supabaseAdmin
+            .from('business_owners')
+            .insert({
+              firebase_uid: null,
+              owner_name: shopName.trim(),
+              email: shopEmail.trim(),
+              enquiry_number: digits,
+            })
+            .select()
+            .single()
+
+          if (ownerError) {
+            return res.status(500).json({ error: `Failed to create owner: ${ownerError.message}` })
+          }
+          owner = newOwner
+        }
+
+        // --- Duplicate Check ---
+        const { data: existing } = await supabaseAdmin
+          .from('sell_your_bussiness')
+          .select('id')
+          .eq('shop_name', shopName.trim())
+          .eq('owner_id', owner.id)
+          .maybeSingle()
+
+        if (existing) {
+          return res.status(409).json({ error: 'A listing with this shop name already exists for this owner' })
+        }
+
+        // --- Insert into sell_your_bussiness ---
+        const { data: newBusiness, error: businessError } = await supabaseAdmin
+          .from('sell_your_bussiness')
+          .insert({
+            owner_id: owner.id,
+            category_id: categoryId,
+            subcategory_id: businessSubcategory || null,
+            shop_name: shopName.trim(),
+            business_email: shopEmail.trim(),
+            enquiry_number: digits,
+            shop_address: shopAddress.trim(),
+            shop_image_url: imageUrl || null,
+            shop_description: description || null,
+            opening_time: openingTime || null,
+            closing_time: closingTime || null,
+            status: 'pending',
+            is_active: false,
+          })
+          .select()
+          .single()
+
+        if (businessError) {
+          return res.status(500).json({ error: `Failed to create business: ${businessError.message}` })
+        }
+
+        // --- Insert into offers_post ---
+        const todayStr = new Date().toISOString().split('T')[0]
+        const { data: offerPost, error: offerError } = await supabaseAdmin
+          .from('offers_post')
+          .insert({
+            title: shopName.trim(),
+            description: description || null,
+            image_url: imageUrl || null,
+            valid_from: todayStr,
+            is_active: true,
+            business_id: newBusiness.id,
+            created_by_uid: decodedToken.uid,
+            created_by_role: 'admin',
+            listing_type: 'sell-business',
+          })
+          .select()
+          .single()
+
+        if (offerError) {
+          console.error('[admin] create-post offer insert error:', offerError)
+        }
+
+        // --- Log to admin_logs ---
+        await supabaseAdmin.from('admin_logs').insert({
+          admin_uid: decodedToken.uid,
+          admin_email: decodedToken.email,
+          action: 'create_post_on_behalf',
+          target_type: 'business',
+          target_id: newBusiness.id,
+          details: {
+            shop_name: shopName.trim(),
+            business_email: shopEmail.trim(),
+            owner_id: owner.id,
+            category_id: categoryId,
+            created_at: new Date().toISOString(),
+          },
+        })
+
+        return res.status(201).json({
+          success: true,
+          message: 'Post created successfully. Pending approval.',
+          business: { id: newBusiness.id, shop_name: shopName.trim() },
+          offer: offerPost ? { id: offerPost.id } : null,
+        })
+      }
+
+      return res.status(400).json({ error: 'Invalid action' })
+    }
+
     // ── GET ?type=shops → list businesses / GET ?type=offers → list offers ──
     if (req.method === 'GET') {
       const { type, status, page = 1, limit = 20 } = req.query
