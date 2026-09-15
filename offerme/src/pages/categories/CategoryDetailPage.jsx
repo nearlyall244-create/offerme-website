@@ -225,41 +225,52 @@ export default function CategoryDetailPage() {
           ) : listings.length > 0 ? (
             listings.map((biz) => (
               <div key={biz.id} className={styles.listingCard}>
-                {biz.image && (
-                  <div className={styles.listingImageWrap}>
-                    <img src={biz.image} alt={biz.name} className={styles.listingImage} />
-                  </div>
-                )}
-                <div className={styles.listingTop}>
-                  <h3 className={styles.listingName}>{biz.name}</h3>
-                  <span className={`${styles.listingBadge} ${biz.isOpen ? styles.badgeOpen : styles.badgeClosed}`}>
-                    {biz.isOpen ? '● Open' : '● Closed'}
-                  </span>
+                <div className={styles.cardImageSection}>
+                  {biz.image && (
+                    <div className={styles.listingImageWrap}>
+                      <img src={biz.image} alt={biz.name} className={styles.listingImage} />
+                      <span className={styles.photoCount}>📷 1</span>
+                    </div>
+                  )}
                 </div>
-
-                <div className={styles.listingRating}>
-                  <StarRating rating={biz.rating} />
-                  <span className={styles.ratingValue}>{biz.rating}</span>
-                  <span>({biz.reviewCount} reviews)</span>
-                </div>
-
-                <p className={styles.listingAddress}>📍 {biz.address}</p>
-                <p className={styles.listingDesc}>{biz.description}</p>
-
-                {biz.offers.length > 0 && (
-                  <div className={styles.listingOffers}>
-                    {biz.offers.map((offer, idx) => (
-                      <span key={idx} className={styles.offerTag}>
-                        <span className={styles.offerIcon}>🏷️</span>
-                        {offer}
-                      </span>
-                    ))}
+                <div className={styles.cardBody}>
+                  <div className={styles.listingTop}>
+                    <div className={styles.listingNameRow}>
+                      <h3 className={styles.listingName}>{biz.name}</h3>
+                      {biz.isVerified && (
+                        <span className={styles.verifiedBadge}>✓ Verified Business</span>
+                      )}
+                    </div>
+                    <span className={`${styles.listingBadge} ${biz.isOpen ? styles.badgeOpen : styles.badgeClosed}`}>
+                      {biz.isOpen ? '● Open' : '● Closed'}
+                    </span>
                   </div>
-                )}
 
-                <p className={styles.listingHours}>
-                  ⏰ {biz.openingTime} — {biz.closingTime}
-                </p>
+                  <div className={styles.listingRating}>
+                    <StarRating rating={biz.rating} />
+                    <span className={styles.ratingValue}>{biz.rating}</span>
+                    <span className={styles.reviewCount}>({biz.reviewCount} reviews)</span>
+                  </div>
+
+                  <p className={styles.listingAddress}>📍 {biz.address}</p>
+
+                  <div className={styles.listingTags}>
+                    <span className={styles.tag}>{category.name}</span>
+                    {subcategory && (
+                      <span className={styles.tag}>{subcategory.name}</span>
+                    )}
+                  </div>
+
+                  <p className={styles.listingDesc}>{biz.description}</p>
+
+                  <div className={styles.listingFooter}>
+                    <span className={styles.footerTime}>⏰ {biz.openingTime} — {biz.closingTime}</span>
+                    {biz.phone && (
+                      <span className={styles.footerPhone}>📞 {biz.phone}</span>
+                    )}
+                    <button className={styles.viewDetailsBtn}>View Details →</button>
+                  </div>
+                </div>
               </div>
             ))
           ) : (

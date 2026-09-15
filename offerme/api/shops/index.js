@@ -51,6 +51,7 @@ export default async function handler(req, res) {
         reviewCount: 0,
         address: shop.shop_address,
         description: shop.shop_description,
+        phone: shop.enquiry_number || null,
         offers: (shop.offers_post || [])
           .filter(o => o.is_active)
           .map(o => o.title),
@@ -58,6 +59,7 @@ export default async function handler(req, res) {
         closingTime: shop.closing_time,
         isOpen: computeIsOpen(shop.opening_time, shop.closing_time),
         image: shop.shop_image_url,
+        isVerified: true,
       }))
 
       return res.status(200).json({
