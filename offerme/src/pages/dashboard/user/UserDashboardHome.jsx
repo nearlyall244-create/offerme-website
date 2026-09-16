@@ -90,10 +90,13 @@ export default function UserDashboardHome() {
 
   // Filtered and sorted results
   const results = useMemo(() => {
+    const q = search.trim().toLowerCase()
+
+    if (!q) return []
+
     let filtered = [...allListings]
 
     // Search filter
-    const q = search.trim().toLowerCase()
     if (q) {
       filtered = filtered.filter(
         (l) =>
