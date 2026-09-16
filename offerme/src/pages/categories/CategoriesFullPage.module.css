@@ -48,40 +48,6 @@
   padding: 0.5rem 0 1.5rem;
 }
 
-.headerRow {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  margin-bottom: 1.25rem;
-}
-
-.titleArea {
-  flex: 1;
-  min-width: 280px;
-}
-
-.pageTitle {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #0f172a;
-  margin: 0 0 0.4rem 0;
-  letter-spacing: -0.025em;
-  display: inline-block;
-  margin-right: 0.85rem;
-  vertical-align: middle;
-}
-
-.pageSubtitle {
-  display: inline-block;
-  font-size: 0.9375rem;
-  color: #64748b;
-  margin: 0;
-  vertical-align: middle;
-  line-height: 1.4;
-}
-
 /* Search Box */
 .searchBox {
   position: relative;

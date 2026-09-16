@@ -57,16 +57,8 @@ export default function CategoriesFullPage() {
       {/* ── Page Header ────────────────────────────────────────── */}
       <div className={styles.headerSection}>
         <div className={styles.container}>
-          <div className={styles.headerRow}>
-            <div className={styles.titleArea}>
-              <h1 className={styles.pageTitle}>All Categories</h1>
-              <p className={styles.pageSubtitle}>
-                Explore the best local businesses, services and exclusive offers near you.
-              </p>
-            </div>
-
-            {/* Live Search */}
-            <div className={styles.searchBox}>
+          {/* Live Search */}
+          <div className={styles.searchBox}>
               <svg
                 className={styles.searchIcon}
                 width="18"
@@ -99,9 +91,6 @@ export default function CategoriesFullPage() {
                 </button>
               )}
             </div>
-          </div>
-
-
         </div>
       </div>
 
