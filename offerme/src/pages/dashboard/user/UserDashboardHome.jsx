@@ -43,29 +43,10 @@ export default function UserDashboardHome() {
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState('relevance')
   const [locationFilter, setLocationFilter] = useState('all')
-  const [selectedCategory, setSelectedCategory] = useState(null)
   const [recentSearches, setRecentSearches] = useState(getRecentSearches)
   const [showSuggestions, setShowSuggestions] = useState(false)
   const searchRef = useRef(null)
   const suggestionsRef = useRef(null)
-  const [categories, setCategories] = useState([])
-  const [categoriesLoading, setCategoriesLoading] = useState(true)
-
-  useEffect(() => {
-    async function fetchCategories() {
-      try {
-        const res = await fetch('/api/categories')
-        const data = await res.json()
-        setCategories(data.categories || [])
-      } catch (error) {
-        console.error('Failed to fetch categories:', error)
-      } finally {
-        setCategoriesLoading(false)
-      }
-    }
-    fetchCategories()
-  }, [])
-
   const [allListings, setAllListings] = useState([])
   const [listingsLoading, setListingsLoading] = useState(true)
 
@@ -111,11 +92,6 @@ export default function UserDashboardHome() {
   const results = useMemo(() => {
     let filtered = [...allListings]
 
-    // Category filter
-    if (selectedCategory) {
-      filtered = filtered.filter((l) => l.category === selectedCategory)
-    }
-
     // Search filter
     const q = search.trim().toLowerCase()
     if (q) {
@@ -146,7 +122,7 @@ export default function UserDashboardHome() {
     }
 
     return filtered
-  }, [allListings, search, sortBy, locationFilter, selectedCategory])
+  }, [allListings, search, sortBy, locationFilter])
 
   const handleSearch = (value) => {
     setSearch(value)
@@ -180,11 +156,7 @@ export default function UserDashboardHome() {
     setShowSuggestions(false)
   }
 
-  const clearCategory = () => {
-    setSelectedCategory(null)
-  }
-
-  const hasActiveFilters = search || selectedCategory || locationFilter !== 'all'
+  const hasActiveFilters = search || locationFilter !== 'all'
 
   return (
     <div className={styles.page}>
@@ -296,37 +268,11 @@ export default function UserDashboardHome() {
         </div>
 
         {hasActiveFilters && (
-          <button className={styles.clearFilters} onClick={() => { clearSearch(); clearCategory(); setLocationFilter('all'); setSortBy('relevance') }}>
+          <button className={styles.clearFilters} onClick={() => { clearSearch(); setLocationFilter('all'); setSortBy('relevance') }}>
             <X size={14} />
             Clear all
           </button>
         )}
-      </section>
-
-      {/* ── Category Chips ───────────────────────────────────── */}
-      <section className={styles.categoriesSection}>
-        <div className={styles.categoriesScroll}>
-          <button
-            className={`${styles.categoryChip} ${!selectedCategory ? styles.categoryChipActive : ''}`}
-            onClick={clearCategory}
-          >
-            All
-          </button>
-          {categoriesLoading ? (
-            <span className={styles.categoryChip}>Loading...</span>
-          ) : (
-            categories.map((cat) => (
-              <button
-                key={cat.id}
-                className={`${styles.categoryChip} ${selectedCategory === cat.id ? styles.categoryChipActive : ''}`}
-                onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
-              >
-                <span className={styles.categoryIcon}>{cat.icon}</span>
-                <span>{cat.name}</span>
-              </button>
-            ))
-          )}
-        </div>
       </section>
 
       {/* ── Results ──────────────────────────────────────────── */}
