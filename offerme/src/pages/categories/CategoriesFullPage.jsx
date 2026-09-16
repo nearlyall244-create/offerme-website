@@ -1,13 +1,10 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import styles from './CategoriesFullPage.module.css'
 
 export default function CategoriesFullPage() {
-  const { categoryId } = useParams()
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedGroup, setSelectedGroup] = useState(categoryId || 'all')
   const [categories, setCategories] = useState([])
-  const [groups, setGroups] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -16,7 +13,6 @@ export default function CategoriesFullPage() {
         const res = await fetch('/api/categories')
         const data = await res.json()
         setCategories(data.categories || [])
-        setGroups(data.groups || [])
       } catch (err) {
         console.error('Failed to fetch categories:', err)
       } finally {
@@ -28,10 +24,6 @@ export default function CategoriesFullPage() {
 
   const filteredCategories = useMemo(() => {
     let list = categories
-
-    if (selectedGroup !== 'all') {
-      list = list.filter((cat) => cat.group_id === selectedGroup)
-    }
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim()
@@ -47,7 +39,7 @@ export default function CategoriesFullPage() {
     }
 
     return list
-  }, [selectedGroup, searchQuery, categories])
+  }, [searchQuery, categories])
 
   return (
     <div className={styles.page}>
@@ -109,31 +101,7 @@ export default function CategoriesFullPage() {
             </div>
           </div>
 
-          {/* Quick Group Filters */}
-          <div className={styles.filterScroll}>
-            <button
-              type="button"
-              onClick={() => setSelectedGroup('all')}
-              className={`${styles.filterChip} ${selectedGroup === 'all' ? styles.filterChipActive : ''}`}
-            >
-              All Categories ({categories.length})
-            </button>
-            {groups.map((group) => {
-              const count = categories.filter((c) => c.group_id === group.id).length
-              if (count === 0) return null
-              return (
-                <button
-                  key={group.id}
-                  type="button"
-                  onClick={() => setSelectedGroup(group.id)}
-                  className={`${styles.filterChip} ${selectedGroup === group.id ? styles.filterChipActive : ''}`}
-                >
-                  <span className={styles.chipIcon}>{group.icon}</span>
-                  {group.name} ({count})
-                </button>
-              )
-            })}
-          </div>
+
         </div>
       </div>
 
@@ -152,10 +120,7 @@ export default function CategoriesFullPage() {
               <p>We couldn't find any categories matching "{searchQuery}".</p>
               <button
                 type="button"
-                onClick={() => {
-                  setSearchQuery('')
-                  setSelectedGroup('all')
-                }}
+                onClick={() => setSearchQuery('')}
                 className={styles.resetBtn}
               >
                 Reset Filters
