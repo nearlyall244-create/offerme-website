@@ -165,30 +165,6 @@
   transform: translateY(-7px) rotate(-45deg);
 }
 
-.categoriesItem {
-  position: relative;
-}
-
-.categoriesBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-}
-
-.chevron {
-  font-size: 0.7rem;
-  transition: transform 0.2s;
-  line-height: 1;
-}
-
-.chevronOpen {
-  transform: rotate(180deg);
-}
-
 .mobileOverlay {
   display: none;
 }
