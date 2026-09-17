@@ -237,6 +237,7 @@ export default async function handler(req, res) {
       }
 
       if (type === 'shops') {
+        const { source } = req.query
         let query = supabaseAdmin
           .from('sell_your_bussiness')
           .select('*, business_owners(owner_name, email, firebase_uid)', { count: 'exact' })
@@ -245,6 +246,13 @@ export default async function handler(req, res) {
           query = query.eq('is_active', true)
         } else if (status === 'inactive') {
           query = query.eq('is_active', false)
+        }
+
+        const ADMIN_PLACEHOLDER_UID = '00000000-0000-0000-0000-000000000000'
+        if (source === 'admin') {
+          query = query.eq('business_owners.firebase_uid', ADMIN_PLACEHOLDER_UID)
+        } else if (source === 'business') {
+          query = query.neq('business_owners.firebase_uid', ADMIN_PLACEHOLDER_UID)
         }
 
         const { data, count, error } = await query

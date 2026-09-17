@@ -31,6 +31,7 @@ export default function PostDetailsPage() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('')
+  const [sourceFilter, setSourceFilter] = useState('')
   const [categories, setCategories] = useState([])
   const [page, setPage] = useState(1)
   const perPage = 10
@@ -42,7 +43,10 @@ export default function PostDetailsPage() {
       setError('')
       try {
         const token = await getToken()
-        const res = await fetch('/api/admin?type=shops&limit=500', {
+        const url = sourceFilter
+          ? `/api/admin?type=shops&limit=500&source=${sourceFilter}`
+          : '/api/admin?type=shops&limit=500'
+        const res = await fetch(url, {
           headers: { Authorization: `Bearer ${token}` },
         })
         const data = await res.json()
@@ -55,7 +59,7 @@ export default function PostDetailsPage() {
     }
     load()
     return () => { cancelled = true }
-  }, [getToken])
+  }, [getToken, sourceFilter])
 
   useEffect(() => {
     let cancelled = false
@@ -120,6 +124,11 @@ export default function PostDetailsPage() {
         <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} className={styles.filterSelect}>
           <option value="">All Categories</option>
           {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+        </select>
+        <select value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)} className={styles.filterSelect}>
+          <option value="">All Posts</option>
+          <option value="admin">Admin Posts</option>
+          <option value="business">Business Owner Posts</option>
         </select>
       </div>
 
