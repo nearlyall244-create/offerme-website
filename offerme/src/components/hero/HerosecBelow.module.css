@@ -1,0 +1,632 @@
+/* ── HerosecBelow Container ─────────────────────────────────── */
+.wrapper {
+  width: 100%;
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow: hidden;
+}
+
+/* ── Discovery Grid: Banner (Left) + Category Cards (Right) ─ */
+.discoveryGrid {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 0.875rem;
+  align-items: stretch;
+  width: 100%;
+}
+
+@media (min-width: 1380px) {
+  .discoveryGrid {
+    grid-template-columns: 420px 1fr;
+    gap: 1rem;
+  }
+}
+
+/* ── Promotional Banner (Left) ────────────────────────────── */
+.bannerCard {
+  position: relative;
+  background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 50%, #eff6ff 100%);
+  border: 1px solid rgba(191, 219, 254, 0.7);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px -4px rgba(59, 130, 246, 0.12), 0 2px 6px -2px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 270px;
+  height: 270px;
+  padding: 1.35rem 1.25rem 1rem;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+}
+
+.bannerCard:hover {
+  box-shadow: 0 10px 28px -4px rgba(59, 130, 246, 0.2);
+}
+
+.bannerSlider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 2;
+}
+
+.slideInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  flex: 1;
+}
+
+.bannerContent {
+  flex: 1;
+  max-width: 58%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  z-index: 3;
+}
+
+.bannerTitle {
+  font-size: 1.7rem;
+  font-weight: 800;
+  line-height: 1.15;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.4rem 0;
+}
+
+.bannerTitleHighlight {
+  color: #0284c7;
+  display: block;
+}
+
+.bannerSubtitle {
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: #475569;
+  margin: 0 0 1rem 0;
+  font-weight: 500;
+}
+
+.bannerCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  background: #facc15;
+  color: #0f172a;
+  font-size: 0.825rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  text-decoration: none;
+  box-shadow: 0 3px 10px rgba(250, 204, 21, 0.4);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1.5px solid #eab308;
+}
+
+.bannerCta:hover {
+  background: #fbbf24;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 16px rgba(250, 204, 21, 0.55);
+}
+
+.bannerCta svg {
+  transition: transform 0.2s ease;
+}
+
+.bannerCta:hover svg {
+  transform: translateX(3px);
+}
+
+/* Banner Image Graphic */
+.bannerImageWrap {
+  position: relative;
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  height: 100%;
+  max-width: 44%;
+}
+
+.bannerShopperImg {
+  width: 100%;
+  max-width: 180px;
+  height: 200px;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 0.875rem;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.1);
+  filter: drop-shadow(0 4px 10px rgba(59, 130, 246, 0.15));
+}
+
+.bannerSticker {
+  position: absolute;
+  top: 4px;
+  right: -4px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  padding: 0.22rem 0.55rem;
+  border-radius: 9999px;
+  border: 1px solid #fed7aa;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.18);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #ea580c;
+  white-space: nowrap;
+  transform: rotate(3deg);
+  animation: floatSticker 3s ease-in-out infinite;
+}
+
+@keyframes floatSticker {
+
+  0%,
+  100% {
+    transform: rotate(3deg) translateY(0);
+  }
+
+  50% {
+    transform: rotate(1deg) translateY(-3px);
+  }
+}
+
+/* Controls: Arrows & Dots */
+.bannerNavBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.875rem;
+  height: 1.875rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.bannerNavBtn:hover {
+  background: #ffffff;
+  color: #0284c7;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.bannerNavPrev {
+  left: 0.4rem;
+}
+
+.bannerNavNext {
+  right: 0.4rem;
+}
+
+.bannerDots {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.25rem;
+  padding-left: 0.25rem;
+  z-index: 4;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: rgba(148, 163, 184, 0.6);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.25s ease;
+}
+
+.activeDot {
+  width: 18px;
+  background: #0284c7;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.4);
+}
+
+/* ── Category Cards Section (Right) ───────────────────────── */
+.categorySection {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.categoryScrollWrap {
+  display: flex;
+  gap: 0.65rem;
+  width: 100%;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  padding: 0.15rem 0.15rem 0.4rem;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+  align-items: stretch;
+}
+
+.categoryScrollWrap::-webkit-scrollbar {
+  height: 4px;
+}
+
+.categoryScrollWrap::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+.categoryScrollWrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ── Category Card: Tall, vertical, #052B58 card, full-width image ── */
+.categoryCard {
+  flex: 0 0 142px;
+  min-width: 142px;
+  max-width: 142px;
+  height: 270px;
+  border-radius: 16px;
+  background-color: #052B58;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 14px -3px rgba(0, 0, 0, 0.15), 0 1px 4px -1px rgba(0, 0, 0, 0.05);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.2s ease;
+  user-select: none;
+  scroll-snap-align: start;
+}
+
+.categoryCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px -3px rgba(5, 43, 88, 0.35), 0 3px 8px -2px rgba(0, 0, 0, 0.1);
+}
+
+.cardHeader {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0.85rem 0.75rem 0.5rem;
+  text-align: center;
+  z-index: 2;
+  min-height: 46px;
+}
+
+.cardTitle {
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.22;
+  margin: 0;
+  color: #FE6902;
+  letter-spacing: -0.01em;
+  text-align: center;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Full-Width Image Container Occupying Entire Space Up to Title ── */
+.cardImageContainer {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  height: calc(100% - 46px);
+  min-height: 215px;
+  margin-top: 0;
+  overflow: hidden;
+  border-radius: 0 0 16px 16px;
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  border-radius: 0 0 16px 16px;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.categoryCard:hover .cardImage {
+  transform: scale(1.06);
+}
+
+/* ── Bottom-Right Small Circular Arrow Button (Over Image) ── */
+.cardActionCircle {
+  position: absolute;
+  bottom: 0.55rem;
+  right: 0.55rem;
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  z-index: 10;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+}
+
+.categoryCard:hover .cardActionCircle {
+  transform: scale(1.12);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* Category Scroll Nav Buttons (for desktop & tablet) */
+.catScrollBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 15;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transition: all 0.2s ease;
+}
+
+.catScrollBtn:hover {
+  background: #f8fafc;
+  color: #0284c7;
+  transform: translateY(-50%) scale(1.08);
+}
+
+.catScrollLeft {
+  left: -0.65rem;
+}
+
+.catScrollRight {
+  right: -0.65rem;
+}
+
+@media (min-width: 1024px) {
+  .catScrollBtn {
+    display: flex;
+  }
+}
+
+/* ── Feature Strip Below ──────────────────────────────────── */
+.featureStrip {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 0.85rem 1.25rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  align-items: center;
+}
+
+.featureItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+.featureIconWrap {
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.featureItem:hover .featureIconWrap {
+  transform: scale(1.08);
+}
+
+.featureTitle {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.featureDesc {
+  font-size: 0.7rem;
+  color: #64748b;
+  line-height: 1.2;
+  margin: 0.15rem 0 0 0;
+}
+
+/* ── Dark Mode Adaptations ────────────────────────────────── */
+:global(html.dark) .bannerCard {
+  background: linear-gradient(135deg, #132438 0%, #172c45 50%, #1e3a5f 100%);
+  border-color: #1e3a5f;
+  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.4);
+}
+
+:global(html.dark) .bannerTitle {
+  color: #f1f5f9;
+}
+
+:global(html.dark) .bannerTitleHighlight {
+  color: #38bdf8;
+}
+
+:global(html.dark) .bannerSubtitle {
+  color: #94a3b8;
+}
+
+:global(html.dark) .bannerNavBtn {
+  background: rgba(30, 41, 59, 0.85);
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+:global(html.dark) .bannerSticker {
+  background: rgba(15, 23, 42, 0.9);
+  border-color: #7c2d12;
+  color: #fb923c;
+}
+
+:global(html.dark) .categoryCard {
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 14px -3px rgba(0, 0, 0, 0.3);
+}
+
+:global(html.dark) .cardSubtitle {
+  color: #94a3b8;
+}
+
+:global(html.dark) .catScrollBtn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+:global(html.dark) .featureStrip {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+:global(html.dark) .featureTitle {
+  color: #f1f5f9;
+}
+
+:global(html.dark) .featureDesc {
+  color: #94a3b8;
+}
+
+:global(html.dark) .categoryScrollWrap::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+/* ── Responsive Media Queries ─────────────────────────────── */
+@media (max-width: 1080px) {
+  .discoveryGrid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .bannerCard {
+    height: auto;
+    min-height: 230px;
+    padding: 1.35rem;
+  }
+
+  .bannerShopperImg {
+    max-width: 160px;
+    height: 180px;
+  }
+
+  .bannerContent {
+    max-width: 62%;
+  }
+
+  .categoryCard {
+    flex: 0 0 148px;
+    min-width: 148px;
+    max-width: 148px;
+  }
+
+  .featureStrip {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .wrapper {
+    margin-top: 1rem;
+    gap: 1.25rem;
+  }
+
+  .bannerCard {
+    padding: 1.1rem 0.9rem 0.9rem;
+    min-height: 200px;
+    height: auto;
+  }
+
+  .bannerTitle {
+    font-size: 1.35rem;
+  }
+
+  .bannerSubtitle {
+    font-size: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .bannerShopperImg {
+    max-width: 120px;
+    height: 150px;
+  }
+
+  .categoryCard {
+    flex: 0 0 calc(50% - 6px);
+    min-width: 136px;
+    max-width: 165px;
+    height: 245px;
+    border-radius: 14px;
+  }
+
+  .cardHeader {
+    padding: 0.75rem 0.65rem 0.4rem;
+    min-height: 42px;
+    align-items: center;
+    text-align: center;
+  }
+
+  .cardTitle {
+    font-size: 0.825rem;
+    text-align: center;
+  }
+
+  .cardImageContainer {
+    height: calc(100% - 42px);
+    min-height: 195px;
+    border-radius: 0 0 14px 14px;
+  }
+
+  .cardImage {
+    border-radius: 0 0 14px 14px;
+  }
+
+  .featureStrip {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+  }
+}

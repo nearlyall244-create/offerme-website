@@ -1,14 +1,15 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Search, X, Star, MapPin, ChevronDown } from 'lucide-react'
+import HerosecBelowcard from './HerosecBelowcard'
 import styles from './HeroSection.module.css'
 
 const LOCATIONS = [
-  { value: 'all', label: 'All Locations' },
-  { value: 't-nagar', label: 'T Nagar' },
-  { value: 'vadapalani', label: 'Vadapalani' },
-  { value: 'porur', label: 'Porur' },
+  { value: 'all', label: 'All Chennai' },
+  { value: 't-nagar', label: 'T Nagar, Chennai' },
+  { value: 'vadapalani', label: 'Vadapalani, Chennai' },
+  { value: 'porur', label: 'Porur, Chennai' },
 ]
 
 const AREA_KEYWORDS = {
@@ -26,7 +27,7 @@ function matchesLocation(listing, locationValue) {
 
 export default function HeroSection() {
   const [query, setQuery] = useState('')
-  const [location, setLocation] = useState('all')
+  const [location, setLocation] = useState('t-nagar')
   const [showLocationDropdown, setShowLocationDropdown] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
   const searchRef = useRef(null)
@@ -60,7 +61,7 @@ export default function HeroSection() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const selectedLocationLabel = LOCATIONS.find((l) => l.value === location)?.label || 'All Locations'
+  const selectedLocationLabel = LOCATIONS.find((l) => l.value === location)?.label || 'T Nagar, Chennai'
 
   const suggestions = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -71,7 +72,7 @@ export default function HeroSection() {
     let results = []
 
     matchedAreas.forEach((area) => {
-      const locEntry = LOCATIONS.find((l) => l.label.toLowerCase() === area)
+      const locEntry = LOCATIONS.find((l) => l.label.toLowerCase().includes(area))
       if (locEntry) {
         results.push({ type: 'area', id: `area-${locEntry.value}`, label: locEntry.label, locationValue: locEntry.value })
       }
@@ -149,25 +150,34 @@ export default function HeroSection() {
       <div className={styles.container}>
         <motion.div
           className={styles.content}
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.5 }}
         >
-          <h1 className={styles.title}>
-            Find the Best{' '}
-            <span className={styles.highlight}>Offers Near You</span>
-          </h1>
+          {/* Top Headline */}
+          <div className={styles.headerBlock}>
+            <h1 className={styles.title}>
+              Find the Best{' '}
+              <span className={styles.highlight}>Offers Near You</span>
+            </h1>
+            <p className={styles.subheadline}>
+              Search across 5,000+ local businesses, verified deals & neighborhood services
+            </p>
+          </div>
 
+          {/* Wide Centered Search Bar (Justdial-inspired) */}
           <div className={styles.searchRow}>
             <div className={styles.searchWrapper} ref={searchRef}>
               <form onSubmit={handleSearch} className={styles.searchBar}>
+                {/* Location Dropdown */}
                 <div className={styles.locationDropdown} ref={locationRef}>
                   <button
                     type="button"
                     className={styles.locationBtn}
                     onClick={() => setShowLocationDropdown(!showLocationDropdown)}
+                    aria-label="Select city location"
                   >
-                    <MapPin size={16} />
+                    <MapPin size={17} className={styles.locationPin} />
                     <span className={styles.locationLabel}>{selectedLocationLabel}</span>
                     <ChevronDown size={14} className={`${styles.locationChevron} ${showLocationDropdown ? styles.locationChevronOpen : ''}`} />
                   </button>
@@ -191,11 +201,12 @@ export default function HeroSection() {
 
                 <div className={styles.searchDivider} />
 
-                <Search className={styles.searchIcon} size={20} />
+                {/* Search Text Input */}
+                <Search className={styles.searchIcon} size={19} />
                 <input
                   type="text"
                   className={styles.searchInput}
-                  placeholder="Search restaurants, shops, offers..."
+                  placeholder="Search for restaurants, shops, services, offers..."
                   value={query}
                   onChange={(e) => {
                     setQuery(e.target.value)
@@ -208,16 +219,19 @@ export default function HeroSection() {
                   spellCheck="false"
                   name="offerme_hero_search"
                 />
+
                 {query && (
                   <button type="button" className={styles.clearBtn} onClick={clearSearch} aria-label="Clear search">
                     <X size={16} />
                   </button>
                 )}
+
                 <button type="submit" className={styles.searchBtn}>
                   Search
                 </button>
               </form>
 
+              {/* Autocomplete Suggestions Dropdown */}
               {showSuggestions && suggestions.length > 0 && (
                 <div className={styles.suggestions}>
                   {suggestions.map((item) => {
@@ -273,11 +287,10 @@ export default function HeroSection() {
                 </div>
               )}
             </div>
-
-            <Link to="/auth/signup" className={styles.ctaPrimary}>
-              Get Started
-            </Link>
           </div>
+
+          {/* ── Justdial-Inspired Discovery Layout: Promotional Banner + Categories + Feature Strip ── */}
+          <HerosecBelowcard />
         </motion.div>
       </div>
     </section>
