@@ -106,7 +106,6 @@ export default async function handler(req, res) {
           .from('sell_your_bussiness')
           .select('id')
           .eq('shop_name', shopName.trim())
-          .eq('business_email', shopEmail.trim())
           .maybeSingle()
 
         if (existing) {

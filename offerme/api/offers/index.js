@@ -190,13 +190,14 @@ export default async function handler(req, res) {
           owner = newOwner
         }
 
-        // Find or associate business
+        // Find or associate business by owner + shop_name
         let businessId = shop_id
-        if (!businessId && owner) {
+        if (!businessId && owner && shopName) {
           const { data: business } = await supabaseAdmin
             .from('sell_your_bussiness')
             .select('id')
             .eq('owner_id', owner.id)
+            .eq('shop_name', shopName.trim())
             .maybeSingle()
           if (business) businessId = business.id
         }

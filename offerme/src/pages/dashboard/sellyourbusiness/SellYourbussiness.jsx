@@ -136,9 +136,9 @@ export default function SellYourbussiness({ onSuccess, onCancel }) {
   const navigate = useNavigate()
 
   const [form, setForm] = useState({
-    shopName: userProfile?.owner_name || '',
-    shopEmail: userProfile?.email || '',
-    enquiryNumber: userProfile?.phone_number || '',
+    shopName: '',
+    shopEmail: '',
+    enquiryNumber: '',
     mainCategory: '',
     subcategory: '',
     openingTime: '',
