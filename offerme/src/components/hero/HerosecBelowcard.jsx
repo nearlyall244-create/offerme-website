@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, ArrowRight, ShieldCheck, Tag, PhoneCall, Star } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react'
 import shopperImg from '@/assets/shopper_banner.jpg'
 import styles from './HerosecBelow.module.css'
 
@@ -91,33 +91,6 @@ const CATEGORIES = [
     image: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=400&auto=format&fit=crop&q=80',
   }
 
-]
-
-const FEATURES = [
-  {
-    icon: <ShieldCheck size={22} className="text-emerald-500" />,
-    title: '5,000+ Verified Businesses',
-    desc: 'Authenticated local shops & services',
-    bg: 'rgba(16, 185, 129, 0.1)',
-  },
-  {
-    icon: <Tag size={22} className="text-blue-500" />,
-    title: 'Exclusive Local Deals',
-    desc: 'Save up to 50% on everyday needs',
-    bg: 'rgba(59, 130, 246, 0.1)',
-  },
-  {
-    icon: <PhoneCall size={22} className="text-amber-500" />,
-    title: 'Direct Connect',
-    desc: 'Call, WhatsApp & navigate in 1 click',
-    bg: 'rgba(245, 158, 11, 0.1)',
-  },
-  {
-    icon: <Star size={22} className="text-purple-500" />,
-    title: '100% Genuine Reviews',
-    desc: 'Ratings by authentic local shoppers',
-    bg: 'rgba(168, 85, 247, 0.1)',
-  },
 ]
 
 export default function HerosecBelowcard() {
@@ -306,22 +279,6 @@ export default function HerosecBelowcard() {
             </button>
           )}
         </div>
-      </div>
-
-
-      {/* ── Feature Strip Below ── */}
-      <div className={styles.featureStrip}>
-        {FEATURES.map((feat, index) => (
-          <div key={index} className={styles.featureItem}>
-            <div className={styles.featureIconWrap} style={{ backgroundColor: feat.bg }}>
-              {feat.icon}
-            </div>
-            <div>
-              <h4 className={styles.featureTitle}>{feat.title}</h4>
-              <p className={styles.featureDesc}>{feat.desc}</p>
-            </div>
-          </div>
-        ))}
       </div>
     </div>
   )
