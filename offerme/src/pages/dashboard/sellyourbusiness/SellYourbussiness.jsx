@@ -37,14 +37,6 @@ function SearchableSelect({ label, required, options, value, onChange, placehold
     return options.filter((o) => (o.name || '').toLowerCase().includes(q))
   }, [query, options])
 
-  useEffect(() => {
-    if (open && selected) {
-      setQuery('')
-    } else if (!open) {
-      setQuery('')
-    }
-  }, [open, selected])
-
   const handleSelect = (opt) => {
     onChange(opt.id)
     setOpen(false)
@@ -533,7 +525,7 @@ export default function SellYourbussiness({ onSuccess, onCancel }) {
             <span className={styles.successEmoji}>✅</span>
             <p className={styles.successMessage}>Once the activation is completed, you will be able to access your account and proceed with the next steps.</p>
             <p className={styles.successMessage} style={{ fontWeight: 600 }}>Thank you for your cooperation.</p>
-            <button type="button" className={styles.successBtn} onClick={() => { setSubmitted(false); onSuccess ? onSuccess() : navigate('/business/dashboard/posts') }}>Okay</button>
+            <button type="button" className={styles.successBtn} onClick={() => { setSubmitted(false); if (onSuccess) { onSuccess() } else { navigate('/business/dashboard/posts') } }}>Okay</button>
           </div>
         </div>
       )}

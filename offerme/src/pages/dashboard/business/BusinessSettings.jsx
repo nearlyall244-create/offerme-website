@@ -21,22 +21,23 @@ export default function BusinessSettings() {
   )
   const [statusMessage, setStatusMessage] = useState({ type: '', text: '' })
 
-  // Keep businessName and phoneNumber in sync when userProfile loads or updates
   useEffect(() => {
     if (userProfile) {
-      const currentName =
-        userProfile?.owner_name ||
-        userProfile?.shop_name ||
-        userProfile?.businessName ||
-        userProfile?.displayName ||
-        ''
-      setBusinessName(currentName)
-      const currentPhone =
-        userProfile?.phone ||
-        userProfile?.phoneNumber ||
-        userProfile?.businessPhoneNumber ||
-        ''
-      setPhoneNumber(currentPhone)
+      requestAnimationFrame(() => {
+        const currentName =
+          userProfile?.owner_name ||
+          userProfile?.shop_name ||
+          userProfile?.businessName ||
+          userProfile?.displayName ||
+          ''
+        setBusinessName(currentName)
+        const currentPhone =
+          userProfile?.phone ||
+          userProfile?.phoneNumber ||
+          userProfile?.businessPhoneNumber ||
+          ''
+        setPhoneNumber(currentPhone)
+      })
     }
   }, [userProfile])
 

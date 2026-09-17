@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
-import { Search, X, SlidersHorizontal, MapPin, Star, Clock, ChevronDown } from 'lucide-react'
+import { Search, X, SlidersHorizontal, MapPin, Star, Clock } from 'lucide-react'
 import styles from './UserDashboardHome.module.css'
 
 const RECENT_KEY = 'offerme_recent_searches'
@@ -126,15 +126,6 @@ export default function UserDashboardHome() {
 
     return filtered
   }, [allListings, search, sortBy, locationFilter])
-
-  const handleSearch = (value) => {
-    setSearch(value)
-    setShowSuggestions(false)
-    if (value.trim()) {
-      saveRecentSearch(value.trim())
-      setRecentSearches(getRecentSearches())
-    }
-  }
 
   const handleSuggestionClick = (listing) => {
     setSearch(listing.name)

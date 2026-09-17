@@ -279,9 +279,8 @@
 
 /* ── Category Card: Tall, vertical, #052B58 card, full-width image ── */
 .categoryCard {
-  flex: 0 0 142px;
-  min-width: 142px;
-  max-width: 142px;
+  flex: 1 1 0;
+  min-width: 150px;
   height: 270px;
   border-radius: 16px;
   background-color: #052B58;
@@ -557,9 +556,8 @@
   }
 
   .categoryCard {
-    flex: 0 0 148px;
+    flex: 1 1 0;
     min-width: 148px;
-    max-width: 148px;
   }
 
   .featureStrip {

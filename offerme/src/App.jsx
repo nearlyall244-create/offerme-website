@@ -16,7 +16,6 @@ import UserRegister from '@/auth/userauth/UserRegister'
 import UserLogin from '@/auth/userauth/UserLogin'
 import BusinessRegister from '@/auth/bussinessauth/BussinessRegister.jsx'
 import BusinessLogin from '@/auth/bussinessauth/BussinessLogin'
-import AdminLogin from '@/auth/adminauth/AdminLogin'
 import VerifyEmail from '@/auth/VerifyEmail'
 
 import DashboardLayout from '@/components/dashboard/DashboardLayout'

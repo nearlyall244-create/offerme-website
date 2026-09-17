@@ -4,7 +4,7 @@ export default async function handler(req, res) {
 
     // ── GET → public offers list or authenticated vendor's offers ──
     if (req.method === 'GET') {
-      const { category, shop_id, search, page = 1, limit = 20, mine, listing_type } = req.query
+      const { category: _category, shop_id, search, page = 1, limit = 20, mine, listing_type } = req.query
       const offset = (page - 1) * limit
 
       if (mine === 'true') {
@@ -97,7 +97,6 @@ export default async function handler(req, res) {
     // ── POST → create, claim, or redeem ──
     if (req.method === 'POST') {
       const { verifyToken } = await import('../_lib/verifyToken.js')
-      const { hasRole } = await import('../_lib/resolveRole.js')
       const { action } = req.query
 
       const authResult = await verifyToken(req)

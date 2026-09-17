@@ -22,19 +22,19 @@ export default function Landingcards() {
   const count = CARDS.length
   const angleStep = 360 / count
 
-  const startAutoRotate = useCallback(() => {
-    stopAutoRotate()
-    autoRef.current = setInterval(() => {
-      setRotation((prev) => prev + 0.3)
-    }, 16)
-  }, [])
-
   const stopAutoRotate = () => {
     if (autoRef.current) {
       clearInterval(autoRef.current)
       autoRef.current = null
     }
   }
+
+  const startAutoRotate = useCallback(() => {
+    stopAutoRotate()
+    autoRef.current = setInterval(() => {
+      setRotation((prev) => prev + 0.3)
+    }, 16)
+  }, [])
 
   useEffect(() => {
     startAutoRotate()

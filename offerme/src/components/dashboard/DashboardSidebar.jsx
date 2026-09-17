@@ -38,7 +38,7 @@ const adminLinks = [
 
 export default function DashboardSidebar({ role = 'user' }) {
   const location = useLocation()
-  const { userProfile } = useAuth()
+  useAuth()
   const [pendingCount, setPendingCount] = useState(0)
 
   useEffect(() => {

@@ -18,15 +18,16 @@ export default function AdminSettings() {
   )
   const [statusMessage, setStatusMessage] = useState({ type: '', text: '' })
 
-  // Keep adminName in sync when userProfile loads or updates
   useEffect(() => {
     if (userProfile) {
-      const currentName =
-        userProfile?.name ||
-        userProfile?.displayName ||
-        userProfile?.owner_name ||
-        ''
-      setAdminName(currentName)
+      requestAnimationFrame(() => {
+        const currentName =
+          userProfile?.name ||
+          userProfile?.displayName ||
+          userProfile?.owner_name ||
+          ''
+        setAdminName(currentName)
+      })
     }
   }, [userProfile])
 

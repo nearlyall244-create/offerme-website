@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import OffersDeals from '@/components/dashboard/OffersDeals'
-import { Plus, Calendar, Tag, Trash2, Store, RefreshCw, Ticket } from 'lucide-react'
+import { Plus, Calendar, Trash2, Store, RefreshCw, Ticket } from 'lucide-react'
 import styles from './OffersDealsPage.module.css'
 
 export default function OffersDealsPage() {
@@ -36,9 +36,7 @@ export default function OffersDealsPage() {
     }
   }, [getToken])
 
-  useEffect(() => {
-    fetchOffers()
-  }, [fetchOffers])
+  useEffect(() => { requestAnimationFrame(() => { fetchOffers() }) }, [fetchOffers])
 
   const handleDelete = async (offerId) => {
     if (!window.confirm('Are you sure you want to delete this offer from offers_post?')) return

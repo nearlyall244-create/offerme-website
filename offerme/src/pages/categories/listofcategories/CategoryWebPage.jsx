@@ -246,8 +246,6 @@ export default function CategoryWebPage() {
             const { meta } = group
             const IconComponent = meta.icon || Layers
             const visible = categoryId ? group.categories : group.categories.slice(0, MAX_VISIBLE)
-            const totalGroupCategories = group.categories.length
-
             return (
               <div
                 key={group.id}

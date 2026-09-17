@@ -14,7 +14,7 @@ export async function verifyToken(req) {
   try {
     const decodedToken = await verifyFirebaseToken(idToken)
     return { decodedToken }
-  } catch (err) {
+  } catch {
     return { error: 'Invalid or expired token', status: 401 }
   }
 }

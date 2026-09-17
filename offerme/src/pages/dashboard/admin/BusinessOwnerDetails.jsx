@@ -13,27 +13,25 @@ export default function BusinessOwnerDetails() {
   const [selectedOwner, setSelectedOwner] = useState(null)
 
   useEffect(() => {
-    fetchOwners()
-  }, [])
-
-  const fetchOwners = async () => {
-    if (!user) return
-    try {
-      setLoading(true)
-      setError(null)
-      const token = await user.getIdToken()
-      const res = await fetch('/api/admin?type=owners', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error)
-      setOwners(data.owners || [])
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
-    }
-  }
+    requestAnimationFrame(async () => {
+      if (!user) return
+      try {
+        setLoading(true)
+        setError(null)
+        const token = await user.getIdToken()
+        const res = await fetch('/api/admin?type=owners', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.error)
+        setOwners(data.owners || [])
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    })
+  }, [user])
 
   const filtered = useMemo(() => {
     let result = [...owners]

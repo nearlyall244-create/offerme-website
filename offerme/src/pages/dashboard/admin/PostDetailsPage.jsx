@@ -93,7 +93,9 @@ export default function PostDetailsPage() {
   const totalPages = Math.max(1, Math.ceil(filtered.length / perPage))
   const paged = filtered.slice((page - 1) * perPage, page * perPage)
 
-  useEffect(() => { setPage(1) }, [search, statusFilter, categoryFilter])
+  useEffect(() => {
+    requestAnimationFrame(() => { setPage(1) })
+  }, [search, statusFilter, categoryFilter])
 
   return (
     <div className={styles.page}>

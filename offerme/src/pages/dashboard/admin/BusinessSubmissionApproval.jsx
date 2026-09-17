@@ -21,24 +21,22 @@ export default function BusinessSubmissionApproval() {
 
   useEffect(() => {
     if (!user) return
-    fetchSubmissions()
+    requestAnimationFrame(async () => {
+      setLoading(true)
+      try {
+        const token = await user.getIdToken()
+        const res = await fetch('/api/admin?type=submissions', {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        const data = await res.json()
+        if (res.ok) setSubmissions(data.submissions || [])
+      } catch (err) {
+        console.error('Failed to fetch submissions:', err)
+      } finally {
+        setLoading(false)
+      }
+    })
   }, [user])
-
-  async function fetchSubmissions() {
-    setLoading(true)
-    try {
-      const token = await user.getIdToken()
-      const res = await fetch('/api/admin?type=submissions', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      const data = await res.json()
-      if (res.ok) setSubmissions(data.submissions || [])
-    } catch (err) {
-      console.error('Failed to fetch submissions:', err)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   async function handleApprove(id) {
     try {

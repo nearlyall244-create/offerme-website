@@ -36,14 +36,6 @@ function SearchableSelect({ label, required, options, value, onChange, placehold
     return options.filter((o) => (o.name || '').toLowerCase().includes(q))
   }, [query, options])
 
-  useEffect(() => {
-    if (open && selected) {
-      setQuery('')
-    } else if (!open) {
-      setQuery('')
-    }
-  }, [open, selected])
-
   const handleSelect = (opt) => {
     onChange(opt.id)
     setOpen(false)

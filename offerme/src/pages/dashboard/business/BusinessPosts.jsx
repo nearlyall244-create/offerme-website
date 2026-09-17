@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import SellYourbussiness from '@/pages/dashboard/sellyourbusiness/SellYourbussiness'
-import { Plus, Tag, Calendar, MapPin, Phone, Trash2, Store, RefreshCw, Ticket } from 'lucide-react'
+import { Plus, Tag, Calendar, MapPin, Phone, Trash2, Store, RefreshCw } from 'lucide-react'
 import styles from './BusinessPosts.module.css'
 
 export default function BusinessPosts() {
@@ -36,9 +36,7 @@ export default function BusinessPosts() {
     }
   }, [getToken])
 
-  useEffect(() => {
-    fetchPosts()
-  }, [fetchPosts])
+  useEffect(() => { requestAnimationFrame(() => { fetchPosts() }) }, [fetchPosts])
 
   const handleDeletePost = async (offerId) => {
     if (!window.confirm('Are you sure you want to remove this post?')) return

@@ -38,56 +38,7 @@ const BANNER_SLIDES = [
 ]
 
 const CATEGORIES = [
-  {
-    id: 'restaurants',
-    title: 'Restaurants',
-    slug: 'food-restaurants',
-    bgColor: '#052B58',
-    darkBg: '#052B58',
-    titleColor: '#FE6902',
-    accentColor: '#FE6902',
-    image: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'fashion',
-    title: 'Fashion',
-    slug: 'fashion-clothing',
-    bgColor: '#052B58',
-    darkBg: '#052B58',
-    titleColor: '#FE6902',
-    accentColor: '#FE6902',
-    image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'beauty',
-    title: 'Beauty',
-    slug: 'beauty-personal-care',
-    bgColor: '#052B58',
-    darkBg: '#052B58',
-    titleColor: '#FE6902',
-    accentColor: '#FE6902',
-    image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'home-services',
-    title: 'Home Services',
-    slug: 'home-repair-maintenance',
-    bgColor: '#052B58',
-    darkBg: '#052B58',
-    titleColor: '#FE6902',
-    accentColor: '#FE6902',
-    image: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'grocery',
-    title: 'Grocery',
-    slug: 'grocery-daily-needs',
-    bgColor: '#052B58',
-    darkBg: '#052B58',
-    titleColor: '#FE6902',
-    accentColor: '#FE6902',
-    image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&auto=format&fit=crop&q=80',
-  },
+
   {
     id: 'real-estate',
     title: 'Real Estate',
@@ -108,6 +59,38 @@ const CATEGORIES = [
     accentColor: '#FE6902',
     image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=400&auto=format&fit=crop&q=80',
   },
+  {
+    id: 'industrial-b2b',
+    title: 'Industrial B2B',
+    slug: 'industrial-b2b',
+    bgColor: '#052B58',
+    darkBg: '#052B58',
+    titleColor: '#FE6902',
+    accentColor: '#FE6902',
+    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&auto=format&fit=crop&q=80',
+  },
+
+  {
+    id: 'home-services',
+    title: 'Home Services',
+    slug: 'home-repair-maintenance',
+    bgColor: '#052B58',
+    darkBg: '#052B58',
+    titleColor: '#FE6902',
+    accentColor: '#FE6902',
+    image: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400&auto=format&fit=crop&q=80',
+  },
+  {
+    id: 'healthcare',
+    title: 'Healthcare',
+    slug: 'healthcare-medical',
+    bgColor: '#052B58',
+    darkBg: '#052B58',
+    titleColor: '#FE6902',
+    accentColor: '#FE6902',
+    image: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=400&auto=format&fit=crop&q=80',
+  }
+
 ]
 
 const FEATURES = [
@@ -142,6 +125,30 @@ export default function HerosecBelowcard() {
   const [isHovered, setIsHovered] = useState(false)
   const scrollContainerRef = useRef(null)
 
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+  const [canScrollRight, setCanScrollRight] = useState(false)
+
+  const checkScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current
+      setCanScrollLeft(scrollLeft > 5)
+      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 5)
+    }
+  }
+
+  useEffect(() => {
+    checkScroll()
+    const el = scrollContainerRef.current
+    if (el) {
+      el.addEventListener('scroll', checkScroll)
+    }
+    window.addEventListener('resize', checkScroll)
+    return () => {
+      if (el) el.removeEventListener('scroll', checkScroll)
+      window.removeEventListener('resize', checkScroll)
+    }
+  }, [])
+
   // Auto rotate banner slides every 5 seconds
   useEffect(() => {
     if (isHovered) return
@@ -163,6 +170,7 @@ export default function HerosecBelowcard() {
     if (scrollContainerRef.current) {
       const scrollAmount = direction === 'left' ? -260 : 260
       scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' })
+      setTimeout(checkScroll, 350)
     }
   }
 
@@ -240,14 +248,16 @@ export default function HerosecBelowcard() {
 
         {/* Right Category Cards Carousel / Row */}
         <div className={styles.categorySection}>
-          <button
-            type="button"
-            className={`${styles.catScrollBtn} ${styles.catScrollLeft}`}
-            onClick={() => scrollCategories('left')}
-            aria-label="Scroll categories left"
-          >
-            <ChevronLeft size={18} />
-          </button>
+          {canScrollLeft && (
+            <button
+              type="button"
+              className={`${styles.catScrollBtn} ${styles.catScrollLeft}`}
+              onClick={() => scrollCategories('left')}
+              aria-label="Scroll categories left"
+            >
+              <ChevronLeft size={18} />
+            </button>
+          )}
 
           <div className={styles.categoryScrollWrap} ref={scrollContainerRef}>
             {CATEGORIES.map((cat) => (
@@ -285,16 +295,19 @@ export default function HerosecBelowcard() {
             ))}
           </div>
 
-          <button
-            type="button"
-            className={`${styles.catScrollBtn} ${styles.catScrollRight}`}
-            onClick={() => scrollCategories('right')}
-            aria-label="Scroll categories right"
-          >
-            <ChevronRight size={18} />
-          </button>
+          {canScrollRight && (
+            <button
+              type="button"
+              className={`${styles.catScrollBtn} ${styles.catScrollRight}`}
+              onClick={() => scrollCategories('right')}
+              aria-label="Scroll categories right"
+            >
+              <ChevronRight size={18} />
+            </button>
+          )}
         </div>
       </div>
+
 
       {/* ── Feature Strip Below ── */}
       <div className={styles.featureStrip}>

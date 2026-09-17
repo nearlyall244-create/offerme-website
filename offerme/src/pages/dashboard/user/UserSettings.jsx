@@ -18,13 +18,14 @@ export default function UserSettings() {
     phone: userProfile?.phone || userProfile?.phone_number || '',
   })
 
-  // Sync profile data when userProfile updates
   useEffect(() => {
     if (userProfile) {
-      setProfileData({
-        displayName: userProfile?.displayName || userProfile?.name || '',
-        email: userProfile?.email || '',
-        phone: userProfile?.phone || userProfile?.phone_number || '',
+      requestAnimationFrame(() => {
+        setProfileData({
+          displayName: userProfile?.displayName || userProfile?.name || '',
+          email: userProfile?.email || '',
+          phone: userProfile?.phone || userProfile?.phone_number || '',
+        })
       })
     }
   }, [userProfile])

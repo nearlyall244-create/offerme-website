@@ -87,7 +87,7 @@ export default async function handler(req, res) {
         return res.status(403).json({ error: 'Forbidden: vendor role required' })
       }
 
-      const { shop_name, category, phone_number, email, address, logo_url } = req.body
+      const { shop_name, category, phone_number, email: _email, address, logo_url } = req.body
 
       if (!shop_name) {
         return res.status(400).json({ error: 'shop_name is required' })
@@ -156,7 +156,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'shop_id is required' })
       }
 
-      let { data: business, error: fetchError } = await supabaseAdmin
+      let { data: business, error: _fetchError } = await supabaseAdmin
         .from('sell_your_bussiness')
         .select('id, owner_id, business_owners(firebase_uid)')
         .eq('id', shop_id)

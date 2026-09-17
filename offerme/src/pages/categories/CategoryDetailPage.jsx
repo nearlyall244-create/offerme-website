@@ -4,17 +4,6 @@ import Navbar from '@/components/navbar/Navbar'
 import Footer from '@/pages/footer/Footer'
 import styles from './CategoryDetailPage.module.css'
 
-function StarRating({ rating }) {
-  const full = Math.floor(rating)
-  const half = rating - full >= 0.5
-  let stars = ''
-  for (let i = 0; i < full; i++) stars += '★'
-  if (half) stars += '★'
-  const remaining = 5 - full - (half ? 1 : 0)
-  for (let i = 0; i < remaining; i++) stars += '☆'
-  return <span className={styles.ratingStars}>{stars}</span>
-}
-
 export default function CategoryDetailPage() {
   const { slug, subSlug } = useParams()
   const [searchQuery, setSearchQuery] = useState('')
