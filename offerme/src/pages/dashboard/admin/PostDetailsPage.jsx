@@ -7,6 +7,7 @@ const STATUS_OPTIONS = [
   { value: 'pending', label: 'Pending' },
   { value: 'approved', label: 'Approved' },
   { value: 'rejected', label: 'Rejected' },
+  { value: 'deleted', label: 'Deleted' },
 ]
 
 function formatDate(dateStr) {
@@ -19,6 +20,7 @@ function formatDate(dateStr) {
 function StatusBadge({ status }) {
   const cls = status === 'approved' ? styles.statusApproved
     : status === 'rejected' ? styles.statusRejected
+    : status === 'deleted' ? styles.statusDeleted
     : styles.statusPending
   return <span className={`${styles.statusBadge} ${cls}`}>{status || 'pending'}</span>
 }

@@ -346,13 +346,20 @@ export default async function handler(req, res) {
 
       const { data: offer } = await supabaseAdmin
         .from('offers_post')
-        .select('id, created_by_uid')
+        .select('id, created_by_uid, business_id')
         .eq('id', offerId)
         .single()
 
       if (!offer) return res.status(404).json({ error: 'Offer not found' })
       if (offer.created_by_uid !== uid) {
         return res.status(403).json({ error: 'Forbidden: you do not own this offer' })
+      }
+
+      if (offer.business_id) {
+        await supabaseAdmin
+          .from('sell_your_bussiness')
+          .update({ status: 'deleted', is_active: false })
+          .eq('id', offer.business_id)
       }
 
       await supabaseAdmin.from('offers_post').delete().eq('id', offerId)

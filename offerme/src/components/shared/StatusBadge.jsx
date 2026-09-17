@@ -5,6 +5,7 @@ const STATUS_LABELS = {
   pending: 'Pending',
   approved: 'Approved',
   rejected: 'Rejected',
+  deleted: 'Post Deleted',
   suspended: 'Suspended',
 }
 

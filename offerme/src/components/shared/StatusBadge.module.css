@@ -32,6 +32,11 @@
   background: #fee2e2;
 }
 
+.deleted {
+  color: #6b7280;
+  background: #f3f4f6;
+}
+
 /* Dark mode */
 :global(html.dark) .badge {
   color: var(--color-text);
@@ -49,4 +54,8 @@
 :global(html.dark) .rejected,
 :global(html.dark) .suspended {
   background: #7f1d1d;
+}
+
+:global(html.dark) .deleted {
+  background: #374151;
 }
