@@ -1,15 +1,6 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, MapPin } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import styles from './MiddleSection.module.css'
-
-const LOCALITIES = [
-  { id: 't-nagar', name: 'T Nagar' },
-  { id: 'anna-nagar', name: 'Anna Nagar' },
-  { id: 'velachery', name: 'Velachery' },
-  { id: 'omr', name: 'OMR' },
-  { id: 'adyar', name: 'Adyar' },
-]
 
 const PROPERTY_TYPES = [
   {
@@ -38,42 +29,20 @@ const PROPERTY_TYPES = [
   },
 ]
 
-export default function MiddleSection({ defaultLocality = 'T Nagar' }) {
-  const [selectedLocality, setSelectedLocality] = useState(defaultLocality)
+export default function MiddleSection() {
 
   return (
     <section className={styles.sectionWrapper} aria-label="Featured Properties">
       <div className={styles.container}>
-        {/* Locality Selector Bar */}
-        <div className={styles.localitySelector}>
-          <div className={styles.localityLabel}>
-            <MapPin size={16} className={styles.locationPinIcon} />
-            <span>Popular Localities:</span>
-          </div>
-          <div className={styles.pillsList}>
-            {LOCALITIES.map((loc) => {
-              const isActive = selectedLocality.toLowerCase() === loc.name.toLowerCase()
-              return (
-                <button
-                  key={loc.id}
-                  type="button"
-                  onClick={() => setSelectedLocality(loc.name)}
-                  className={`${styles.pillBtn} ${isActive ? styles.activePill : ''}`}
-                >
-                  {loc.name}
-                </button>
-              )
-            })}
-          </div>
-        </div>
+
 
         {/* Main Property Showcase Card */}
         <div className={styles.cardContainer}>
           {/* Header Row */}
           <div className={styles.cardHeader}>
-            <h2 className={styles.cardTitle}>Properties in {selectedLocality}</h2>
+            <h2 className={styles.cardTitle}>Properties</h2>
             <Link
-              to={`/category/real-estate-property?locality=${encodeURIComponent(selectedLocality)}`}
+              to="/category/real-estate-property"
               className={styles.viewAllLink}
             >
               <span>View All</span>
@@ -86,13 +55,13 @@ export default function MiddleSection({ defaultLocality = 'T Nagar' }) {
             {PROPERTY_TYPES.map((prop) => (
               <Link
                 key={prop.id}
-                to={`/category/real-estate-property?type=${prop.id}&locality=${encodeURIComponent(selectedLocality)}`}
+                to={`/category/real-estate-property?type=${prop.id}`}
                 className={styles.propertyCard}
               >
                 <div className={styles.imageContainer}>
                   <img
                     src={prop.image}
-                    alt={`${prop.title} in ${selectedLocality}`}
+                    alt={`${prop.title}`}
                     className={styles.propertyImg}
                     loading="lazy"
                     onError={(e) => {
