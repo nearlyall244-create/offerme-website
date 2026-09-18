@@ -107,7 +107,7 @@ export default function HerosecBelowcard() {
             onClick={prevSlide}
             aria-label="Previous slide"
           >
-            <ChevronLeft size={18} />
+            <ChevronLeft size={14} />
           </button>
 
           <button
@@ -116,7 +116,7 @@ export default function HerosecBelowcard() {
             onClick={nextSlide}
             aria-label="Next slide"
           >
-            <ChevronRight size={18} />
+            <ChevronRight size={14} />
           </button>
 
           <div className={styles.promoContent}>
@@ -131,7 +131,7 @@ export default function HerosecBelowcard() {
 
             <Link to={slide.ctaLink} className={styles.promoButton}>
               <span>{slide.ctaText}</span>
-              <ArrowRight size={16} />
+              <ArrowRight size={12} />
             </Link>
 
             <div className={styles.promoDots}>
@@ -176,7 +176,7 @@ export default function HerosecBelowcard() {
                   loading="lazy"
                 />
                 <div className={styles.categoryAction} aria-hidden="true">
-                  <ArrowRight size={14} strokeWidth={2.5} />
+                  <ArrowRight size={12} strokeWidth={2.5} />
                 </div>
               </div>
             </Link>
