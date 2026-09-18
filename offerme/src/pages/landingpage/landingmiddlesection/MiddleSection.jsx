@@ -57,7 +57,7 @@ export default function MiddleSection() {
         {/* 1st Card: Properties */}
         <div className={styles.cardContainer}>
           <div className={styles.cardHeader}>
-            <h2 className={styles.cardTitle}>Properties in T Nagar</h2>
+            <h2 className={styles.cardTitle}>Properties </h2>
             <Link
               to="/category/real-estate-property"
               className={styles.viewAllLink}
