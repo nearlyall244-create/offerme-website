@@ -3,6 +3,8 @@
    Compact 200px card design. No global selectors.
    ═══════════════════════════════════════════════════════════════ */
 
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
+
 /* ── Section Wrapper ───────────────────────────────────────── */
 .herosecBelow {
   width: 100%;
@@ -213,7 +215,7 @@
   flex: 1 1 0;
   min-width: 0;
   border-radius: 16px;
-  background-color: #052B58;
+  background-color: #98ccf4;
   text-decoration: none;
   position: relative;
   overflow: hidden;
@@ -241,11 +243,12 @@
 }
 
 .categoryTitle {
-  font-size: 0.8rem;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 15px;
   font-weight: 700;
   line-height: 1.2;
   margin: 0;
-  color: #FE6902;
+  color: #FFFFFF;
   letter-spacing: -0.01em;
   text-align: center;
   white-space: nowrap;
