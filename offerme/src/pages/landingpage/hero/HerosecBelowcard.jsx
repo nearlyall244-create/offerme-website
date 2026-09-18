@@ -2,6 +2,11 @@ import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react'
 import shopperImg from '@/assets/shopper_banner.jpg'
+import realEstateImg from '@/assets/herosectionimg/realestate.png'
+import educationImg from '@/assets/herosectionimg/education.png'
+import industrialImg from '@/assets/herosectionimg/industryb2b.png'
+import homeServicesImg from '@/assets/herosectionimg/HOMESERVICE.png'
+import healthcareImg from '@/assets/herosectionimg/healthcare.png'
 import styles from './HerosecBelow.module.css'
 
 const PROMO_SLIDES = [
@@ -42,31 +47,31 @@ const CATEGORIES = [
     id: 'real-estate',
     title: 'Real Estate',
     slug: 'real-estate-property',
-    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&auto=format&fit=crop&q=80',
+    image: realEstateImg,
   },
   {
     id: 'education',
     title: 'Education',
     slug: 'education-training',
-    image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=400&auto=format&fit=crop&q=80',
+    image: educationImg,
   },
   {
     id: 'industrial-b2b',
     title: 'Industrial B2B',
     slug: 'industrial-b2b',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&auto=format&fit=crop&q=80',
+    image: industrialImg,
   },
   {
     id: 'home-services',
     title: 'Home Services',
     slug: 'home-repair-maintenance',
-    image: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400&auto=format&fit=crop&q=80',
+    image: homeServicesImg,
   },
   {
     id: 'healthcare',
     title: 'Healthcare',
     slug: 'healthcare-medical',
-    image: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=400&auto=format&fit=crop&q=80',
+    image: healthcareImg,
   },
 ]
 
