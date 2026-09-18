@@ -29,7 +29,7 @@
   box-shadow: 0 6px 24px -4px rgba(59, 130, 246, 0.1), 0 2px 8px -2px rgba(0, 0, 0, 0.04);
   display: flex;
   align-items: stretch;
-  min-height: 260px;
+  min-height: 200px;
   max-width: 380px;
   width: 100%;
   transition: box-shadow 0.3s ease;
@@ -243,7 +243,7 @@
 .categoryTitle {
   font-size: 1.15rem;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.5;
   margin: 0;
   color: #FE6902;
   letter-spacing: -0.01em;
@@ -349,7 +349,7 @@
   }
 
   .promoCard {
-    min-height: 300px;
+    min-height: 150px;
   }
 
   .promoImageWrapper {
@@ -362,7 +362,7 @@
   }
 
   .categoryCard {
-    min-height: 320px;
+    min-height: 280px;
   }
 
   .categoryTitle {
