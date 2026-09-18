@@ -7,7 +7,6 @@ const CARDS = [
   { label: 'Gift Shops', image: 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=400&q=80' },
   { label: 'Mobile Shops', image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&q=80' },
   { label: 'Supermarkets', image: 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=400&q=80' },
-  { label: 'Tea Shops', image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&q=80' },
   { label: 'Automotive', image: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400&q=80' },
 ]
 
