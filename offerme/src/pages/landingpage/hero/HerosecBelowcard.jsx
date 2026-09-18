@@ -175,7 +175,10 @@ export default function HerosecBelowcard() {
                   className={styles.categoryImage}
                   loading="lazy"
                 />
-                <div className={styles.categoryAction} aria-hidden="true">
+              </div>
+              <div className={styles.categoryAction}>
+                <span className={styles.categoryActionLabel}>Explore Offers</span>
+                <div className={styles.categoryActionBtn} aria-hidden="true">
                   <ArrowRight size={12} strokeWidth={2.5} />
                 </div>
               </div>

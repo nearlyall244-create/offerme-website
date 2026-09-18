@@ -215,7 +215,7 @@
   flex: 1 1 0;
   min-width: 0;
   border-radius: 16px;
-  background-color: #98ccf4;
+  background-color: #0B3768;
   text-decoration: none;
   position: relative;
   overflow: hidden;
@@ -240,6 +240,8 @@
   flex-shrink: 0;
   text-align: center;
   z-index: 2;
+  background-color: #FF6B00;
+  border-radius: 16px 16px 0 0;
 }
 
 .categoryTitle {
@@ -257,14 +259,13 @@
   width: 100%;
 }
 
-/* ── Category Image + Action Area ─────────────────────────── */
+/* ── Category Image ───────────────────────────────────────── */
 .categoryImageWrapper {
   position: relative;
   width: 100%;
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  border-radius: 0 0 16px 16px;
   display: flex;
   flex-direction: column;
 }
@@ -282,27 +283,41 @@
   transform: scale(1.03);
 }
 
-/* ── Navy Footer with Orange Button ───────────────────────── */
+/* ── Bottom Footer: Explore Offers + Arrow ────────────────── */
 .categoryAction {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  width: 32px;
-  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #0B3768;
+  flex-shrink: 0;
+}
+
+.categoryActionLabel {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  letter-spacing: 0.01em;
+}
+
+.categoryActionBtn {
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: #FE6902;
+  background: #FF6B00;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  box-shadow: 0 2px 6px rgba(254, 105, 2, 0.35);
-  z-index: 10;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(255, 107, 0, 0.35);
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
 }
 
-.categoryCard:hover .categoryAction {
+.categoryCard:hover .categoryActionBtn {
   transform: translateX(2px);
-  box-shadow: 0 3px 10px rgba(254, 105, 2, 0.45);
+  box-shadow: 0 3px 10px rgba(255, 107, 0, 0.45);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -395,10 +410,16 @@
   }
 
   .categoryAction {
-    width: 28px;
-    height: 28px;
-    bottom: 6px;
-    right: 6px;
+    padding: 6px 10px;
+  }
+
+  .categoryActionBtn {
+    width: 26px;
+    height: 26px;
+  }
+
+  .categoryActionLabel {
+    font-size: 0.6rem;
   }
 }
 
@@ -480,14 +501,20 @@
   }
 
   .categoryAction {
-    width: 26px;
-    height: 26px;
-    bottom: 5px;
-    right: 5px;
+    padding: 5px 8px;
+  }
+
+  .categoryActionBtn {
+    width: 24px;
+    height: 24px;
+  }
+
+  .categoryActionLabel {
+    font-size: 0.55rem;
   }
 
   .categoryImageWrapper {
-    border-radius: 0 0 14px 14px;
+    border-radius: 0;
   }
 }
 
@@ -558,4 +585,12 @@
 :global(html.dark) .categoryCard {
   border-color: rgba(255, 255, 255, 0.06);
   box-shadow: 0 3px 12px -2px rgba(0, 0, 0, 0.3);
+}
+
+:global(html.dark) .categoryHeader {
+  background-color: #FF6B00;
+}
+
+:global(html.dark) .categoryAction {
+  background: #0B3768;
 }
