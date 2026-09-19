@@ -1,0 +1,5 @@
+[mcp_servers.offerme_codegraph]
+command = "node"
+args = ["scripts/codegraph-mcp.js"]
+cwd = "E:\\offermeproject\\offerme"
+startup_timeout_sec = 30

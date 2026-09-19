@@ -17,6 +17,7 @@ import UserLogin from '@/auth/userauth/UserLogin'
 import BusinessRegister from '@/auth/bussinessauth/BussinessRegister.jsx'
 import BusinessLogin from '@/auth/bussinessauth/BussinessLogin'
 import VerifyEmail from '@/auth/VerifyEmail'
+import EmailAction from '@/auth/EmailAction'
 
 import DashboardLayout from '@/components/dashboard/DashboardLayout'
 import UserDashboardHome from '@/pages/dashboard/user/UserDashboardHome'
@@ -68,6 +69,7 @@ export default function App() {
           <Route path="/auth/business/login" element={<GuestRoute><BusinessLogin /></GuestRoute>} />
           <Route path="/auth/admin/login" element={<Navigate to="/auth/login" replace />} />
           <Route path="/auth/verify-email" element={<VerifyEmail />} />
+          <Route path="/auth/email-action" element={<EmailAction />} />
 
           {/* Sell Your Business (accessible to both user and business roles) */}
           <Route

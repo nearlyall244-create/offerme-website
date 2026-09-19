@@ -103,7 +103,7 @@ export default function UserRegister() {
 
     try {
       const displayName = form.fullName.trim()
-      await signUp(form.email.trim(), form.password, displayName, 'user')
+      await signUp(form.email.trim(), form.password, displayName, 'user', form.phoneNumber.trim())
       navigate('/auth/verify-email', { state: { email: form.email.trim() } })
     } catch (err) {
       setError(err.message || 'Registration failed. Please try again.')

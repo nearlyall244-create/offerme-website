@@ -33,7 +33,9 @@ export default function DashboardNavbar({ role }) {
       <div className={styles.right}>
         <span className={styles.name}>{displayName}</span>
         <div className={styles.avatar}>
-          {initial}
+          {userProfile?.avatar_url ? (
+            <img src={userProfile.avatar_url} alt="" className={styles.avatarImage} />
+          ) : initial}
         </div>
       </div>
     </header>

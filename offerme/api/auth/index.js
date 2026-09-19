@@ -52,7 +52,31 @@ export default async function handler(req, res) {
         .maybeSingle()
 
       if (customer) {
-        return res.status(200).json({ role: 'customer', profile: customer })
+        // Firebase is the source of truth for an email address. This also syncs
+        // the database only after Firebase has completed an email-change action.
+        let profile = customer
+        if (email && customer.email !== email) {
+          const { data: syncedCustomer, error: syncError } = await supabaseAdmin
+            .from('public_users')
+            .update({ email, updated_at: new Date().toISOString() })
+            .eq('id', customer.id)
+            .select()
+            .single()
+          if (!syncError && syncedCustomer) profile = syncedCustomer
+        }
+
+        // Avatar objects live in a private bucket. Only this authenticated
+        // profile response includes a short-lived URL for the image.
+        if (profile.avatar_path) {
+          const { data: signedAvatar } = await supabaseAdmin.storage
+            .from('profile-avatars')
+            .createSignedUrl(profile.avatar_path, 60 * 60)
+          if (signedAvatar?.signedUrl) {
+            profile = { ...profile, avatar_url: signedAvatar.signedUrl }
+          }
+        }
+
+        return res.status(200).json({ role: 'customer', profile })
       }
 
       const { data: owner } = await supabaseAdmin
@@ -132,9 +156,35 @@ export default async function handler(req, res) {
         .maybeSingle()
 
       if (customer) {
+        const phoneNumber = String(body.phone_number ?? body.phone ?? customer.phone_number ?? '').trim()
+        const phoneDigits = phoneNumber.replace(/\D/g, '')
+        const location = String(body.location ?? customer.location ?? '').trim()
+        const bio = String(body.bio ?? customer.bio ?? '').trim()
+        const avatarPath = body.avatar_path === undefined ? customer.avatar_path : body.avatar_path
+
+        if (!/^\d{10}$/.test(phoneDigits)) {
+          return res.status(400).json({ error: 'Phone number must contain exactly 10 digits' })
+        }
+        if (location.length > 120) {
+          return res.status(400).json({ error: 'Location must be 120 characters or fewer' })
+        }
+        if (bio.length > 500) {
+          return res.status(400).json({ error: 'Bio must be 500 characters or fewer' })
+        }
+        if (avatarPath !== null && avatarPath !== undefined && !String(avatarPath).startsWith(`${uid}/`)) {
+          return res.status(400).json({ error: 'Invalid avatar path' })
+        }
+
         const { data: updatedCustomer, error: updateCustErr } = await supabaseAdmin
           .from('public_users')
-          .update({ name: trimmedName, updated_at: new Date().toISOString() })
+          .update({
+            name: trimmedName,
+            phone_number: phoneDigits,
+            location: location || null,
+            bio: bio || null,
+            avatar_path: avatarPath || null,
+            updated_at: new Date().toISOString(),
+          })
           .eq('id', customer.id)
           .select()
           .single()
@@ -193,6 +243,59 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
+  }
+
+  if (action === 'delete-account') {
+    if (req.method !== 'DELETE') {
+      return res.status(405).json({ error: 'Method not allowed' })
+    }
+    try {
+      const { verifyToken } = await import('../_lib/verifyToken.js')
+      const { supabaseAdmin } = await import('../_lib/supabaseAdmin.js')
+      const { deleteFirebaseUser } = await import('../_lib/firebaseAdmin.js')
+
+      const authResult = await verifyToken(req)
+      if (authResult.error) {
+        return res.status(authResult.status).json({ error: authResult.error })
+      }
+
+      const uid = authResult.decodedToken.uid
+
+      const { data: customer } = await supabaseAdmin
+        .from('public_users')
+        .select('id, avatar_path')
+        .eq('firebase_uid', uid)
+        .maybeSingle()
+
+      if (customer) {
+        if (customer.avatar_path) {
+          await supabaseAdmin.storage
+            .from('profile-avatars')
+            .remove([customer.avatar_path])
+        }
+        await supabaseAdmin.from('public_users').delete().eq('id', customer.id)
+      }
+
+      const { data: owner } = await supabaseAdmin
+        .from('business_owners')
+        .select('id')
+        .eq('firebase_uid', uid)
+        .maybeSingle()
+
+      if (owner) {
+        await supabaseAdmin.from('sell_your_bussiness').delete().eq('owner_id', owner.id)
+        await supabaseAdmin.from('business_owners').delete().eq('id', owner.id)
+      }
+
+      await supabaseAdmin.from('admin_log').delete().eq('firebase_uid', uid)
+
+      await deleteFirebaseUser(uid)
+
+      return res.status(200).json({ success: true, message: 'Account deleted successfully.' })
+    } catch (err) {
+      console.error('[auth] delete-account error:', err)
+      return res.status(500).json({ error: err.message || 'Failed to delete account.' })
+    }
   }
 
   if (action === 'signup-customer') {

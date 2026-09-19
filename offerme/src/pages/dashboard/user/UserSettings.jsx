@@ -1,34 +1,19 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { User, Bell, Shield, Trash2, Save, Camera } from 'lucide-react'
+import { Bell, Shield, Trash2, Save, LogOut } from 'lucide-react'
 import ConfirmModal from '@/components/shared/ConfirmModal'
 import styles from './UserSettings.module.css'
 
 export default function UserSettings() {
-  const { userProfile, signOut, updateProfile, refreshProfile } = useAuth()
-  const [activeTab, setActiveTab] = useState('profile')
+  const { userProfile, signOut, getToken } = useAuth()
+  const [activeTab, setActiveTab] = useState('notifications')
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
   const [saving, setSaving] = useState(false)
-
-  const [profileData, setProfileData] = useState({
-    displayName: userProfile?.displayName || userProfile?.name || '',
-    email: userProfile?.email || '',
-    phone: userProfile?.phone || userProfile?.phone_number || '',
-  })
-
-  useEffect(() => {
-    if (userProfile) {
-      requestAnimationFrame(() => {
-        setProfileData({
-          displayName: userProfile?.displayName || userProfile?.name || '',
-          email: userProfile?.email || '',
-          phone: userProfile?.phone || userProfile?.phone_number || '',
-        })
-      })
-    }
-  }, [userProfile])
+  const [deleteEmail, setDeleteEmail] = useState('')
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
 
   const [notifications, setNotifications] = useState({
     emailAlerts: true,
@@ -42,31 +27,36 @@ export default function UserSettings() {
     sessionTimeout: '30',
   })
 
-  const handleProfileSave = async () => {
-    if (!profileData.displayName.trim()) return
-    setSaving(true)
-    try {
-      await updateProfile({
-        name: profileData.displayName.trim(),
-        displayName: profileData.displayName.trim(),
-        phone: profileData.phone,
-      })
-      await refreshProfile()
-    } catch (err) {
-      console.error('Failed to update profile:', err)
-    } finally {
-      setSaving(false)
-    }
-  }
-
   const handleNotificationSave = async () => {
     setSaving(true)
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise((r) => setTimeout(r, 1000))
     setSaving(false)
   }
 
+  const handleDeleteAccount = async () => {
+    if (deleteEmail.trim().toLowerCase() !== userProfile?.email?.toLowerCase()) {
+      setDeleteError('Email does not match your account email.')
+      return
+    }
+    setDeleting(true)
+    setDeleteError('')
+    try {
+      const token = await getToken()
+      const res = await fetch('/api/auth?action=delete-account', {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to delete account.')
+      await signOut()
+      window.location.href = '/'
+    } catch (err) {
+      setDeleteError(err.message || 'Failed to delete account.')
+      setDeleting(false)
+    }
+  }
+
   const tabs = [
-    { id: 'profile', label: 'Profile', icon: User },
     { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'security', label: 'Security', icon: Shield },
     { id: 'account', label: 'Account', icon: Trash2 },
@@ -94,65 +84,10 @@ export default function UserSettings() {
         </nav>
 
         <div className={styles.content}>
-          {activeTab === 'profile' && (
-            <div className={styles.section}>
-              <h2 className={styles.sectionTitle}>Profile Information</h2>
-              
-              <div className={styles.avatarSection}>
-                <div className={styles.avatarLarge}>
-                  {(userProfile?.displayName || 'U')[0].toUpperCase()}
-                </div>
-                <button className={styles.changePhotoBtn}>
-                  <Camera size={16} />
-                  Change Photo
-                </button>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Display Name</label>
-                <input
-                  type="text"
-                  className={styles.input}
-                  value={profileData.displayName}
-                  onChange={(e) => setProfileData({ ...profileData, displayName: e.target.value })}
-                />
-              </div>
-
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Email Address</label>
-                <input
-                  type="email"
-                  className={styles.input}
-                  value={profileData.email}
-                  disabled
-                />
-                <span className={styles.hint}>Email cannot be changed</span>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Phone Number</label>
-                <input
-                  type="tel"
-                  className={styles.input}
-                  value={profileData.phone}
-                  onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
-                  placeholder="Enter phone number"
-                />
-              </div>
-
-              <div className={styles.actions}>
-                <button className={styles.saveBtn} onClick={handleProfileSave} disabled={saving}>
-                  <Save size={16} />
-                  {saving ? 'Saving...' : 'Save Changes'}
-                </button>
-              </div>
-            </div>
-          )}
-
           {activeTab === 'notifications' && (
             <div className={styles.section}>
               <h2 className={styles.sectionTitle}>Notification Preferences</h2>
-              
+
               <div className={styles.toggleGroup}>
                 <div className={styles.toggleItem}>
                   <div className={styles.toggleInfo}>
@@ -216,7 +151,7 @@ export default function UserSettings() {
               </div>
 
               <div className={styles.actions}>
-                <button className={styles.saveBtn} onClick={handleNotificationSave} disabled={saving}>
+                <button className={`${styles.saveBtn} ${styles.btn}`} onClick={handleNotificationSave} disabled={saving}>
                   <Save size={16} />
                   {saving ? 'Saving...' : 'Save Preferences'}
                 </button>
@@ -227,7 +162,7 @@ export default function UserSettings() {
           {activeTab === 'security' && (
             <div className={styles.section}>
               <h2 className={styles.sectionTitle}>Security Settings</h2>
-              
+
               <div className={styles.toggleGroup}>
                 <div className={styles.toggleItem}>
                   <div className={styles.toggleInfo}>
@@ -260,7 +195,7 @@ export default function UserSettings() {
               </div>
 
               <div className={styles.actions}>
-                <button className={styles.saveBtn} onClick={handleNotificationSave} disabled={saving}>
+                <button className={`${styles.saveBtn} ${styles.btn}`} onClick={handleNotificationSave} disabled={saving}>
                   <Save size={16} />
                   {saving ? 'Saving...' : 'Save Settings'}
                 </button>
@@ -271,27 +206,28 @@ export default function UserSettings() {
           {activeTab === 'account' && (
             <div className={styles.section}>
               <h2 className={styles.sectionTitle}>Account Management</h2>
-              
+
               <div className={styles.dangerZone}>
-                <h3 className={styles.dangerTitle}>Danger Zone</h3>
-                
                 <div className={styles.dangerItem}>
                   <div className={styles.dangerInfo}>
                     <span className={styles.dangerLabel}>Sign Out</span>
                     <span className={styles.dangerDesc}>Sign out from your account on this device</span>
                   </div>
-                  <button className={styles.logoutBtn} onClick={() => setShowLogoutModal(true)}>
-                    Sign Out
+                  <button className={`${styles.logoutBtn} ${styles.btn}`} onClick={() => setShowLogoutModal(true)}>
+                    <LogOut size={16} /> Sign Out
                   </button>
                 </div>
 
                 <div className={styles.dangerItem}>
                   <div className={styles.dangerInfo}>
                     <span className={styles.dangerLabel}>Delete Account</span>
-                    <span className={styles.dangerDesc}>Permanently delete your account and all data</span>
+                    <span className={styles.dangerDesc}>Permanently delete your account and all data. This action cannot be undone.</span>
                   </div>
-                  <button className={styles.deleteBtn} onClick={() => setShowDeleteModal(true)}>
-                    Delete Account
+                  <button
+                    className={`${styles.deleteBtn} ${styles.btn}`}
+                    onClick={() => { setShowDeleteModal(true); setDeleteEmail(''); setDeleteError('') }}
+                  >
+                    <Trash2 size={16} /> Delete Account
                   </button>
                 </div>
               </div>
@@ -315,12 +251,26 @@ export default function UserSettings() {
       <ConfirmModal
         open={showDeleteModal}
         title="Delete Account"
-        message="This action cannot be undone. All your data will be permanently deleted."
+        message="This action cannot be undone. All your data will be permanently deleted. Type your email address below to confirm."
         confirmLabel="Delete Account"
         danger
-        onConfirm={() => { window.location.href = '/' }}
-        onCancel={() => setShowDeleteModal(false)}
-      />
+        onConfirm={handleDeleteAccount}
+        onCancel={() => { setShowDeleteModal(false); setDeleteEmail(''); setDeleteError('') }}
+      >
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="delete-email">Type your email to confirm</label>
+          <input
+            id="delete-email"
+            type="email"
+            className={styles.input}
+            placeholder={userProfile?.email || ''}
+            value={deleteEmail}
+            onChange={(e) => { setDeleteEmail(e.target.value); setDeleteError('') }}
+            autoComplete="off"
+          />
+          {deleteError && <span className={styles.deleteError}>{deleteError}</span>}
+        </div>
+      </ConfirmModal>
     </div>
   )
 }
