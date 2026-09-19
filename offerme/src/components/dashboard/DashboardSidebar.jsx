@@ -8,7 +8,6 @@ const userLinks = [
   { to: '/', label: 'Main Page', icon: '🏠' },
   { to: '/dashboard', label: 'Dashboard', icon: '📊' },
   { to: '/sell-your-business', label: 'Sell Business', icon: '🏢' },
-  { to: '/dashboard/my-businesses', label: 'My Businesses', icon: '🏪' },
   { to: '/dashboard/profile', label: 'Profile', icon: '👤' },
   { to: '/dashboard/favorites', label: 'Favorites', icon: '❤️' },
   { to: '/dashboard/claims', label: 'My Claims', icon: '🎟️' },
