@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import styles from './CategoryGroupCards.module.css'
 
 const categories = [
@@ -37,6 +38,8 @@ const categories = [
 ]
 
 export default function CategoryGroupCards() {
+  const navigate = useNavigate()
+
   return (
     <section className={styles.section}>
       <div className={styles.header}>
@@ -63,49 +66,66 @@ export default function CategoryGroupCards() {
 
       <div className={styles.grid}>
         {categories.map((item) => (
-          <Link
+          <div
             key={item.slug}
-            to={`/category/${item.slug}`}
             className={styles.card}
           >
-            <div className={styles.imageWrap}>
-              <img
-                src={item.image}
-                alt={item.title}
-                className={styles.bgImage}
-                loading="lazy"
-              />
-              <div className={styles.overlay} />
-            </div>
-
-            <div className={styles.cardTop}>
-              <span className={styles.iconWrap}>{item.icon}</span>
-              <span className={styles.tag}>{item.tag}</span>
-            </div>
-
-            <div className={styles.cardBottom}>
-              <h3 className={styles.cardTitle}>{item.title}</h3>
-              <p className={styles.cardSubtitle}>{item.subtitle}</p>
-              <div className={styles.arrowRow}>
-                <span className={styles.exploreText}>Explore Offers</span>
-                <span className={styles.arrowBtn}>
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="7" y1="17" x2="17" y2="7" />
-                    <polyline points="7 7 17 7 17 17" />
-                  </svg>
-                </span>
+            <Link to={`/category/${item.slug}`} className={styles.cardLink}>
+              <div className={styles.imageWrap}>
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className={styles.bgImage}
+                  loading="lazy"
+                />
+                <div className={styles.overlay} />
               </div>
+
+              <div className={styles.cardTop}>
+                <span className={styles.iconWrap}>{item.icon}</span>
+                <span className={styles.tag}>{item.tag}</span>
+              </div>
+
+              <div className={styles.cardBottom}>
+                <h3 className={styles.cardTitle}>{item.title}</h3>
+                <p className={styles.cardSubtitle}>{item.subtitle}</p>
+              </div>
+            </Link>
+
+            <div className={styles.arrowRow}>
+              <span className={styles.exploreText}>Explore Offers</span>
+              <motion.button
+                type="button"
+                className={styles.arrowBtn}
+                onClick={() => navigate(`/category/${item.slug}`)}
+                initial={{ "--shiny-x": "100%" }}
+                whileHover={{ "--shiny-x": "-100%" }}
+                transition={{
+                  repeat: Infinity,
+                  repeatType: "loop",
+                  repeatDelay: 0.5,
+                  type: "spring",
+                  stiffness: 20,
+                  damping: 15,
+                  mass: 2,
+                }}
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="7" y1="17" x2="17" y2="7" />
+                  <polyline points="7 7 17 7 17 17" />
+                </svg>
+              </motion.button>
             </div>
-          </Link>
+          </div>
         ))}
       </div>
     </section>

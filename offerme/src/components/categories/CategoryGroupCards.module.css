@@ -66,17 +66,24 @@
   height: 270px;
   border-radius: 1.125rem;
   overflow: hidden;
-  text-decoration: none;
-  color: #ffffff;
-  padding: 1.25rem;
   box-shadow: 0 4px 18px rgba(15, 23, 42, 0.08);
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
-  cursor: pointer;
 }
 
 .card:hover {
   transform: translateY(-6px);
   box-shadow: 0 20px 38px rgba(15, 23, 42, 0.24);
+}
+
+.cardLink {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+  text-decoration: none;
+  color: #ffffff;
+  padding: 1.25rem;
 }
 
 .imageWrap {
@@ -205,19 +212,39 @@
 }
 
 .arrowBtn {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 1.75rem;
   height: 1.75rem;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
+  border: none;
+  padding: 0;
+  background: #ea580c;
+  color: #0f172a;
+  cursor: pointer;
   transition: all 0.25s ease;
+  overflow: hidden;
+}
+
+.arrowBtn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    -75deg,
+    rgba(255, 255, 255, 0) calc(var(--shiny-x, 100%) + 20%),
+    rgba(255, 255, 255, 0.5) calc(var(--shiny-x, 100%) + 30%),
+    rgba(255, 255, 255, 0) calc(var(--shiny-x, 100%) + 50%)
+  );
+  pointer-events: none;
 }
 
 .card:hover .arrowBtn {
-  background: #ea580c;
+  background: #0f172a;
+  color: #ea580c;
   transform: translate(2px, -2px);
 }
 
@@ -251,6 +278,9 @@
 
   .card {
     height: 230px;
+  }
+
+  .cardLink {
     padding: 1rem;
   }
 
@@ -271,8 +301,11 @@
 
   .card {
     height: 210px;
-    padding: 0.85rem;
     border-radius: 0.875rem;
+  }
+
+  .cardLink {
+    padding: 0.85rem;
   }
 
   .iconWrap {
