@@ -66,86 +66,43 @@
   height: 270px;
   border-radius: 1.125rem;
   overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #edf2f7;
   box-shadow: 0 4px 18px rgba(15, 23, 42, 0.08);
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
 }
 
 .card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 20px 38px rgba(15, 23, 42, 0.24);
+  box-shadow: 0 20px 38px rgba(15, 23, 42, 0.15);
 }
 
 .cardLink {
-  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   flex: 1;
   text-decoration: none;
-  color: #ffffff;
+  color: #0f172a;
   padding: 1.25rem;
 }
 
-.imageWrap {
-  position: absolute;
-  inset: 0;
+.thumbImg {
   width: 100%;
-  height: 100%;
-  z-index: 0;
-}
-
-.bgImage {
-  width: 100%;
-  height: 100%;
+  height: 90px;
   object-fit: cover;
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 0.5rem;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.card:hover .bgImage {
-  transform: scale(1.08);
-}
-
-.overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(15, 23, 42, 0.25) 0%,
-    rgba(15, 23, 42, 0.45) 45%,
-    rgba(15, 23, 42, 0.94) 100%
-  );
-  transition: background 0.3s ease;
-}
-
-.card:hover .overlay {
-  background: linear-gradient(
-    180deg,
-    rgba(15, 23, 42, 0.15) 0%,
-    rgba(15, 23, 42, 0.5) 40%,
-    rgba(15, 23, 42, 0.96) 100%
-  );
+.card:hover .thumbImg {
+  transform: scale(1.03);
 }
 
 .cardTop {
-  position: relative;
-  z-index: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-}
-
-.iconWrap {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.75rem;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  font-size: 1.25rem;
 }
 
 .tag {
@@ -155,16 +112,11 @@
   letter-spacing: 0.06em;
   padding: 0.25rem 0.625rem;
   border-radius: 9999px;
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.95);
+  background: #fff7ed;
+  color: #ea580c;
 }
 
 .cardBottom {
-  position: relative;
-  z-index: 1;
   display: flex;
   flex-direction: column;
 }
@@ -173,42 +125,40 @@
   margin: 0 0 0.35rem 0;
   font-size: 1.1875rem;
   font-weight: 700;
-  color: #ffffff;
+  color: #0f172a;
   letter-spacing: -0.01em;
   line-height: 1.25;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 .cardSubtitle {
-  margin: 0 0 0.75rem 0;
+  margin: 0;
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.82);
+  color: #64748b;
   line-height: 1.35;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .arrowRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 0.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0.75rem 1.25rem 0;
+  border-top: 1px solid #f1f5f9;
 }
 
 .exploreText {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #fdba74;
+  color: #ea580c;
   letter-spacing: 0.02em;
   transition: color 0.2s ease;
 }
 
 .card:hover .exploreText {
-  color: #ffedd5;
+  color: #c2410c;
 }
 
 .arrowBtn {
@@ -221,8 +171,8 @@
   border-radius: 50%;
   border: none;
   padding: 0;
-  background: #ea580c;
-  color: #0f172a;
+  background: #0f172a;
+  color: #ffffff;
   cursor: pointer;
   transition: all 0.25s ease;
   overflow: hidden;
@@ -236,15 +186,15 @@
   background: linear-gradient(
     -75deg,
     rgba(255, 255, 255, 0) calc(var(--shiny-x, 100%) + 20%),
-    rgba(255, 255, 255, 0.5) calc(var(--shiny-x, 100%) + 30%),
+    rgba(255, 255, 255, 0.4) calc(var(--shiny-x, 100%) + 30%),
     rgba(255, 255, 255, 0) calc(var(--shiny-x, 100%) + 50%)
   );
   pointer-events: none;
 }
 
 .card:hover .arrowBtn {
-  background: #0f172a;
-  color: #ea580c;
+  background: #ea580c;
+  color: #ffffff;
   transform: translate(2px, -2px);
 }
 
@@ -308,10 +258,8 @@
     padding: 0.85rem;
   }
 
-  .iconWrap {
-    width: 2rem;
-    height: 2rem;
-    font-size: 1rem;
+  .thumbImg {
+    height: 60px;
   }
 
   .tag {

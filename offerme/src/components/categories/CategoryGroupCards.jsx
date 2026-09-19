@@ -71,18 +71,13 @@ export default function CategoryGroupCards() {
             className={styles.card}
           >
             <Link to={`/category/${item.slug}`} className={styles.cardLink}>
-              <div className={styles.imageWrap}>
+              <div className={styles.cardTop}>
                 <img
                   src={item.image}
                   alt={item.title}
-                  className={styles.bgImage}
+                  className={styles.thumbImg}
                   loading="lazy"
                 />
-                <div className={styles.overlay} />
-              </div>
-
-              <div className={styles.cardTop}>
-                <span className={styles.iconWrap}>{item.icon}</span>
                 <span className={styles.tag}>{item.tag}</span>
               </div>
 
