@@ -94,7 +94,7 @@ export const authService = {
     }
   },
 
-  async changePassword(currentPassword, newPassword) {
+  async changePassword(newPassword) {
     const user = auth.currentUser
     if (!user) throw new Error('No user signed in')
 
@@ -102,10 +102,7 @@ export const authService = {
     if (!usesPassword) {
       throw new Error('Your account uses a social login. Password change is not available.')
     }
-    if (!currentPassword) throw new Error('Enter your current password to continue')
 
-    const credential = EmailAuthProvider.credential(user.email, currentPassword)
-    await reauthenticateWithCredential(user, credential)
     const { updatePassword } = await import('firebase/auth')
     await updatePassword(user, newPassword)
   },

@@ -26,7 +26,7 @@ export default function UserProfile() {
 
   /* ── password modal ── */
   const [showPasswordModal, setShowPasswordModal] = useState(false)
-  const [pwForm, setPwForm] = useState({ current: '', newPw: '', confirm: '' })
+  const [pwForm, setPwForm] = useState({ newPw: '', confirm: '' })
   const [pwStatus, setPwStatus] = useState({ type: '', message: '' })
   const [pwSaving, setPwSaving] = useState(false)
   const [showPw, setShowPw] = useState({ current: false, newPw: false, confirm: false })
@@ -141,10 +141,8 @@ export default function UserProfile() {
 
   /* ── change password ── */
   const pwValidate = () => {
-    if (!pwForm.current) return 'Current password is required.'
     if (pwForm.newPw.length < 8) return 'New password must be at least 8 characters.'
     if (pwForm.newPw !== pwForm.confirm) return 'Passwords do not match.'
-    if (pwForm.newPw === pwForm.current) return 'New password must be different from current password.'
     return ''
   }
 
@@ -155,9 +153,9 @@ export default function UserProfile() {
     setPwSaving(true)
     setPwStatus({ type: '', message: '' })
     try {
-      await authService.changePassword(pwForm.current, pwForm.newPw)
+      await authService.changePassword(pwForm.newPw)
       setPwStatus({ type: 'success', message: 'Password updated successfully.' })
-      setPwForm({ current: '', newPw: '', confirm: '' })
+      setPwForm({ newPw: '', confirm: '' })
       setTimeout(() => setShowPasswordModal(false), 1500)
     } catch (err) {
       setPwStatus({ type: 'error', message: err.message || 'Unable to change password.' })
@@ -167,7 +165,7 @@ export default function UserProfile() {
   }
 
   const openPasswordModal = useCallback(() => {
-    setPwForm({ current: '', newPw: '', confirm: '' })
+    setPwForm({ newPw: '', confirm: '' })
     setPwStatus({ type: '', message: '' })
     setShowPasswordModal(true)
   }, [])
@@ -265,15 +263,6 @@ export default function UserProfile() {
             <h2 id="pw-modal-title">Change Password</h2>
             <p>Enter your current password and choose a new one.</p>
             <form onSubmit={handlePasswordChange} className={styles.modalForm}>
-              <div className={styles.field}>
-                <label htmlFor="pw-current">Current password</label>
-                <div className={styles.pwInputWrap}>
-                  <input id="pw-current" type={showPw.current ? 'text' : 'password'} value={pwForm.current} onChange={(ev) => setPwForm((c) => ({ ...c, current: ev.target.value }))} autoComplete="current-password" required />
-                  <button type="button" className={styles.pwToggle} onClick={() => setShowPw((s) => ({ ...s, current: !s.current }))} tabIndex={-1} aria-label={showPw.current ? 'Hide password' : 'Show password'}>
-                    {showPw.current ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              </div>
               <div className={styles.field}>
                 <label htmlFor="pw-new">New password (min 8 characters)</label>
                 <div className={styles.pwInputWrap}>
