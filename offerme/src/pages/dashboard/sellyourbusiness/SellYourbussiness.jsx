@@ -312,7 +312,7 @@ export default function SellYourbussiness({ onSuccess, onCancel }) {
               <h2 className={styles.promoTitle}>Become a Business Owner</h2>
               <p className={styles.promoDescription}>Upgrade to a Business Owner account to publish your business.</p>
               <div className={styles.promoActions}>
-                <a href="/auth/business/register" className={styles.promoPrimaryBtn}>Become a Business Owner →</a>
+                <a href="/auth/signup" className={styles.promoPrimaryBtn}>Become a Business Owner →</a>
                 <button type="button" className={styles.promoSecondaryBtn} onClick={() => navigate('/dashboard')}>Maybe Later</button>
               </div>
             </div>
