@@ -309,10 +309,21 @@ export default function SellYourbussiness({ onSuccess, onCancel }) {
           <div className={styles.promoWrapper}>
             <div className={styles.promoCard}>
               <div className={styles.promoIconWrapper}><span role="img">🚀</span></div>
-              <h2 className={styles.promoTitle}>Become a Business Owner</h2>
-              <p className={styles.promoDescription}>Upgrade to a Business Owner account to publish your business.</p>
+              <h2 className={styles.promoTitle}>Business Owner Account Required</h2>
+              <p className={styles.promoDescription}>To post your shop, you need to create a separate Business Owner account.</p>
+              <div className={styles.promoSteps}>
+                <p>If you are currently logged in with a personal account:</p>
+                <ol>
+                  <li>Log out of your current user account.</li>
+                  <li>Register a new account using a different personal or business email.</li>
+                  <li>Select Business Owner during registration.</li>
+                  <li>After registration, log in to your Business Owner account and post your shop.</li>
+                </ol>
+                <p><strong>Already using the email you want for your Business Owner account?</strong></p>
+                <p>You can delete the existing personal account associated with that email and then register again as a Business Owner.</p>
+              </div>
               <div className={styles.promoActions}>
-                <a href="/auth/signup" className={styles.promoPrimaryBtn}>Become a Business Owner →</a>
+                <a href="/auth/signup" className={styles.promoPrimaryBtn}>Go to Logout</a>
                 <button type="button" className={styles.promoSecondaryBtn} onClick={() => navigate('/dashboard')}>Maybe Later</button>
               </div>
             </div>
