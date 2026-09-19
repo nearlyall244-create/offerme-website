@@ -312,12 +312,19 @@ export default function SellYourbussiness({ onSuccess, onCancel }) {
               <h2 className={styles.promoTitle}>Business Owner Account Required</h2>
               <p className={styles.promoDescription}>To post your shop, you need to create a separate Business Owner account.</p>
               <div className={styles.promoSteps}>
-                <p>If you are currently logged in with a personal account:</p>
+                <p>If you are currently logged in with a personal account:
+                  <ol>
+                    <li> but you want business account means follow this steps</li>
+                  </ol>
+
+                </p>
+
+
                 <ol>
-                  <li>Log out of your current user account.</li>
-                  <li>Register a new account using a different personal or business email.</li>
-                  <li>Select Business Owner during registration.</li>
-                  <li>After registration, log in to your Business Owner account and post your shop.</li>
+                  <li>1. Log out of your current user account.</li>
+                  <li>2. Register a new account using a different personal or business email.</li>
+                  <li>3. Select Business Owner during registration.</li>
+                  <li>4. After registration, log in to your Business Owner account and post your shop.</li>
                 </ol>
                 <p><strong>Already using the email you want for your Business Owner account?</strong></p>
                 <p>You can delete the existing personal account associated with that email and then register again as a Business Owner.</p>
