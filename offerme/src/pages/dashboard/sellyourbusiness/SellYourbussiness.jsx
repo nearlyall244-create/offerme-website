@@ -330,7 +330,6 @@ export default function SellYourbussiness({ onSuccess, onCancel }) {
                 <p>You can delete the existing personal account associated with that email and then register again as a Business Owner.</p>
               </div>
               <div className={styles.promoActions}>
-                <a href="/auth/signup" className={styles.promoPrimaryBtn}>Go to Logout</a>
                 <button type="button" className={styles.promoSecondaryBtn} onClick={() => navigate('/dashboard')}>Maybe Later</button>
               </div>
             </div>
