@@ -114,6 +114,34 @@
   cursor: default;
 }
 
+/* ── Password toggle ── */
+.pwInputWrap {
+  position: relative;
+  display: flex;
+}
+.pwInputWrap input {
+  flex: 1;
+  padding-right: 2.5rem;
+}
+.pwToggle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 2.5rem;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-radius: 0 .5rem .5rem 0;
+  transition: color .15s;
+}
+.pwToggle:hover {
+  color: var(--color-text);
+}
+
 /* ── Buttons ── */
 .actions { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; margin-top: 1.25rem; }
 

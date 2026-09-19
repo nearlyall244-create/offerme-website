@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
-import { Camera, Loader2, Lock, Trash2, X } from 'lucide-react'
+import { Camera, Eye, EyeOff, Loader2, Lock, Trash2, X } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { authService } from '@/services/authService'
 import styles from '@/pages/dashboard/Profile.module.css'
@@ -29,6 +29,7 @@ export default function UserProfile() {
   const [pwForm, setPwForm] = useState({ current: '', newPw: '', confirm: '' })
   const [pwStatus, setPwStatus] = useState({ type: '', message: '' })
   const [pwSaving, setPwSaving] = useState(false)
+  const [showPw, setShowPw] = useState({ current: false, newPw: false, confirm: false })
 
   const fileInputRef = useRef(null)
 
@@ -266,15 +267,30 @@ export default function UserProfile() {
             <form onSubmit={handlePasswordChange} className={styles.modalForm}>
               <div className={styles.field}>
                 <label htmlFor="pw-current">Current password</label>
-                <input id="pw-current" type="password" value={pwForm.current} onChange={(ev) => setPwForm((c) => ({ ...c, current: ev.target.value }))} autoComplete="current-password" required />
+                <div className={styles.pwInputWrap}>
+                  <input id="pw-current" type={showPw.current ? 'text' : 'password'} value={pwForm.current} onChange={(ev) => setPwForm((c) => ({ ...c, current: ev.target.value }))} autoComplete="current-password" required />
+                  <button type="button" className={styles.pwToggle} onClick={() => setShowPw((s) => ({ ...s, current: !s.current }))} tabIndex={-1} aria-label={showPw.current ? 'Hide password' : 'Show password'}>
+                    {showPw.current ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </div>
               <div className={styles.field}>
                 <label htmlFor="pw-new">New password (min 8 characters)</label>
-                <input id="pw-new" type="password" value={pwForm.newPw} onChange={(ev) => setPwForm((c) => ({ ...c, newPw: ev.target.value }))} autoComplete="new-password" required minLength={8} />
+                <div className={styles.pwInputWrap}>
+                  <input id="pw-new" type={showPw.newPw ? 'text' : 'password'} value={pwForm.newPw} onChange={(ev) => setPwForm((c) => ({ ...c, newPw: ev.target.value }))} autoComplete="new-password" required minLength={8} />
+                  <button type="button" className={styles.pwToggle} onClick={() => setShowPw((s) => ({ ...s, newPw: !s.newPw }))} tabIndex={-1} aria-label={showPw.newPw ? 'Hide password' : 'Show password'}>
+                    {showPw.newPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </div>
               <div className={styles.field}>
                 <label htmlFor="pw-confirm">Confirm new password</label>
-                <input id="pw-confirm" type="password" value={pwForm.confirm} onChange={(ev) => setPwForm((c) => ({ ...c, confirm: ev.target.value }))} autoComplete="new-password" required />
+                <div className={styles.pwInputWrap}>
+                  <input id="pw-confirm" type={showPw.confirm ? 'text' : 'password'} value={pwForm.confirm} onChange={(ev) => setPwForm((c) => ({ ...c, confirm: ev.target.value }))} autoComplete="new-password" required />
+                  <button type="button" className={styles.pwToggle} onClick={() => setShowPw((s) => ({ ...s, confirm: !s.confirm }))} tabIndex={-1} aria-label={showPw.confirm ? 'Hide password' : 'Show password'}>
+                    {showPw.confirm ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </div>
               {pwStatus.message && (
                 <p className={pwStatus.type === 'error' ? styles.errorMessage : styles.successMessage} role="status">{pwStatus.message}</p>
