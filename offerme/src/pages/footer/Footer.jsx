@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import logo from '@/assets/logo/logo.png'
 import styles from './Footer.module.css'
 
 const TOP_CATEGORIES = [
@@ -30,13 +29,6 @@ export default function Footer() {
         <div className={styles.grid}>
           {/* Column 1: Brand + Contact + Social */}
           <div className={styles.brand}>
-            <Link to="/" className={styles.logo}>
-              <img src={logo} alt="OfferMe" className={styles.logoImg} />
-            </Link>
-            <p className={styles.tagline}>Discover Local Deals Near You</p>
-            <p className={styles.desc}>
-              Explore local businesses, discover exclusive offers, and support your community. Your next great deal is just around the corner.
-            </p>
 
             <div className={styles.socials}>
               <a href="https://www.facebook.com/profile.php?id=61594118865200" className={styles.socialLink} aria-label="Facebook" target="_blank" rel="noopener noreferrer">

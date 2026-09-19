@@ -22,32 +22,7 @@
   flex-direction: column;
 }
 
-.logo {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: white;
-}
 
-.logoImg {
-  height: 2.5rem;
-  width: auto;
-  filter: brightness(0) invert(1);
-}
-
-.tagline {
-  margin: 0.5rem 0 0;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--color-primary-light);
-}
-
-.desc {
-  margin-top: 0.75rem;
-  font-size: 0.8125rem;
-  line-height: 1.6;
-  color: #94a3b8;
-}
 
 /* ── Social Icons ──────────────────────────────────────────────── */
 .socials {

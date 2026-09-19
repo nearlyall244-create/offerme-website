@@ -23,14 +23,6 @@ const GROUP_BG_MAP = {
 }
 
 /**
- * Returns the CSS class name for a category group's background.
- * Falls back to undefined if no mapping exists (card gets default styling).
- */
-export function getGroupBgClass(groupId) {
-  return GROUP_BG_MAP[groupId]
-}
-
-/**
  * Renders the background overlay for a category group card.
  * Place this inside .groupCard as the first child.
  *
