@@ -513,7 +513,7 @@ export default function ViewPosts() {
         open={showSuccess}
         icon={<CheckCircle size={48} />}
         title="Changes Submitted Successfully!"
-        message="Please wait a few minutes or hours. Your post will become active once it is approved."
+        message="Dear Customer, Please wait. Your post will become active once it has been approved. Thank you for your patience."
         onClose={() => setShowSuccess(false)}
       />
     </div>
