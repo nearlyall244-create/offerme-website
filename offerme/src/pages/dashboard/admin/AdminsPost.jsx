@@ -317,7 +317,7 @@ export default function AdminsPost() {
       <div className={styles.container}>
         <div className={styles.pageHeader}>
           <h1 className={styles.pageTitle}>
-            + Post</h1>
+            Post</h1>
           <p className={styles.pageSubtitle}>Create a business listing on behalf of a business owner. Fill in their details below.</p>
         </div>
 
@@ -512,7 +512,7 @@ export default function AdminsPost() {
           <div className={styles.successCard}>
             <span className={styles.successEmoji}>✅</span>
             <p className={styles.successMessage}>Post created successfully! The listing is now pending approval.</p>
-            <p className={styles.successMessage} style={{ fontWeight: 600 }}>Thank you for helping business owners.</p>
+
             <button type="button" className={styles.successBtn} onClick={handleReset}>Create Another Post</button>
           </div>
         </div>
