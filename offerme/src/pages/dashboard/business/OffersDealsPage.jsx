@@ -104,13 +104,7 @@ export default function OffersDealsPage() {
             </div>
           ) : offers.length === 0 ? (
             <div className={styles.empty}>
-              <Store size={48} className={styles.emptyIcon} />
-              <h3>No offers published yet</h3>
-              <p>Create your first discount or promotional deal to attract customers to your business.</p>
-              <button onClick={() => setShowForm(true)} className={styles.emptyAddBtn}>
-                <Plus size={18} />
-                Create New Offer / Deal
-              </button>
+              <p>No offers yet.</p>
             </div>
           ) : (
             <div className={styles.dealGrid}>
