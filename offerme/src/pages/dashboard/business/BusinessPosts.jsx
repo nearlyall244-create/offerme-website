@@ -101,16 +101,6 @@ export default function BusinessPosts() {
               <p>{error}</p>
               <button onClick={fetchPosts} className={styles.retryBtn}>Retry</button>
             </div>
-          ) : posts.length === 0 ? (
-            <div className={styles.empty}>
-              <Store size={48} className={styles.emptyIcon} />
-              <h3>No posts published yet</h3>
-              <p>Sell your business to reach local customers on OfferMe.</p>
-              <button onClick={() => setShowForm(true)} className={styles.emptyAddBtn}>
-                <Plus size={18} />
-                Sell Business
-              </button>
-            </div>
           ) : (
 
             <div className={styles.postGrid}>
