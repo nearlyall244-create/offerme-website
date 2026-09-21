@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
-import { Plus, Trash2, Store, RefreshCw, Tag, Calendar, MapPin, Phone } from 'lucide-react'
+import { Plus, Trash2, Store, RefreshCw, Tag, Calendar, MapPin, Phone, CheckCircle } from 'lucide-react'
+import SuccessModal from '@/components/shared/SuccessModal'
 import styles from './ViewPosts.module.css'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024
@@ -20,6 +21,7 @@ export default function ViewPosts() {
   const [deletingId, setDeletingId] = useState(null)
   const [categories, setCategories] = useState([])
   const [editErrors, setEditErrors] = useState({})
+  const [showSuccess, setShowSuccess] = useState(false)
   const fileInputRef = useRef(null)
 
   const fetchPosts = useCallback(async () => {
@@ -248,7 +250,7 @@ export default function ViewPosts() {
           : p
       ))
       cancelEditing()
-      alert('Post updated and submitted for admin approval.')
+      setShowSuccess(true)
     } catch (err) {
       alert(err.message || 'Failed to update post')
     } finally {
@@ -507,6 +509,13 @@ export default function ViewPosts() {
           })}
         </div>
       )}
+      <SuccessModal
+        open={showSuccess}
+        icon={<CheckCircle size={48} />}
+        title="Changes Submitted Successfully!"
+        message="Please wait a few minutes or hours. Your post will become active once it is approved."
+        onClose={() => setShowSuccess(false)}
+      />
     </div>
   )
 }
