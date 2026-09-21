@@ -28,6 +28,7 @@ import UserSettings from '@/pages/dashboard/user/UserSettings'
 import BusinessDashboardHome from '@/pages/dashboard/business/BusinessDashboardHome'
 import BusinessProfile from '@/pages/dashboard/business/BusinessProfile'
 import BusinessPosts from '@/pages/dashboard/business/BusinessPosts'
+import ViewPosts from '@/pages/dashboard/business/ViewPosts'
 import OffersDealsPage from '@/pages/dashboard/business/OffersDealsPage'
 import BusinessAnalytics from '@/pages/dashboard/business/BusinessAnalytics'
 import BusinessSettings from '@/pages/dashboard/business/BusinessSettings'
@@ -100,6 +101,7 @@ export default function App() {
             <Route index element={<BusinessDashboardHome />} />
             <Route path="profile" element={<BusinessProfile />} />
             <Route path="posts" element={<BusinessPosts />} />
+            <Route path="view-posts" element={<ViewPosts />} />
             <Route path="offers" element={<OffersDealsPage />} />
             <Route path="analytics" element={<BusinessAnalytics />} />
             <Route path="settings" element={<BusinessSettings />} />
