@@ -289,13 +289,7 @@ export default function ViewPosts() {
         </div>
       ) : posts.length === 0 ? (
         <div className={styles.empty}>
-          <Store size={48} className={styles.emptyIcon} />
-          <h3>No posts yet</h3>
-          <p>Create your first business listing to reach local customers.</p>
-          <Link to="/sell-your-business" className={styles.emptyAddBtn}>
-            <Plus size={18} />
-            Sell Business
-          </Link>
+          <p>No posts yet.</p>
         </div>
       ) : (
         <div className={styles.postGrid}>
