@@ -224,29 +224,29 @@ export default function ViewPosts() {
       setPosts((prev) => prev.map((p) =>
         p.id === post.id
           ? {
-              ...p,
-              title: payload.title,
-              description: payload.description,
-              image_url: uploadedImageUrl,
-              discount_percent: payload.discountPercentage,
-              discount_value: payload.offerPrice,
-              coupon_code: payload.couponCode,
-              valid_until: payload.valid_until,
-              businesses: {
-                ...p.businesses,
-                shop_name: payload.shopName,
-                shop_address: payload.shopAddress,
-                enquiry_number: payload.phoneNumber,
-                business_email: payload.businessEmail,
-                category_id: payload.businessCategory,
-                subcategory_id: payload.businessSubcategory,
-                shop_description: payload.shopDescription,
-                shop_image_url: uploadedImageUrl,
-                opening_time: payload.openingTime,
-                closing_time: payload.closingTime,
-                status: 'pending',
-              },
-            }
+            ...p,
+            title: payload.title,
+            description: payload.description,
+            image_url: uploadedImageUrl,
+            discount_percent: payload.discountPercentage,
+            discount_value: payload.offerPrice,
+            coupon_code: payload.couponCode,
+            valid_until: payload.valid_until,
+            businesses: {
+              ...p.businesses,
+              shop_name: payload.shopName,
+              shop_address: payload.shopAddress,
+              enquiry_number: payload.phoneNumber,
+              business_email: payload.businessEmail,
+              category_id: payload.businessCategory,
+              subcategory_id: payload.businessSubcategory,
+              shop_description: payload.shopDescription,
+              shop_image_url: uploadedImageUrl,
+              opening_time: payload.openingTime,
+              closing_time: payload.closingTime,
+              status: 'pending',
+            },
+          }
           : p
       ))
       cancelEditing()
@@ -513,7 +513,13 @@ export default function ViewPosts() {
         open={showSuccess}
         icon={<CheckCircle size={48} />}
         title="Changes Submitted Successfully!"
-        message="Dear Customer, Please wait. Your post will become active once it has been approved. Thank you for your patience."
+        message={
+          <>
+            Dear Partner, Please wait. Your post will become active once it has been approved.
+            <br />
+            Thank you for your patience!
+          </>
+        }
         onClose={() => setShowSuccess(false)}
       />
     </div>
