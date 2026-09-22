@@ -9,6 +9,7 @@ export default async function handler(req, res) {
     }
 
     const { decodedToken } = authResult
+    const { deleteFirebaseUser } = await import('../_lib/firebaseAdmin.js')
 
     const ADMIN_EMAILS = ['nearlyall244@gmail.com', 'delivery.adbricks@gmail.com']
     const isAdmin = ADMIN_EMAILS.includes(decodedToken.email)
@@ -540,6 +541,12 @@ export default async function handler(req, res) {
 
         if (deleteOwnerError) {
           return res.status(500).json({ error: deleteOwnerError.message })
+        }
+
+        try {
+          await deleteFirebaseUser(owner.firebase_uid)
+        } catch (fbErr) {
+          console.error('[admin] Firebase user delete failed (non-fatal):', fbErr.message)
         }
 
         await supabaseAdmin.from('admin_logs').insert({
