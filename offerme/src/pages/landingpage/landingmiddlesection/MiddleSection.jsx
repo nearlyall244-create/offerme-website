@@ -72,6 +72,7 @@ const AUTOMOTIVE_TYPES = [
     title: 'Bike Service',
     image: bikeServiceImg,
     count: '35+ Services',
+
   },
 ]
 
