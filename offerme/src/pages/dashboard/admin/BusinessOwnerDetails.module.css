@@ -109,6 +109,33 @@
   color: white;
 }
 
+.actionsCell {
+  display: flex;
+  gap: 0.375rem;
+}
+
+.deleteBtn {
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.deleteBtn:hover {
+  background: #dc2626;
+  color: white;
+}
+
+.deleteBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .emptyCell {
   text-align: center;
   padding: 2rem !important;

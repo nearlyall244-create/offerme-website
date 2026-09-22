@@ -494,11 +494,72 @@ export default async function handler(req, res) {
       })
     }
 
-    // ── DELETE → admin deletes a business submission ──
+    // ── DELETE → admin deletes a business submission or business owner ──
     if (req.method === 'DELETE') {
-      const { shop_id } = req.body
+      const { shop_id, owner_id } = req.body
+
+      // --- Delete a business owner and all associated data ---
+      if (owner_id) {
+        const { data: owner, error: ownerFetchError } = await supabaseAdmin
+          .from('business_owners')
+          .select('id, owner_name, firebase_uid')
+          .eq('id', owner_id)
+          .single()
+
+        if (ownerFetchError || !owner) {
+          return res.status(404).json({ error: 'Business owner not found' })
+        }
+
+        if (owner.firebase_uid === '00000000-0000-0000-0000-000000000000') {
+          return res.status(400).json({ error: 'Cannot delete the admin placeholder owner' })
+        }
+
+        const { data: businesses } = await supabaseAdmin
+          .from('sell_your_bussiness')
+          .select('id')
+          .eq('owner_id', owner_id)
+
+        const businessIds = (businesses || []).map((b) => b.id)
+
+        if (businessIds.length > 0) {
+          await supabaseAdmin
+            .from('offers_post')
+            .delete()
+            .in('business_id', businessIds)
+        }
+
+        await supabaseAdmin
+          .from('sell_your_bussiness')
+          .delete()
+          .eq('owner_id', owner_id)
+
+        const { error: deleteOwnerError } = await supabaseAdmin
+          .from('business_owners')
+          .delete()
+          .eq('id', owner_id)
+
+        if (deleteOwnerError) {
+          return res.status(500).json({ error: deleteOwnerError.message })
+        }
+
+        await supabaseAdmin.from('admin_logs').insert({
+          admin_uid: decodedToken.uid,
+          admin_email: decodedToken.email,
+          action: 'delete_owner',
+          target_type: 'business_owner',
+          target_id: String(owner_id),
+          details: {
+            owner_name: owner.owner_name,
+            businesses_removed: businessIds.length,
+          },
+        })
+
+        return res.status(200).json({ message: 'Business owner deleted successfully' })
+      }
+
+      // --- Delete a business submission ---
       if (!shop_id) {
-        return res.status(400).json({ error: 'shop_id is required' })
+        return res.status(400).json({ error: 'shop_id or owner_id is required' })
       }
 
       const { data: business, error: fetchError } = await supabaseAdmin

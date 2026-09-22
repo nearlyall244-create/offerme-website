@@ -1,6 +1,7 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { formatDate, formatDateTime } from '@/utils/date'
+import ConfirmModal from '@/components/shared/ConfirmModal'
 import styles from './BusinessOwnerDetails.module.css'
 
 export default function BusinessOwnerDetails() {
@@ -11,6 +12,9 @@ export default function BusinessOwnerDetails() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [selectedOwner, setSelectedOwner] = useState(null)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [ownerToDelete, setOwnerToDelete] = useState(null)
+  const [deletingId, setDeletingId] = useState(null)
 
   useEffect(() => {
     requestAnimationFrame(async () => {
@@ -75,6 +79,39 @@ export default function BusinessOwnerDetails() {
     }
   }
 
+  const handleDeleteOwner = useCallback((owner) => {
+    setOwnerToDelete(owner)
+    setShowDeleteModal(true)
+  }, [])
+
+  const confirmDelete = useCallback(async () => {
+    if (!ownerToDelete) return
+    setDeletingId(ownerToDelete.id)
+    try {
+      const token = await user.getIdToken()
+      const res = await fetch('/api/admin', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ owner_id: ownerToDelete.id }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to delete owner')
+      setOwners((prev) => prev.filter((o) => o.id !== ownerToDelete.id))
+      if (selectedOwner?.id === ownerToDelete.id) {
+        setSelectedOwner(null)
+      }
+      setShowDeleteModal(false)
+      setOwnerToDelete(null)
+    } catch (err) {
+      alert('Failed to delete owner: ' + err.message)
+    } finally {
+      setDeletingId(null)
+    }
+  }, [ownerToDelete, selectedOwner, user])
+
   return (
     <div className={styles.page}>
       <h1 className={styles.title}>Business Owner Details</h1>
@@ -119,9 +156,18 @@ export default function BusinessOwnerDetails() {
                   <td>{owner.phone_number || '—'}</td>
                   <td>{formatDate(owner.created_at)}</td>
                   <td>
-                    <button className={styles.viewBtn} onClick={() => setSelectedOwner(owner)}>
-                      View
-                    </button>
+                    <div className={styles.actionsCell}>
+                      <button className={styles.viewBtn} onClick={() => setSelectedOwner(owner)}>
+                        View
+                      </button>
+                      <button
+                        className={styles.deleteBtn}
+                        onClick={() => handleDeleteOwner(owner)}
+                        disabled={deletingId === owner.id}
+                      >
+                        {deletingId === owner.id ? '...' : 'Delete'}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -198,6 +244,16 @@ export default function BusinessOwnerDetails() {
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        open={showDeleteModal}
+        title="Delete Business Owner"
+        message={`Are you sure you want to delete "${ownerToDelete?.owner_name}"? This will permanently remove their account and all associated data. This action cannot be undone.`}
+        confirmLabel="Delete"
+        danger={true}
+        onConfirm={confirmDelete}
+        onCancel={() => { setShowDeleteModal(false); setOwnerToDelete(null) }}
+      />
     </div>
   )
 }
