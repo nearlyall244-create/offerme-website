@@ -515,6 +515,22 @@ export default async function handler(req, res) {
           return res.status(400).json({ error: 'Cannot delete the admin placeholder owner' })
         }
 
+        // Step 1: Delete Firebase Auth account FIRST (so we can retry if it fails)
+        let firebaseDeleted = false
+        let firebaseError = null
+        try {
+          await deleteFirebaseUser(owner.firebase_uid)
+          firebaseDeleted = true
+        } catch (fbErr) {
+          console.error('[admin] Firebase user delete failed:', fbErr.message)
+          firebaseError = fbErr.message
+          return res.status(500).json({
+            error: 'Firebase Auth deletion failed. Owner data preserved. Please retry.',
+            details: firebaseError,
+          })
+        }
+
+        // Step 2: Delete Supabase data
         const { data: businesses } = await supabaseAdmin
           .from('sell_your_bussiness')
           .select('id')
@@ -543,12 +559,6 @@ export default async function handler(req, res) {
           return res.status(500).json({ error: deleteOwnerError.message })
         }
 
-        try {
-          await deleteFirebaseUser(owner.firebase_uid)
-        } catch (fbErr) {
-          console.error('[admin] Firebase user delete failed (non-fatal):', fbErr.message)
-        }
-
         await supabaseAdmin.from('admin_logs').insert({
           admin_uid: decodedToken.uid,
           admin_email: decodedToken.email,
@@ -558,10 +568,11 @@ export default async function handler(req, res) {
           details: {
             owner_name: owner.owner_name,
             businesses_removed: businessIds.length,
+            firebase_deleted: firebaseDeleted,
           },
         })
 
-        return res.status(200).json({ message: 'Business owner deleted successfully' })
+        return res.status(200).json({ message: 'Business owner and Firebase account deleted successfully' })
       }
 
       // --- Delete a business submission ---
