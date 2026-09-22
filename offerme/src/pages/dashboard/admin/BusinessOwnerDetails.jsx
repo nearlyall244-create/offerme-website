@@ -98,7 +98,7 @@ export default function BusinessOwnerDetails() {
         body: JSON.stringify({ owner_id: ownerToDelete.id }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed to delete owner')
+      if (!res.ok) throw new Error(data.details || data.error || 'Failed to delete owner')
       setOwners((prev) => prev.filter((o) => o.id !== ownerToDelete.id))
       if (selectedOwner?.id === ownerToDelete.id) {
         setSelectedOwner(null)
