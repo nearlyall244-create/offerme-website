@@ -24,30 +24,22 @@ import card4Xerox from '@/assets/discovercatimg/card4/xerox.png'
 const categories = [
   {
     title: 'Home & Furniture',
-    subtitle: 'Curtains, furniture, furnishings & kitchen',
     slug: 'home-furniture',
-    tag: 'Home',
     images: [card1Curtains, card1Furniture, card1HomeFurnishing, card1Kitchen],
   },
   {
     title: 'Cakes, Bakery & Sweets',
-    subtitle: 'Bakery items, homemade cakes, ice cream & sweets',
     slug: 'cakes-bakery-sweets',
-    tag: 'Bakery',
     images: [card2Bakery, card2HomemadeCake, card2IceCream, card2Sweet],
   },
   {
     title: 'Domestic Help & Care',
-    subtitle: 'Cook services, patient care & security guards',
     slug: 'domestic-help-care',
-    tag: 'Services',
     images: [card3Cook, card3PatientCare, card3SecurityGuard],
   },
   {
     title: 'Books, Stationery & Office',
-    subtitle: 'Book binding, stationery shop & xerox services',
     slug: 'books-stationery-office',
-    tag: 'Office',
     images: [card4BookBinding, card4Stationery, card4Xerox],
   },
 ]
@@ -153,12 +145,10 @@ export default function WhatLookingFor() {
             <Link to={`/category/${item.slug}`} className={styles.cardLink}>
               <div className={styles.cardTop}>
                 <CarouselCard item={item} />
-                <span className={styles.tag}>{item.tag}</span>
               </div>
 
               <div className={styles.cardBottom}>
                 <h3 className={styles.cardTitle}>{item.title}</h3>
-                <p className={styles.cardSubtitle}>{item.subtitle}</p>
               </div>
             </Link>
 
