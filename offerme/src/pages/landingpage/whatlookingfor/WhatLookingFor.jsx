@@ -128,7 +128,7 @@ export default function WhatLookingFor() {
     <section className={styles.section}>
       <div className={styles.header}>
         <div>
-          <span className={styles.eyebrow}>DISCOVER POPULAR CATEGORIES</span>
+
           <h2 className={styles.heading}>What are you looking for?</h2>
         </div>
         <Link to="/categories" className={styles.viewAllBtn}>

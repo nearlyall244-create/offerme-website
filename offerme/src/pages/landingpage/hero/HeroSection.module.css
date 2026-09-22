@@ -38,12 +38,12 @@
   font-size: 2.75rem;
   font-weight: 800;
   line-height: 1.15;
-  color: #0f172a;
+  color: #052B58;
   letter-spacing: -0.025em;
 }
 
 .highlight {
-  background: linear-gradient(135deg, #0284c7, #3b82f6);
+  background: #ea580c;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -237,8 +237,7 @@
   font-size: 0.875rem;
   font-weight: 600;
   color: white;
-  background: #007aff;
-  background: linear-gradient(135deg, #0284c7 0%, #007aff 100%);
+  background: #ea580c;
   border: none;
   border-radius: 0.625rem;
   cursor: pointer;
