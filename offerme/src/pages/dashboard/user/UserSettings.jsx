@@ -254,6 +254,7 @@ export default function UserSettings() {
         message="This action cannot be undone. All your data will be permanently deleted. Type your email address below to confirm."
         confirmLabel="Delete Account"
         danger
+        confirmDisabled={deleteEmail.trim().toLowerCase() !== (userProfile?.email || '').toLowerCase()}
         onConfirm={handleDeleteAccount}
         onCancel={() => { setShowDeleteModal(false); setDeleteEmail(''); setDeleteError('') }}
       >
@@ -267,6 +268,7 @@ export default function UserSettings() {
             value={deleteEmail}
             onChange={(e) => { setDeleteEmail(e.target.value); setDeleteError('') }}
             autoComplete="off"
+            autoFocus
           />
           {deleteError && <span className={styles.deleteError}>{deleteError}</span>}
         </div>

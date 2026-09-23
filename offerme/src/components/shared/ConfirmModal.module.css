@@ -111,6 +111,21 @@
   background: #dc2626;
 }
 
+.confirmBtn:disabled,
+.confirmDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.confirmBtn:disabled:hover,
+.confirmDisabled:hover {
+  background: var(--color-danger);
+}
+
+.confirmBtn:disabled:not(.danger):hover {
+  background: var(--color-primary);
+}
+
 .successState {
   display: flex;
   flex-direction: column;

@@ -11,12 +11,14 @@ export default function ConfirmModal({
   danger = false,
   success = false,
   successMessage = '',
+  confirmDisabled = false,
   onConfirm,
   onCancel,
   children,
 }) {
   const modalRef = useRef(null)
   const confirmRef = useRef(null)
+  const cancelRef = useRef(null)
 
   useEffect(() => {
     if (!open || success) return
@@ -24,9 +26,13 @@ export default function ConfirmModal({
       if (e.key === 'Escape') onCancel()
     }
     document.addEventListener('keydown', onKey)
-    confirmRef.current?.focus()
+    if (confirmDisabled) {
+      cancelRef.current?.focus()
+    } else {
+      confirmRef.current?.focus()
+    }
     return () => document.removeEventListener('keydown', onKey)
-  }, [open, onCancel, success])
+  }, [open, onCancel, success, confirmDisabled])
 
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
@@ -62,11 +68,13 @@ export default function ConfirmModal({
             <p className={styles.message}>{message}</p>
             {children}
             <div className={styles.footer}>
-              <button className={styles.cancelBtn} onClick={onCancel}>{cancelLabel}</button>
+              <button ref={cancelRef} className={styles.cancelBtn} onClick={onCancel}>{cancelLabel}</button>
               <button
                 ref={confirmRef}
-                className={`${styles.confirmBtn} ${danger ? styles.danger : ''}`}
+                className={`${styles.confirmBtn} ${danger ? styles.danger : ''} ${confirmDisabled ? styles.confirmDisabled : ''}`}
                 onClick={onConfirm}
+                disabled={confirmDisabled}
+                aria-disabled={confirmDisabled}
               >
                 {confirmLabel}
               </button>
