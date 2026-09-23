@@ -55,16 +55,25 @@ export async function deleteFirebaseUser(uid) {
       }
 
       if (getApps().length === 0) {
-        const missing = []
-        if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) missing.push('GOOGLE_APPLICATION_CREDENTIALS')
-        if (!process.env.FIREBASE_PRIVATE_KEY_B64) missing.push('FIREBASE_PRIVATE_KEY_B64')
-        if (!process.env.FIREBASE_CLIENT_EMAIL) missing.push('FIREBASE_CLIENT_EMAIL')
-        if (!FIREBASE_PROJECT_ID) missing.push('FIREBASE_PROJECT_ID')
+        const hasGac = !!process.env.GOOGLE_APPLICATION_CREDENTIALS
+        const hasCert = !!(
+          process.env.FIREBASE_PRIVATE_KEY_B64 &&
+          process.env.FIREBASE_CLIENT_EMAIL &&
+          FIREBASE_PROJECT_ID
+        )
+
+        if (!hasGac && !hasCert) {
+          const missing = []
+          if (!process.env.FIREBASE_PRIVATE_KEY_B64) missing.push('FIREBASE_PRIVATE_KEY_B64')
+          if (!process.env.FIREBASE_CLIENT_EMAIL) missing.push('FIREBASE_CLIENT_EMAIL')
+          if (!FIREBASE_PROJECT_ID) missing.push('FIREBASE_PROJECT_ID')
+          throw new Error(
+            `Missing env vars: ${missing.join(', ')} (or GOOGLE_APPLICATION_CREDENTIALS)`
+          )
+        }
 
         throw new Error(
-          missing.length
-            ? `Missing env vars: ${missing.join(', ')}`
-            : `Firebase Admin SDK not initialized${initError ? ` (${initError})` : ''}`
+          `Firebase Admin SDK not initialized${initError ? ` (${initError})` : ''}`
         )
       }
     }
