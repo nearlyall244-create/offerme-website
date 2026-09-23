@@ -2,8 +2,11 @@
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
-  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
-  backdrop-filter: blur(12px);
+  background: #f0f7ff;
+}
+
+:global(html.dark) .navbar {
+  background: #ffffff;
 }
 
 .container {
