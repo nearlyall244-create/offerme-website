@@ -16,7 +16,7 @@
 .heroLogo {
   position: absolute;
   top: 0.75rem;
-  right: 1.5rem;
+  left: 1.5rem;
   z-index: 25;
   display: flex;
   align-items: center;
@@ -31,7 +31,7 @@
 @media (max-width: 768px) {
   .heroLogo {
     top: 0.5rem;
-    right: 1rem;
+    left: 1rem;
   }
 
   .heroLogo img {
