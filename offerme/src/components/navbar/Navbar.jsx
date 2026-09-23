@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import ConfirmModal from '@/components/shared/ConfirmModal'
 import ThemeSwitch from './ThemeSwitch'
+import logo from '@/assets/logo/logo.png'
 import styles from './Navbar.module.css'
 
 export default function Navbar() {
@@ -28,6 +29,9 @@ export default function Navbar() {
 
   return (
     <nav className={styles.navbar} role="navigation" aria-label="Main navigation">
+      <Link to="/" className={styles.logo}>
+        <img src={logo} alt="OfferMe" />
+      </Link>
       <div className={styles.container}>
         <div className={styles.navGroup}>
           <ul className={`${styles.navLinks} ${mobileOpen ? styles.open : ''}`}>
