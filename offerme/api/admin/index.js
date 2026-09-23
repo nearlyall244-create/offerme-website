@@ -370,6 +370,11 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: error.message })
           }
 
+          await supabaseAdmin
+            .from('offers_post')
+            .update({ is_active: true })
+            .eq('business_id', shop_id)
+
           await supabaseAdmin.from('admin_logs').insert({
             admin_uid: decodedToken.uid,
             action: 'approve_submission',
@@ -392,6 +397,11 @@ export default async function handler(req, res) {
           if (error) {
             return res.status(500).json({ error: error.message })
           }
+
+          await supabaseAdmin
+            .from('offers_post')
+            .update({ is_active: false })
+            .eq('business_id', shop_id)
 
           await supabaseAdmin.from('admin_logs').insert({
             admin_uid: decodedToken.uid,

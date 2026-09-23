@@ -471,6 +471,8 @@ export default async function handler(req, res) {
           shop_name,
           shop_address: address || null,
           enquiry_number: phone_number,
+          status: 'approved',
+          is_active: false,
         })
         .select()
         .single()

@@ -226,15 +226,15 @@ export default async function handler(req, res) {
           if (description) updateFields.shop_description = description
           if (openingTime) updateFields.opening_time = openingTime
           if (closingTime) updateFields.closing_time = closingTime
-          if (Object.keys(updateFields).length > 0) {
-            const { error: updateErr } = await supabaseAdmin
-              .from('sell_your_bussiness')
-              .update(updateFields)
-              .eq('id', businessId)
-            if (updateErr) {
-              console.error('[offers] sell-business update error:', updateErr)
-              return res.status(500).json({ error: `Failed to update business: ${updateErr.message}` })
-            }
+          updateFields.status = 'pending'
+          updateFields.is_active = false
+          const { error: updateErr } = await supabaseAdmin
+            .from('sell_your_bussiness')
+            .update(updateFields)
+            .eq('id', businessId)
+          if (updateErr) {
+            console.error('[offers] sell-business update error:', updateErr)
+            return res.status(500).json({ error: `Failed to update business: ${updateErr.message}` })
           }
         }
 
@@ -289,7 +289,7 @@ export default async function handler(req, res) {
             image_url: imageUrl || image_url || null,
             valid_from: todayStr,
             valid_until: finalValidUntil,
-            is_active: true,
+            is_active: false,
             business_id: businessId || null,
             created_by_uid: uid,
             created_by_role: 'business_owner',
