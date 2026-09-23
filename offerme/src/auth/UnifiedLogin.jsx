@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
+import GooglePhoneStep from './GooglePhoneStep'
 import styles from './Auth.module.css'
 
 export default function UnifiedLogin() {
@@ -10,7 +11,8 @@ export default function UnifiedLogin() {
   const [loading, setLoading] = useState(false)
   const [needsVerification, setNeedsVerification] = useState(false)
   const [resendSent, setResendSent] = useState(false)
-  const { signIn, signInWithGoogle, reloadUser, sendVerificationEmail, getToken, refreshProfile } = useAuth()
+  const [googleSignup, setGoogleSignup] = useState(null)
+  const { signIn, signInWithGoogle, reloadUser, sendVerificationEmail, getToken, refreshProfile, completePendingSignup } = useAuth()
   const navigate = useNavigate()
 
   const routeByRole = (role) => {
@@ -30,6 +32,12 @@ export default function UnifiedLogin() {
         setNeedsVerification(true)
         setLoading(false)
         return
+      }
+
+      try {
+        await completePendingSignup()
+      } catch {
+        /* profile may already exist */
       }
 
       const token = await getToken()
@@ -59,13 +67,23 @@ export default function UnifiedLogin() {
     setLoading(true)
     setError('')
     try {
-      const { role } = await signInWithGoogle('user')
-      routeByRole(role)
+      const result = await signInWithGoogle('user')
+      if (result.needsPhone) {
+        setGoogleSignup(result)
+        setLoading(false)
+        return
+      }
+      routeByRole(result.role)
     } catch (err) {
       setError(err.message || 'Failed to sign in with Google')
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleGooglePhoneDone = (role) => {
+    setGoogleSignup(null)
+    routeByRole(role || 'user')
   }
 
   const handleResendVerification = async () => {
@@ -82,6 +100,11 @@ export default function UnifiedLogin() {
       const refreshed = await reloadUser()
       if (refreshed.emailVerified) {
         setNeedsVerification(false)
+        try {
+          await completePendingSignup()
+        } catch {
+          /* profile may already exist */
+        }
         handleSubmit({ preventDefault: () => {} })
       } else {
         setError('Email still not verified. Check your inbox.')
@@ -99,7 +122,15 @@ export default function UnifiedLogin() {
 
         {error && <div className={styles.error}>{error}</div>}
 
-        {needsVerification ? (
+        {googleSignup ? (
+          <GooglePhoneStep
+            role="user"
+            suggestedName={googleSignup.suggestedName}
+            email={googleSignup.email}
+            onDone={handleGooglePhoneDone}
+            onCancel={() => setGoogleSignup(null)}
+          />
+        ) : needsVerification ? (
           <div className={styles.verificationBox}>
             <div className={styles.verificationIcon}>📧</div>
             <h2 className={styles.verificationTitle}>Verify Your Email</h2>

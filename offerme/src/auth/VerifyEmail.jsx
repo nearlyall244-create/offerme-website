@@ -6,30 +6,43 @@ import styles from './Auth.module.css'
 export default function VerifyEmail() {
   const location = useLocation()
   const navigate = useNavigate()
-  const email = location.state?.email || ''
-  const { reloadUser, sendVerificationEmail, userProfile } = useAuth()
+  const { reloadUser, sendVerificationEmail, completePendingSignup, userProfile, user } = useAuth()
+  const email = location.state?.email || user?.email || ''
   const [resendSent, setResendSent] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const routeForRole = (role) => {
+    const roleMap = { customer: 'user', vendor: 'business' }
+    const normalized = roleMap[role] || role || 'user'
+    const routeMap = {
+      user: '/dashboard',
+      business: '/business/dashboard',
+      admin: '/admin/dashboard',
+    }
+    return routeMap[normalized] || '/dashboard'
+  }
 
   const handleCheckVerified = async () => {
     setLoading(true)
     setError('')
     try {
       const refreshed = await reloadUser()
-      if (refreshed.emailVerified) {
-        const roleMap = { customer: 'user', vendor: 'business' }
-        const role = userProfile?.role || 'user'
-        const normalizedRole = roleMap[role] || role
-        const routeMap = {
-          user: '/dashboard',
-          business: '/business/dashboard',
-          admin: '/admin/dashboard',
-        }
-        navigate(routeMap[normalizedRole] || '/dashboard')
-      } else {
+      if (!refreshed.emailVerified) {
         setError('Email still not verified. Check your inbox and click the verification link.')
+        return
       }
+
+      try {
+        await completePendingSignup()
+      } catch (profileErr) {
+        if (profileErr?.message && !/already exists/i.test(profileErr.message)) {
+          setError(profileErr.message)
+          return
+        }
+      }
+
+      navigate(routeForRole(userProfile?.role || location.state?.role || 'user'))
     } catch (err) {
       setError(err.message || 'Failed to check verification status')
     } finally {
@@ -68,7 +81,7 @@ export default function VerifyEmail() {
 
         <div className={styles.verificationBox}>
           <p className={styles.verificationText}>
-            Please check your inbox and click the verification link to activate your account. You may need to check your spam folder.
+            Please check your inbox and click the verification link to activate your account. Your profile is created only after the email is verified. You may need to check your spam folder.
           </p>
 
           <div className={styles.verificationActions}>

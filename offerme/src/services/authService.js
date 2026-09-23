@@ -1,4 +1,5 @@
 import { auth } from '@/config/firebase'
+import { mapFirebaseAuthError } from '@/utils/validation'
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -17,20 +18,32 @@ import {
 
 const googleProvider = new GoogleAuthProvider()
 
+const verifyContinueUrl = () => `${window.location.origin}/auth/verify-email`
+
 export const authService = {
   async signUp(email, password, displayName) {
-    const { user } = await createUserWithEmailAndPassword(auth, email, password)
-    if (displayName) {
-      const { updateProfile } = await import('firebase/auth')
-      await updateProfile(user, { displayName })
+    try {
+      const { user } = await createUserWithEmailAndPassword(auth, email, password)
+      if (displayName) {
+        const { updateProfile } = await import('firebase/auth')
+        await updateProfile(user, { displayName })
+      }
+      await sendEmailVerification(user, {
+        url: verifyContinueUrl(),
+      })
+      return user
+    } catch (err) {
+      throw new Error(mapFirebaseAuthError(err))
     }
-    await sendEmailVerification(user)
-    return user
   },
 
   async signIn(email, password) {
-    const { user } = await signInWithEmailAndPassword(auth, email, password)
-    return user
+    try {
+      const { user } = await signInWithEmailAndPassword(auth, email, password)
+      return user
+    } catch (err) {
+      throw new Error(mapFirebaseAuthError(err))
+    }
   },
 
   async signInWithGoogle() {
@@ -45,7 +58,9 @@ export const authService = {
   async sendVerificationEmail() {
     const user = auth.currentUser
     if (!user) throw new Error('No user signed in')
-    await sendEmailVerification(user)
+    await sendEmailVerification(user, {
+      url: verifyContinueUrl(),
+    })
   },
 
   async reloadUser() {

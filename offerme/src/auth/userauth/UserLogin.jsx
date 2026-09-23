@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
+import GooglePhoneStep from '../GooglePhoneStep'
 import styles from '../Auth.module.css'
 
 export default function UserLogin() {
@@ -10,7 +11,8 @@ export default function UserLogin() {
   const [needsVerification, setNeedsVerification] = useState(false)
   const [resendSent, setResendSent] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-  const { signIn, signInWithGoogle, reloadUser, sendVerificationEmail } = useAuth()
+  const [googleSignup, setGoogleSignup] = useState(null)
+  const { signIn, signInWithGoogle, reloadUser, sendVerificationEmail, completePendingSignup } = useAuth()
   const navigate = useNavigate()
 
   const handleChange = (e) => {
@@ -37,6 +39,11 @@ export default function UserLogin() {
         return
       }
 
+      try {
+        await completePendingSignup()
+      } catch {
+        /* profile may already exist */
+      }
       navigate('/dashboard')
     } catch (err) {
       setError(err.message || 'Failed to sign in')
@@ -49,13 +56,23 @@ export default function UserLogin() {
     setLoading(true)
     setError('')
     try {
-      await signInWithGoogle('user')
+      const result = await signInWithGoogle('user')
+      if (result.needsPhone) {
+        setGoogleSignup(result)
+        setLoading(false)
+        return
+      }
       navigate('/dashboard')
     } catch (err) {
       setError(err.message || 'Failed to sign in with Google')
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleGooglePhoneDone = () => {
+    setGoogleSignup(null)
+    navigate('/dashboard')
   }
 
   const handleResendVerification = async () => {
@@ -72,6 +89,11 @@ export default function UserLogin() {
       const refreshed = await reloadUser()
       if (refreshed.emailVerified) {
         setNeedsVerification(false)
+        try {
+          await completePendingSignup()
+        } catch {
+          /* profile may already exist */
+        }
         navigate('/dashboard')
       } else {
         setError('Email still not verified. Check your inbox.')
@@ -96,7 +118,15 @@ export default function UserLogin() {
           </div>
         )}
 
-        {needsVerification ? (
+        {googleSignup ? (
+          <GooglePhoneStep
+            role="user"
+            suggestedName={googleSignup.suggestedName}
+            email={googleSignup.email}
+            onDone={handleGooglePhoneDone}
+            onCancel={() => setGoogleSignup(null)}
+          />
+        ) : needsVerification ? (
           <div className={styles.verificationBox}>
             <div className={styles.verificationIcon}>📧</div>
             <h2 className={styles.verificationTitle}>Verify Your Email</h2>

@@ -301,7 +301,8 @@ export default async function handler(req, res) {
   if (action === 'signup-customer') {
     try {
       const { verifyToken } = await import('../_lib/verifyToken.js')
-      const { setCustomClaims } = await import('../_lib/firebaseAdmin.js')
+      const { setCustomClaims, isEmailVerified } = await import('../_lib/firebaseAdmin.js')
+      const { validateSignupProfile } = await import('../_lib/validateSignup.js')
       const { supabaseAdmin } = await import('../_lib/supabaseAdmin.js')
 
       const authResult = await verifyToken(req)
@@ -312,7 +313,24 @@ export default async function handler(req, res) {
       const { decodedToken } = authResult
       const uid = decodedToken.uid
       const body = req.body || {}
-      const { name, phone_number } = body
+
+      let verified = !!decodedToken.email_verified
+      if (!verified) {
+        try {
+          verified = await isEmailVerified(uid)
+        } catch {
+          verified = false
+        }
+      }
+      if (!verified) {
+        return res.status(403).json({ error: 'Email not verified' })
+      }
+
+      const validated = validateSignupProfile(body, { kind: 'customer' })
+      if (validated.error) {
+        return res.status(400).json({ error: validated.error })
+      }
+      const { name, phone_number } = validated
 
       const { data: existing, error: existErr } = await supabaseAdmin
         .from('public_users')
@@ -333,7 +351,7 @@ export default async function handler(req, res) {
         .insert({
           firebase_uid: uid,
           name: name || decodedToken.name || null,
-          phone_number: phone_number || null,
+          phone_number,
           email: decodedToken.email || null,
         })
         .select()
@@ -363,7 +381,8 @@ export default async function handler(req, res) {
   if (action === 'signup-vendor') {
     try {
       const { verifyToken } = await import('../_lib/verifyToken.js')
-      const { setCustomClaims } = await import('../_lib/firebaseAdmin.js')
+      const { setCustomClaims, isEmailVerified } = await import('../_lib/firebaseAdmin.js')
+      const { validateSignupProfile } = await import('../_lib/validateSignup.js')
       const { supabaseAdmin } = await import('../_lib/supabaseAdmin.js')
 
       const authResult = await verifyToken(req)
@@ -374,11 +393,25 @@ export default async function handler(req, res) {
       const { decodedToken } = authResult
       const uid = decodedToken.uid
       const body = req.body || {}
-      const { shop_name, phone_number, email, address, category } = body
+      const { email, address, category } = body
 
-      if (!shop_name) {
-        return res.status(400).json({ error: 'shop_name is required' })
+      let verified = !!decodedToken.email_verified
+      if (!verified) {
+        try {
+          verified = await isEmailVerified(uid)
+        } catch {
+          verified = false
+        }
       }
+      if (!verified) {
+        return res.status(403).json({ error: 'Email not verified' })
+      }
+
+      const validated = validateSignupProfile(body, { kind: 'vendor' })
+      if (validated.error) {
+        return res.status(400).json({ error: validated.error })
+      }
+      const { name, shop_name, phone_number } = validated
 
       const { data: existingOwner, error: existOwnerErr } = await supabaseAdmin
         .from('business_owners')
@@ -397,9 +430,9 @@ export default async function handler(req, res) {
           .from('business_owners')
           .insert({
             firebase_uid: uid,
-            owner_name: decodedToken.name || shop_name,
+            owner_name: name || decodedToken.name || shop_name,
             email: email || decodedToken.email || null,
-            phone_number: phone_number || null,
+            phone_number,
           })
           .select()
           .single()
@@ -437,7 +470,7 @@ export default async function handler(req, res) {
           category_id: categoryId,
           shop_name,
           shop_address: address || null,
-          enquiry_number: phone_number || null,
+          enquiry_number: phone_number,
         })
         .select()
         .single()

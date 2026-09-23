@@ -1,7 +1,35 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { authService } from '@/services/authService'
+import { mapFirebaseAuthError, validatePhone, validateName } from '@/utils/validation'
 
 const AuthContext = createContext(null)
+
+const PENDING_SIGNUP_KEY = 'offerme_pending_signup'
+
+function savePendingSignup(pending) {
+  try {
+    sessionStorage.setItem(PENDING_SIGNUP_KEY, JSON.stringify(pending))
+  } catch {
+    /* ignore */
+  }
+}
+
+function readPendingSignup() {
+  try {
+    const raw = sessionStorage.getItem(PENDING_SIGNUP_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
+function clearPendingSignup() {
+  try {
+    sessionStorage.removeItem(PENDING_SIGNUP_KEY)
+  } catch {
+    /* ignore */
+  }
+}
 
 async function fetchProfile(token) {
   const res = await fetch('/api/auth?action=get-profile', {
@@ -23,6 +51,19 @@ async function fetchProfile(token) {
     ''
 
   return { ...data.profile, displayName, role: normalizedRole }
+}
+
+async function postJson(url, body, token) {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(body),
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok) {
+    throw new Error(data.error || 'Failed to create account profile')
+  }
+  return data
 }
 
 export function AuthProvider({ children }) {
@@ -52,30 +93,115 @@ export function AuthProvider({ children }) {
   }, [])
 
   const signUp = async (email, password, displayName, role = 'user', phone_number = '') => {
-    const firebaseUser = await authService.signUp(email, password, displayName)
-    const token = await authService.getToken()
+    try {
+      const firebaseUser = await authService.signUp(email, password, displayName)
+      savePendingSignup({
+        role,
+        name: displayName,
+        phone_number,
+        email: firebaseUser.email || email,
+      })
+      return firebaseUser
+    } catch (err) {
+      throw new Error(mapFirebaseAuthError(err))
+    }
+  }
 
+  const completePendingSignup = async () => {
+    const pending = readPendingSignup()
+    if (!pending) return null
+
+    const refreshed = await authService.reloadUser()
+    if (!refreshed.emailVerified) {
+      throw new Error('Email not verified yet. Open the verification link and try again.')
+    }
+
+    const token = await authService.getToken(true)
+    const isVendor = pending.role === 'business' || pending.role === 'vendor'
+    const phoneError = validatePhone(pending.phone_number)
+    if (phoneError) throw new Error(phoneError)
+    const nameError = validateName(pending.name)
+    if (nameError) throw new Error(nameError)
+
+    if (isVendor) {
+      const data = await postJson(
+        '/api/auth?action=signup-vendor',
+        {
+          shop_name: pending.name || 'My Shop',
+          name: pending.name,
+          phone_number: pending.phone_number,
+          email: pending.email,
+        },
+        token
+      )
+      setUserProfile(
+        data.shop
+          ? { ...data.shop, role: 'business' }
+          : { firebase_uid: refreshed.uid, email: pending.email, displayName: pending.name, role: 'business' }
+      )
+      clearPendingSignup()
+      await fetchProfile(token).then((p) => p && setUserProfile(p))
+      return 'business'
+    }
+
+    const data = await postJson(
+      '/api/auth?action=signup-customer',
+      { name: pending.name, phone_number: pending.phone_number },
+      token
+    )
+    setUserProfile(
+      data.customer
+        ? { ...data.customer, role: 'user' }
+        : { firebase_uid: refreshed.uid, email: pending.email, displayName: pending.name, role: 'user' }
+    )
+    clearPendingSignup()
+    await fetchProfile(token).then((p) => p && setUserProfile(p))
+    return 'user'
+  }
+
+  const completeGoogleSignup = async (role = 'user', { name = '', phone_number = '' } = {}) => {
+    const phoneError = validatePhone(phone_number)
+    if (phoneError) throw new Error(phoneError)
+    const nameError = validateName(name)
+    if (nameError) throw new Error(nameError)
+
+    const token = await authService.getToken()
     const isVendor = role === 'business' || role === 'vendor'
 
     if (isVendor) {
-      const res = await fetch('/api/auth?action=signup-vendor', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ shop_name: displayName || 'My Shop', phone_number }),
-      })
-      const data = await res.json()
-      setUserProfile(data.shop ? { ...data.shop, role: 'business' } : { firebase_uid: firebaseUser.uid, email, displayName, role: 'business' })
-    } else {
-      const res = await fetch('/api/auth?action=signup-customer', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ name: displayName, phone_number }),
-      })
-      const data = await res.json()
-      setUserProfile(data.customer ? { ...data.customer, role: 'user' } : { firebase_uid: firebaseUser.uid, email, displayName, role: 'user' })
+      const data = await postJson(
+        '/api/auth?action=signup-vendor',
+        {
+          shop_name: name || 'My Shop',
+          name,
+          phone_number,
+          email: user?.email,
+        },
+        token
+      )
+      setUserProfile(
+        data.shop
+          ? { ...data.shop, role: 'business' }
+          : { firebase_uid: user?.uid, email: user?.email, displayName: name, role: 'business' }
+      )
+      const profile = await fetchProfile(token)
+      if (profile) setUserProfile(profile)
+      return 'business'
     }
 
-    return firebaseUser
+    const data = await postJson(
+      '/api/auth?action=signup-customer',
+      { name, phone_number },
+      token
+    )
+    setUserProfile(
+      data.customer
+        ? { ...data.customer, role: 'user' }
+        : { firebase_uid: user?.uid, email: user?.email, displayName: name, role: 'user' }
+    )
+    const profile = await fetchProfile(token)
+    if (profile) setUserProfile(profile)
+    return 'user'
   }
 
   const signIn = async (email, password) => {
@@ -83,44 +209,37 @@ export function AuthProvider({ children }) {
   }
 
   const signInWithGoogle = async (role = 'user') => {
-    const firebaseUser = await authService.signInWithGoogle()
-    const token = await authService.getToken()
+    try {
+      const firebaseUser = await authService.signInWithGoogle()
+      const token = await authService.getToken()
 
-    const res = await fetch('/api/auth?action=get-profile', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    const data = await res.json()
-
-    if (data.role) {
-      const roleMap = { customer: 'user', vendor: 'business' }
-      const normalizedRole = roleMap[data.role] || data.role
-      setUserProfile({ ...data.profile, role: normalizedRole })
-      return { isNewUser: false, role: normalizedRole }
-    }
-
-    const isVendor = role === 'business' || role === 'vendor'
-    if (isVendor) {
-      const res = await fetch('/api/auth?action=signup-vendor', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ shop_name: firebaseUser.displayName || 'My Shop', phone_number: null }),
+      const res = await fetch('/api/auth?action=get-profile', {
+        headers: { Authorization: `Bearer ${token}` },
       })
-      const result = await res.json()
-      setUserProfile(result.shop ? { ...result.shop, role: 'business' } : { firebase_uid: firebaseUser.uid, email: firebaseUser.email, displayName: firebaseUser.displayName, role: 'business' })
-      return { isNewUser: true, role: 'business' }
-    } else {
-      const res = await fetch('/api/auth?action=signup-customer', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ name: firebaseUser.displayName || null, phone_number: null }),
-      })
-      const result = await res.json()
-      setUserProfile(result.customer ? { ...result.customer, role: 'user' } : { firebase_uid: firebaseUser.uid, email: firebaseUser.email, displayName: firebaseUser.displayName, role: 'user' })
-      return { isNewUser: true, role: 'user' }
+      const data = await res.json()
+
+      if (data.role) {
+        const roleMap = { customer: 'user', vendor: 'business' }
+        const normalizedRole = roleMap[data.role] || data.role
+        setUserProfile({ ...data.profile, role: normalizedRole })
+        return { isNewUser: false, role: normalizedRole, needsPhone: false }
+      }
+
+      const isVendor = role === 'business' || role === 'vendor'
+      return {
+        isNewUser: true,
+        role: isVendor ? 'business' : 'user',
+        needsPhone: true,
+        suggestedName: firebaseUser.displayName || '',
+        email: firebaseUser.email || '',
+      }
+    } catch (err) {
+      throw new Error(mapFirebaseAuthError(err))
     }
   }
 
   const signOut = async () => {
+    clearPendingSignup()
     await authService.signOut()
     setUser(null)
     setUserProfile(null)
@@ -185,6 +304,8 @@ export function AuthProvider({ children }) {
     userProfile,
     loading,
     signUp,
+    completePendingSignup,
+    completeGoogleSignup,
     signIn,
     signInWithGoogle,
     signOut,
