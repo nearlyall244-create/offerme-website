@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import ConfirmModal from '@/components/shared/ConfirmModal'
 import ThemeSwitch from './ThemeSwitch'
-import logo from '@/assets/logo/logo.png'
 import styles from './Navbar.module.css'
 
 export default function Navbar() {
@@ -30,25 +29,23 @@ export default function Navbar() {
   return (
     <nav className={styles.navbar} role="navigation" aria-label="Main navigation">
       <div className={styles.container}>
-        <Link to="/" className={styles.logo}>
-          <img src={logo} alt="OfferMe" className={styles.logoImg} />
-        </Link>
+        <div className={styles.navGroup}>
+          <ul className={`${styles.navLinks} ${mobileOpen ? styles.open : ''}`}>
+            {navLinks.map((link) => (
+              <li key={link.to}>
+                <Link
+                  to={link.to}
+                  className={`${styles.navLink} ${location.pathname === link.to ? styles.active : ''}`}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-        <ul className={`${styles.navLinks} ${mobileOpen ? styles.open : ''}`}>
-          {navLinks.map((link) => (
-            <li key={link.to}>
-              <Link
-                to={link.to}
-                className={`${styles.navLink} ${location.pathname === link.to ? styles.active : ''}`}
-                onClick={() => setMobileOpen(false)}
-              >
-                {link.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-
-        <div className={styles.actions}>
+        <div className={styles.actionsGroup}>
           <ThemeSwitch />
           {user ? (
             <>

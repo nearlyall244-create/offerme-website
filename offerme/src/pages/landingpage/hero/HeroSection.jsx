@@ -1,8 +1,9 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Search, X, Star, MapPin, ChevronDown } from 'lucide-react'
 import HerosecBelowcard from './HerosecBelowcard'
+import logo from '@/assets/logo/logo.png'
 import styles from './HeroSection.module.css'
 
 const LOCATIONS = [
@@ -148,6 +149,9 @@ export default function HeroSection() {
   return (
     <section className={styles.hero}>
       <div className={styles.container}>
+        <Link to="/" className={styles.heroLogo}>
+          <img src={logo} alt="OfferMe" />
+        </Link>
         <motion.div
           className={styles.content}
           initial={{ opacity: 0, y: 25 }}
