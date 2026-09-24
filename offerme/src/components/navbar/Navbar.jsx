@@ -2,9 +2,13 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import ConfirmModal from '@/components/shared/ConfirmModal'
+import { ChevronRight } from 'lucide-react'
 import ThemeSwitch from './ThemeSwitch'
 import logo from '@/assets/logo/logo.png'
 import styles from './Navbar.module.css'
+
+
+
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -64,7 +68,11 @@ export default function Navbar() {
 
         <div className={styles.actionsGroup}>
           <button type="button" className={styles.sellBtn} onClick={handleSellClick}>
-            Sell Your Business <span className={styles.freeTag}>[free]</span>
+
+            <span className={styles.sellText}>Sell Your</span>
+            <span className={styles.businessText}>Business</span>
+            <span className={styles.freeBadge}>FREE</span>
+            <ChevronRight size={18} strokeWidth={3} className={styles.sellArrow} />
           </button>
           <ThemeSwitch />
           {user ? (
