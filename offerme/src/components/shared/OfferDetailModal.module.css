@@ -1,0 +1,223 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal, 800);
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 540px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem 1.5rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+:global(html.dark) .modal {
+  background: var(--color-surface);
+}
+
+.closeBtn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  z-index: 1;
+}
+
+.closeBtn:hover {
+  background: var(--color-surface-alt);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.heroImage {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 0.75rem;
+}
+
+.headerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.shopName {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.shopDesc {
+  margin: 0.35rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.offersSection {
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.9rem;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.emptyText {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.offerCard {
+  border: 1px solid var(--color-border);
+  border-left: 3px solid #16a34a;
+  border-radius: 0.6rem;
+  padding: 0.75rem 0.9rem;
+  margin-bottom: 0.65rem;
+  background: var(--color-surface-alt);
+}
+
+.offerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.offerTitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.discountBadge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #15803d;
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+:global(html.dark) .discountBadge {
+  background: #14532d;
+  border-color: #16a34a;
+  color: #86efac;
+}
+
+.priceRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.originalPrice {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}
+
+.offerPrice {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #15803d;
+}
+
+.couponChip {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #b45309;
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.3rem;
+  letter-spacing: 0.02em;
+}
+
+:global(html.dark) .couponChip {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+
+.offerFooter {
+  margin-top: 0.35rem;
+}
+
+.validUntil {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.offerDesc {
+  margin: 0.4rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.doneBtn {
+  padding: 0.5rem 1.4rem;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.doneBtn:hover {
+  background: var(--color-primary-dark);
+}

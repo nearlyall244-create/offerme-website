@@ -52,11 +52,11 @@ export default function Footer() {
             <div className={styles.contactList}>
               <div className={styles.contactItem}>
                 <span className={styles.contactIcon}>📧</span>
-                <span>support@offermee.com</span>
+                <span>info@offermee.in</span>
               </div>
               <div className={styles.contactItem}>
                 <span className={styles.contactIcon}>📞</span>
-                <span>+91 98765 43210</span>
+                <span>+91 81110 25100</span>
               </div>
               <div className={styles.contactItem}>
                 <span className={styles.contactIcon}>📍</span>
@@ -101,7 +101,6 @@ export default function Footer() {
             <h4 className={styles.heading}>For Business</h4>
             <ul className={styles.links}>
               <li><Link to="/auth/business/register">List Your Business</Link></li>
-              <li><Link to="/business/dashboard">Business Dashboard</Link></li>
               <li><Link to="/categories">Browse Categories</Link></li>
               <li><Link to="/about">How It Works</Link></li>
             </ul>

@@ -92,11 +92,9 @@ export default function UserDashboardHome() {
   const results = useMemo(() => {
     const q = search.trim().toLowerCase()
 
-    if (!q) return []
-
     let filtered = [...allListings]
 
-    // Search filter
+    // Search filter (show all listings when no query)
     if (q) {
       filtered = filtered.filter(
         (l) =>
@@ -104,7 +102,11 @@ export default function UserDashboardHome() {
           (l.description || '').toLowerCase().includes(q) ||
           (l.category || '').toLowerCase().includes(q) ||
           (l.address || '').toLowerCase().includes(q) ||
-          (l.offers && l.offers.some((o) => (o || '').toLowerCase().includes(q)))
+          (l.offers && l.offers.some((o) =>
+            ((o.title || '') + ' ' + (o.discount_percent || '') + ' ' + (o.coupon_code || ''))
+              .toLowerCase()
+              .includes(q)
+          ))
       )
     }
 
@@ -202,7 +204,7 @@ export default function UserDashboardHome() {
                 >
                   <div className={styles.suggestionInfo}>
                     <span className={styles.suggestionName}>{listing.name}</span>
-                    <span className={styles.suggestionCategory}>{listing.category.replace(/-/g, ' ')}</span>
+                    <span className={styles.suggestionCategory}>{(listing.category || '').replace(/-/g, ' ')}</span>
                   </div>
                   <div className={styles.suggestionMeta}>
                     <Star size={12} />
@@ -271,11 +273,13 @@ export default function UserDashboardHome() {
 
       {/* ── Results ──────────────────────────────────────────── */}
       <section className={styles.resultsSection}>
-        {hasActiveFilters && (
+        {hasActiveFilters ? (
           <p className={styles.resultsCount}>
             Showing {results.length} result{results.length !== 1 ? 's' : ''}
             {search && <> for <strong>&ldquo;{search}&rdquo;</strong></>}
           </p>
+        ) : (
+          <p className={styles.resultsCount}>Latest businesses & offers</p>
         )}
 
         {listingsLoading ? (
@@ -287,8 +291,10 @@ export default function UserDashboardHome() {
         ) : results.length === 0 ? (
           <div className={styles.emptyState}>
             <span className={styles.emptyIcon}>🔍</span>
-            <h3 className={styles.emptyTitle}>No results found</h3>
-            <p className={styles.emptyDesc}>Try adjusting your search or filters</p>
+            <h3 className={styles.emptyTitle}>{hasActiveFilters ? 'No results found' : 'No businesses yet'}</h3>
+            <p className={styles.emptyDesc}>
+              {hasActiveFilters ? 'Try adjusting your search or filters' : 'Approved businesses will appear here'}
+            </p>
           </div>
         ) : (
           <div className={styles.grid}>
@@ -300,7 +306,7 @@ export default function UserDashboardHome() {
                   </div>
                 )}
                 <div className={styles.cardHeader}>
-                  <span className={styles.cardCategory}>{listing.category.replace(/-/g, ' ')}</span>
+                  <span className={styles.cardCategory}>{(listing.category || '').replace(/-/g, ' ')}</span>
                   {listing.isOpen ? (
                     <span className={styles.openBadge}>Open</span>
                   ) : (
@@ -322,8 +328,12 @@ export default function UserDashboardHome() {
                 </div>
                 {listing.offers && listing.offers.length > 0 && (
                   <div className={styles.cardOffers}>
-                    {listing.offers.map((offer, i) => (
-                      <span key={i} className={styles.offerTag}>{offer}</span>
+                    {listing.offers.slice(0, 3).map((o) => (
+                      <span key={o.id} className={styles.offerTag}>
+                        {o.discount_percent ? `${o.discount_percent}% OFF` : o.title}
+                        {o.discount_value ? ` · ₹${o.discount_value}` : ''}
+                        {o.coupon_code ? ` · ${o.coupon_code}` : ''}
+                      </span>
                     ))}
                   </div>
                 )}

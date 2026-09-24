@@ -274,7 +274,7 @@ export default async function handler(req, res) {
       if (type === 'submissions') {
         let query = supabaseAdmin
           .from('sell_your_bussiness')
-          .select('*, business_owners(owner_name, email, firebase_uid)', { count: 'exact' })
+          .select('*, business_owners(owner_name, email, firebase_uid), offers_post(id, title, discount_percent, discount_value, coupon_code, valid_until, description, listing_type, is_active)', { count: 'exact' })
 
         if (status === 'pending') {
           query = query.eq('status', 'pending')
@@ -370,10 +370,40 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: error.message })
           }
 
+          // Activate offers linked to this shop
           await supabaseAdmin
             .from('offers_post')
             .update({ is_active: true })
             .eq('business_id', shop_id)
+
+          // Also cover owner's unlinked (business_id IS NULL) offers
+          const { data: ownerRow } = await supabaseAdmin
+            .from('business_owners')
+            .select('firebase_uid')
+            .eq('id', data.owner_id)
+            .maybeSingle()
+
+          if (ownerRow?.firebase_uid) {
+            await supabaseAdmin
+              .from('offers_post')
+              .update({ is_active: true })
+              .is('business_id', null)
+              .eq('created_by_uid', ownerRow.firebase_uid)
+
+            // Backfill business_id only when unambiguous (single shop)
+            const { data: ownerShops } = await supabaseAdmin
+              .from('sell_your_bussiness')
+              .select('id')
+              .eq('owner_id', data.owner_id)
+
+            if ((ownerShops || []).length === 1) {
+              await supabaseAdmin
+                .from('offers_post')
+                .update({ business_id: shop_id })
+                .is('business_id', null)
+                .eq('created_by_uid', ownerRow.firebase_uid)
+            }
+          }
 
           await supabaseAdmin.from('admin_logs').insert({
             admin_uid: decodedToken.uid,
@@ -402,6 +432,20 @@ export default async function handler(req, res) {
             .from('offers_post')
             .update({ is_active: false })
             .eq('business_id', shop_id)
+
+          const { data: rejectOwner } = await supabaseAdmin
+            .from('business_owners')
+            .select('firebase_uid')
+            .eq('id', data.owner_id)
+            .maybeSingle()
+
+          if (rejectOwner?.firebase_uid) {
+            await supabaseAdmin
+              .from('offers_post')
+              .update({ is_active: false })
+              .is('business_id', null)
+              .eq('created_by_uid', rejectOwner.firebase_uid)
+          }
 
           await supabaseAdmin.from('admin_logs').insert({
             admin_uid: decodedToken.uid,

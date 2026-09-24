@@ -41,6 +41,7 @@ import BusinessSubmissionApproval from '@/pages/dashboard/admin/BusinessSubmissi
 import PostDetailsPage from '@/pages/dashboard/admin/PostDetailsPage'
 import AdminsPost from '@/pages/dashboard/admin/AdminsPost'
 import AdminViewPosts from '@/pages/dashboard/admin/AdminViewPosts'
+import AdminOffers from '@/pages/dashboard/admin/AdminOffers'
 import AdminSettings from '@/pages/dashboard/admin/AdminSettings'
 
 import PrivacyPolicy from '@/pages/footer/PrivacyPolicy'
@@ -77,7 +78,7 @@ export default function App() {
           <Route
             path="/sell-your-business"
             element={
-              <ProtectedRoute allowedRoles={['user', 'business']}>
+              <ProtectedRoute allowedRoles={['business', 'admin']}>
                 <SellYourbussiness />
               </ProtectedRoute>
             }
@@ -119,6 +120,7 @@ export default function App() {
             <Route path="my-post" element={<AdminsPost />} />
             <Route path="view-posts" element={<AdminViewPosts />} />
             <Route path="post-details" element={<PostDetailsPage />} />
+            <Route path="offers" element={<AdminOffers />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
 

@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import ConfirmModal from '@/components/shared/ConfirmModal'
@@ -11,8 +11,10 @@ export default function Navbar() {
 
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
+  const [showSellInfo, setShowSellInfo] = useState(false)
   const { user, userProfile, signOut } = useAuth()
   const location = useLocation()
+  const navigate = useNavigate()
 
   const navLinks = [
     { label: 'Home', to: '/' },
@@ -26,6 +28,17 @@ export default function Navbar() {
         ? '/business/dashboard'
         : '/dashboard'
     : null
+
+  const canSellBusiness = userProfile?.role === 'business' || userProfile?.role === 'admin'
+
+  const handleSellClick = () => {
+    setMobileOpen(false)
+    if (canSellBusiness) {
+      navigate('/sell-your-business')
+    } else {
+      setShowSellInfo(true)
+    }
+  }
 
   return (
     <nav className={styles.navbar} role="navigation" aria-label="Main navigation">
@@ -50,6 +63,9 @@ export default function Navbar() {
         </div>
 
         <div className={styles.actionsGroup}>
+          <button type="button" className={styles.sellBtn} onClick={handleSellClick}>
+            Sell Your Business <span className={styles.freeTag}>[free]</span>
+          </button>
           <ThemeSwitch />
           {user ? (
             <>
@@ -100,6 +116,16 @@ export default function Navbar() {
         successMessage="You have been logged out successfully."
         onConfirm={() => { setLoggingOut(true); setTimeout(() => { signOut(); window.location.href = '/' }, 2000) }}
         onCancel={() => { setShowLogoutModal(false); setLoggingOut(false) }}
+      />
+
+      <ConfirmModal
+        open={showSellInfo}
+        title="Business Account Required"
+        message="If you want to list your business, please register as a Business account."
+        confirmLabel="Register as Business"
+        cancelLabel="Close"
+        onConfirm={() => { setShowSellInfo(false); navigate('/auth/business/register') }}
+        onCancel={() => setShowSellInfo(false)}
       />
     </nav>
   )

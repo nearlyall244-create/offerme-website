@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import Navbar from '@/components/navbar/Navbar'
 import Footer from '@/pages/footer/Footer'
+import OfferDetailModal from '@/components/shared/OfferDetailModal'
 import styles from './CategoryDetailPage.module.css'
 
 export default function CategoryDetailPage() {
@@ -13,6 +14,7 @@ export default function CategoryDetailPage() {
   const [loading, setLoading] = useState(true)
   const [rawListings, setRawListings] = useState([])
   const [listingsLoading, setListingsLoading] = useState(true)
+  const [detailShop, setDetailShop] = useState(null)
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(searchQuery), 300)
@@ -65,7 +67,12 @@ export default function CategoryDetailPage() {
         (l) =>
           (l.name || '').toLowerCase().includes(q) ||
           (l.description || '').toLowerCase().includes(q) ||
-          (l.address || '').toLowerCase().includes(q)
+          (l.address || '').toLowerCase().includes(q) ||
+          (l.offers || []).some((o) =>
+            ((o.title || '') + ' ' + (o.discount_percent || '') + ' ' + (o.coupon_code || ''))
+              .toLowerCase()
+              .includes(q)
+          )
       )
     }
 
@@ -229,12 +236,30 @@ export default function CategoryDetailPage() {
 
                   <p className={styles.listingDesc}>{biz.description}</p>
 
+                  {biz.offers?.length > 0 && (
+                    <div className={styles.offerBadges}>
+                      {biz.offers.map((o) => (
+                        <span key={o.id} className={styles.offerBadge}>
+                          {o.discount_percent ? `${o.discount_percent}% OFF` : 'Offer'}
+                          {o.discount_value ? ` · ₹${o.discount_value}` : ''}
+                        </span>
+                      ))}
+                      {biz.offers.filter((o) => o.coupon_code).map((o) => (
+                        <span key={`coupon-${o.id}`} className={styles.couponChip}>
+                          Code: {o.coupon_code}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
                   <div className={styles.listingFooter}>
                     <span className={styles.footerTime}>⏰ {biz.openingTime} — {biz.closingTime}</span>
                     {biz.phone && (
                       <span className={styles.footerPhone}>📞 {biz.phone}</span>
                     )}
-                    <button className={styles.viewDetailsBtn}>View Details →</button>
+                    <button className={styles.viewDetailsBtn} onClick={() => setDetailShop(biz)}>
+                      View Details →
+                    </button>
                   </div>
                 </div>
               </div>
@@ -253,6 +278,10 @@ export default function CategoryDetailPage() {
         </div>
       </main>
       <Footer />
+
+      {detailShop && (
+        <OfferDetailModal shop={detailShop} onClose={() => setDetailShop(null)} />
+      )}
     </div>
   )
 }

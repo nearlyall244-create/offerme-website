@@ -7,6 +7,7 @@ const STATUS_LABELS = {
   rejected: 'Rejected',
   deleted: 'Post Deleted',
   suspended: 'Suspended',
+  expired: 'Expired',
 }
 
 export default function StatusBadge({ status }) {

@@ -8,6 +8,41 @@ import styles from './BusinessSubmissionApproval.module.css'
 
 const ITEMS_PER_PAGE = 20
 
+function parseDescPrice(description, label) {
+  if (!description) return null
+  const m = description.match(new RegExp(`${label}:\\s*₹?\\s*([\\d.,]+)`, 'i'))
+  return m ? m[1] : null
+}
+
+function OfferDetailsCell({ offers }) {
+  if (!offers || offers.length === 0) {
+    return <span className={styles.offerEmpty}>—</span>
+  }
+
+  return (
+    <div className={styles.offerCell}>
+      <div className={styles.offerHead}>
+        <span>Discount</span>
+        <span>Original</span>
+        <span>Offer</span>
+        <span>Valid Till</span>
+      </div>
+      {offers.map((o) => {
+        const originalPrice = parseDescPrice(o.description, 'Original Price')
+        const offerPrice = o.discount_value ?? parseDescPrice(o.description, 'Offer Price')
+        return (
+          <div key={o.id} className={styles.offerRow}>
+            <span>{o.discount_percent ? `${o.discount_percent}%` : '—'}</span>
+            <span>{originalPrice ? `₹${originalPrice}` : '—'}</span>
+            <span>{offerPrice ? `₹${offerPrice}` : '—'}</span>
+            <span>{o.valid_until ? formatDate(o.valid_until) : '—'}</span>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 export default function BusinessSubmissionApproval() {
   const { user } = useAuth()
   const [submissions, setSubmissions] = useState([])
@@ -25,7 +60,7 @@ export default function BusinessSubmissionApproval() {
       setLoading(true)
       try {
         const token = await user.getIdToken()
-        const res = await fetch('/api/admin?type=submissions', {
+        const res = await fetch('/api/admin?type=submissions&limit=500', {
           headers: { Authorization: `Bearer ${token}` },
         })
         const data = await res.json()
@@ -165,13 +200,14 @@ export default function BusinessSubmissionApproval() {
               <th>Category</th>
               <th>Subcategory</th>
               <th>Submitted</th>
+              <th>Offer Details</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={8} className={styles.emptyCell}>Loading...</td></tr>
+              <tr><td colSpan={9} className={styles.emptyCell}>Loading...</td></tr>
             ) : paginated.length > 0 ? (
               paginated.map((sub) => {
                 const status = sub.status || (sub.is_active ? 'approved' : 'pending')
@@ -183,6 +219,7 @@ export default function BusinessSubmissionApproval() {
                     <td>{(sub.category_id || '—').replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}</td>
                     <td>{(sub.subcategory_id || '—').replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}</td>
                     <td>{formatDate(sub.created_at)}</td>
+                    <td><OfferDetailsCell offers={sub.offers_post} /></td>
                     <td><StatusBadge status={status} /></td>
                     <td>
                       <div className={styles.actions}>
@@ -209,7 +246,7 @@ export default function BusinessSubmissionApproval() {
               })
             ) : (
               <tr>
-                <td colSpan={8} className={styles.emptyCell}>
+                <td colSpan={9} className={styles.emptyCell}>
                   <div className={styles.emptyState}>
                     <span className={styles.emptyIcon}>📭</span>
                     <p>No submissions found matching your filters.</p>

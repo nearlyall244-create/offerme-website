@@ -78,6 +78,10 @@ export default async function handler(req, res) {
         query = query.ilike('title', `%${search}%`)
       }
 
+      // Hide expired offers (keep open-ended ones)
+      const todayStr = new Date().toISOString().split('T')[0]
+      query = query.or(`valid_until.is.null,valid_until.gte.${todayStr}`)
+
       const { data, count, error } = await query
         .order('created_at', { ascending: false })
         .range(offset, offset + limit - 1)
@@ -202,6 +206,19 @@ export default async function handler(req, res) {
           if (business) businessId = business.id
         }
 
+        // Fallback: link to the owner's most recent business so the offer
+        // is never created with business_id = NULL (invisible publicly)
+        if (!businessId && owner) {
+          const { data: latestBusiness } = await supabaseAdmin
+            .from('sell_your_bussiness')
+            .select('id')
+            .eq('owner_id', owner.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+          if (latestBusiness) businessId = latestBusiness.id
+        }
+
         // Look up category_id if businessCategory slug provided
         let categoryId = null
         if (businessCategory) {
@@ -213,8 +230,9 @@ export default async function handler(req, res) {
           if (cat) categoryId = cat.id
         }
 
-        // Update existing business fields if found
-        if (businessId && owner) {
+        // Update existing business fields if found (sell-business only —
+        // deal creation must not knock an approved listing back to pending)
+        if (action === 'sell-business' && businessId && owner) {
           const updateFields = {}
           if (shopName) updateFields.shop_name = shopName
           if (shopAddress) updateFields.shop_address = shopAddress

@@ -37,6 +37,11 @@
   background: #f3f4f6;
 }
 
+.expired {
+  color: #9a3412;
+  background: #ffedd5;
+}
+
 /* Dark mode */
 :global(html.dark) .badge {
   color: var(--color-text);
@@ -58,4 +63,8 @@
 
 :global(html.dark) .deleted {
   background: #374151;
+}
+
+:global(html.dark) .expired {
+  background: #7c2d12;
 }
