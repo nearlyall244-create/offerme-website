@@ -49,8 +49,19 @@ export default async function handler(req, res) {
       const {
         title, description, shopName, shopAddress, phoneNumber, businessEmail,
         businessCategory, businessSubcategory, openingTime, closingTime,
-        imageUrl, discountPercentage, offerPrice, originalPrice, couponCode, valid_until,
+        imageUrl, discountPercentage, offerPrice, couponCode,
+        valid_from, validFrom, valid_until,
       } = body
+
+      const validFromValue = validFrom !== undefined ? validFrom : valid_from
+      if (validFromValue !== undefined && !validFromValue) {
+        return res.status(400).json({ error: 'valid_from is required' })
+      }
+      const finalValidFrom = validFromValue !== undefined ? String(validFromValue).split('T')[0] : null
+      const finalValidUntil = valid_until !== undefined && valid_until ? String(valid_until).split('T')[0] : null
+      if (finalValidFrom && finalValidUntil && finalValidFrom > finalValidUntil) {
+        return res.status(400).json({ error: 'valid_from cannot be after valid_until' })
+      }
 
       // Update sell_your_bussiness
       if (offer.business_id) {
@@ -95,7 +106,8 @@ export default async function handler(req, res) {
       if (discountPercentage !== undefined) offerFields.discount_percent = Number(discountPercentage) || null
       if (offerPrice !== undefined) offerFields.discount_value = Number(offerPrice) || null
       if (couponCode !== undefined) offerFields.coupon_code = couponCode.trim() || null
-      if (valid_until !== undefined) offerFields.valid_until = valid_until ? String(valid_until).split('T')[0] : null
+      if (finalValidFrom !== null) offerFields.valid_from = finalValidFrom
+      if (valid_until !== undefined) offerFields.valid_until = finalValidUntil
 
       // Admin edits stay active — no is_active reset
       if (Object.keys(offerFields).length > 0) {

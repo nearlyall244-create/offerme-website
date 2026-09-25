@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { Plus, Trash2, Store, RefreshCw, Tag, Calendar, MapPin, Phone, CheckCircle } from 'lucide-react'
 import SuccessModal from '@/components/shared/SuccessModal'
+import DateInput from '@/components/shared/DateInput'
 import styles from './ViewPosts.module.css'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024
@@ -105,9 +106,8 @@ export default function ViewPosts() {
       openingTime: post.businesses?.opening_time || '',
       closingTime: post.businesses?.closing_time || '',
       discountPercentage: post.discount_percent ? String(post.discount_percent) : '',
-      offerPrice: post.discount_value ? String(post.discount_value) : '',
-      originalPrice: '',
       couponCode: post.coupon_code || '',
+      validFrom: post.valid_from ? String(post.valid_from).split('T')[0] : '',
       validUntil: post.valid_until ? String(post.valid_until).split('T')[0] : '',
     })
   }
@@ -162,6 +162,10 @@ export default function ViewPosts() {
     if (!editForm.shopDescription?.trim()) errs.shopDescription = 'Description is required.'
     else if (editForm.shopDescription.trim().length < 10) errs.shopDescription = 'Enter at least 10 characters.'
     if (!editForm.title?.trim()) errs.title = 'Title is required.'
+    if (!editForm.validFrom) errs.validFrom = 'Valid from date is required.'
+    else if (editForm.validUntil && editForm.validFrom > editForm.validUntil) {
+      errs.validFrom = 'Valid from cannot be after valid until.'
+    }
     return errs
   }
 
@@ -207,9 +211,8 @@ export default function ViewPosts() {
         closingTime: editForm.closingTime,
         imageUrl: uploadedImageUrl,
         discountPercentage: editForm.discountPercentage ? Number(editForm.discountPercentage) : null,
-        offerPrice: editForm.offerPrice ? Number(editForm.offerPrice) : null,
-        originalPrice: editForm.originalPrice ? Number(editForm.originalPrice) : null,
         couponCode: editForm.couponCode,
+        valid_from: editForm.validFrom,
         valid_until: editForm.validUntil || null,
       }
 
@@ -229,8 +232,8 @@ export default function ViewPosts() {
             description: payload.description,
             image_url: uploadedImageUrl,
             discount_percent: payload.discountPercentage,
-            discount_value: payload.offerPrice,
             coupon_code: payload.couponCode,
+            valid_from: payload.valid_from,
             valid_until: payload.valid_until,
             businesses: {
               ...p.businesses,
@@ -385,18 +388,22 @@ export default function ViewPosts() {
                           <input name="discountPercentage" type="number" min="1" max="100" value={editForm.discountPercentage} onChange={handleEditChange} className={styles.editInput} />
                         </div>
                         <div className={styles.editField}>
-                          <label>Original Price</label>
-                          <input name="originalPrice" type="number" min="0" value={editForm.originalPrice} onChange={handleEditChange} className={styles.editInput} />
+                          <label>Valid From *</label>
+                          <DateInput
+                            name="validFrom"
+                            value={editForm.validFrom}
+                            onChange={handleEditChange}
+                            placeholder="Select valid from date"
+                            required
+                            className={`${styles.editInput} ${editErrors.validFrom ? styles.fieldError : ''}`}
+                          />
+                          {editErrors.validFrom && <span className={styles.errorText}>{editErrors.validFrom}</span>}
                         </div>
                       </div>
                       <div className={styles.editRow}>
                         <div className={styles.editField}>
-                          <label>Offer Price</label>
-                          <input name="offerPrice" type="number" min="0" value={editForm.offerPrice} onChange={handleEditChange} className={styles.editInput} />
-                        </div>
-                        <div className={styles.editField}>
                           <label>Valid Until</label>
-                          <input name="validUntil" type="date" value={editForm.validUntil} onChange={handleEditChange} className={styles.editInput} />
+                          <input name="validUntil" type="date" value={editForm.validUntil} onChange={handleEditChange} className={styles.editInput} min={editForm.validFrom || undefined} />
                         </div>
                       </div>
                     </div>
@@ -473,6 +480,12 @@ export default function ViewPosts() {
                           <div className={styles.detailItem}>
                             <MapPin size={14} />
                             <span>{post.businesses.shop_address}</span>
+                          </div>
+                        )}
+                        {post.valid_from && (
+                          <div className={styles.detailItem}>
+                            <Calendar size={14} />
+                            <span>Valid from: {new Date(post.valid_from).toLocaleDateString()}</span>
                           </div>
                         )}
                         {post.valid_until && (

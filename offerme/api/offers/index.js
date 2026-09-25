@@ -78,9 +78,10 @@ export default async function handler(req, res) {
         query = query.ilike('title', `%${search}%`)
       }
 
-      // Hide expired offers (keep open-ended ones)
+      // Hide expired offers (keep open-ended ones) and offers not yet started
       const todayStr = new Date().toISOString().split('T')[0]
       query = query.or(`valid_until.is.null,valid_until.gte.${todayStr}`)
+      query = query.or(`valid_from.is.null,valid_from.lte.${todayStr}`)
 
       const { data, count, error } = await query
         .order('created_at', { ascending: false })
@@ -124,6 +125,8 @@ export default async function handler(req, res) {
           originalPrice,
           offerPrice,
           expiryDate,
+          valid_from,
+          validFrom,
           valid_until,
           description,
           imageUrl,
@@ -284,9 +287,20 @@ export default async function handler(req, res) {
         }
 
         const discountNum = Number(discountPercentage ?? discount_percent) || null
-        const discValue = Number(offerPrice) || discountNum || null
+        const discValue = Number(offerPrice) || null
         const finalValidUntil = expiryDate || valid_until ? String(expiryDate || valid_until).split('T')[0] : null
+
+        // The deal form always sends validFrom; other entry points (e.g.
+        // sell-business, which has no offer-detail UI) default to today.
         const todayStr = new Date().toISOString().split('T')[0]
+        const validFromValue = validFrom || valid_from || (action === 'create-deal' ? null : todayStr)
+        if (!validFromValue) {
+          return res.status(400).json({ error: 'valid_from is required' })
+        }
+        const finalValidFrom = String(validFromValue).split('T')[0]
+        if (finalValidUntil && finalValidFrom > finalValidUntil) {
+          return res.status(400).json({ error: 'valid_from cannot be after valid_until' })
+        }
 
         let fullDesc = description || ''
         if (originalPrice && offerPrice) {
@@ -305,7 +319,7 @@ export default async function handler(req, res) {
             discount_value: discValue,
             coupon_code: (couponCode || coupon_code || '').trim() || null,
             image_url: imageUrl || image_url || null,
-            valid_from: todayStr,
+            valid_from: finalValidFrom,
             valid_until: finalValidUntil,
             is_active: false,
             business_id: businessId || null,
@@ -336,7 +350,7 @@ export default async function handler(req, res) {
 
         const { data: offer, error: offerError } = await supabaseAdmin
           .from('offers_post')
-          .select('id, is_active, valid_until')
+          .select('id, is_active, valid_from, valid_until')
           .eq('id', offer_id)
           .single()
 
@@ -346,6 +360,11 @@ export default async function handler(req, res) {
 
         if (!offer.is_active) {
           return res.status(400).json({ error: 'Offer is no longer active' })
+        }
+
+        const todayStr = new Date().toISOString().split('T')[0]
+        if (offer.valid_from && String(offer.valid_from).slice(0, 10) > todayStr) {
+          return res.status(400).json({ error: 'Offer is not valid yet' })
         }
 
         return res.status(200).json({ message: 'Claim successful', offer })
@@ -432,8 +451,20 @@ export default async function handler(req, res) {
         offerPrice,
         originalPrice,
         couponCode,
+        valid_from,
+        validFrom,
         valid_until,
       } = body
+
+      const validFromValue = validFrom !== undefined ? validFrom : valid_from
+      if (validFromValue !== undefined && !validFromValue) {
+        return res.status(400).json({ error: 'valid_from is required' })
+      }
+      const finalValidFrom = validFromValue !== undefined ? String(validFromValue).split('T')[0] : null
+      const finalValidUntil = valid_until !== undefined && valid_until ? String(valid_until).split('T')[0] : null
+      if (finalValidFrom && finalValidUntil && finalValidFrom > finalValidUntil) {
+        return res.status(400).json({ error: 'valid_from cannot be after valid_until' })
+      }
 
       // Update sell_your_bussiness table
       if (offer.business_id) {
@@ -488,7 +519,8 @@ export default async function handler(req, res) {
       if (discountPercentage !== undefined) offerFields.discount_percent = Number(discountPercentage) || null
       if (offerPrice !== undefined) offerFields.discount_value = Number(offerPrice) || null
       if (couponCode !== undefined) offerFields.coupon_code = couponCode.trim() || null
-      if (valid_until !== undefined) offerFields.valid_until = valid_until ? String(valid_until).split('T')[0] : null
+      if (finalValidFrom !== null) offerFields.valid_from = finalValidFrom
+      if (valid_until !== undefined) offerFields.valid_until = finalValidUntil
 
       // Reset offer is_active to false (pending admin approval)
       offerFields.is_active = false

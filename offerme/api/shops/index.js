@@ -22,7 +22,7 @@ export default async function handler(req, res) {
 
       let query = supabaseAdmin
         .from('sell_your_bussiness')
-        .select('*, business_owners(owner_name, email), offers_post(id, title, description, discount_percent, discount_value, coupon_code, valid_until, image_url, listing_type, is_active)', { count: 'exact' })
+        .select('*, business_owners(owner_name, email), offers_post(id, title, description, discount_percent, discount_value, coupon_code, valid_from, valid_until, image_url, listing_type, is_active)', { count: 'exact' })
         .eq('is_active', true)
         .eq('status', 'approved')
 
@@ -57,7 +57,8 @@ export default async function handler(req, res) {
         offers: (shop.offers_post || [])
           .filter(o =>
             o.is_active &&
-            (!o.valid_until || String(o.valid_until).slice(0, 10) >= todayStr)
+            (!o.valid_until || String(o.valid_until).slice(0, 10) >= todayStr) &&
+            (!o.valid_from || String(o.valid_from).slice(0, 10) <= todayStr)
           )
           .map(o => ({
             id: o.id,
@@ -66,6 +67,7 @@ export default async function handler(req, res) {
             discount_percent: o.discount_percent,
             discount_value: o.discount_value,
             coupon_code: o.coupon_code,
+            valid_from: o.valid_from ? String(o.valid_from).slice(0, 10) : null,
             valid_until: o.valid_until ? String(o.valid_until).slice(0, 10) : null,
             image_url: o.image_url,
           })),

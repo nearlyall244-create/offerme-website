@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { UploadCloud, X, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
+import DateInput from '@/components/shared/DateInput'
 import styles from './OffersDeals.module.css'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5 MB
@@ -13,8 +14,7 @@ export default function OffersDeals({ onSuccess, onCancel, initialData = null })
     dealHeadline: initialData?.title || '',
     discountPercentage: initialData?.discount_percent ? String(initialData.discount_percent) : '',
     couponCode: initialData?.coupon_code || '',
-    originalPrice: initialData?.original_price ? String(initialData.original_price) : '',
-    offerPrice: initialData?.discount_value ? String(initialData.discount_value) : '',
+    validFrom: initialData?.valid_from ? String(initialData.valid_from).split('T')[0] : '',
     expiryDate: initialData?.valid_until ? String(initialData.valid_until).split('T')[0] : '',
     description: initialData?.description || '',
   })
@@ -28,30 +28,9 @@ export default function OffersDeals({ onSuccess, onCancel, initialData = null })
 
   const fileInputRef = useRef(null)
 
-  // Calculate savings info
-  const origNum = Number(form.originalPrice)
-  const offerNum = Number(form.offerPrice)
-  let discountInfo = null
-  if (origNum > 0 && offerNum > 0 && offerNum <= origNum) {
-    const saved = origNum - offerNum
-    const pct = ((saved / origNum) * 100).toFixed(0)
-    discountInfo = { saved: saved.toFixed(0), pct }
-  }
-
   const handleChange = useCallback((e) => {
     const { name, value } = e.target
-    setForm((prev) => {
-      const updated = { ...prev, [name]: value }
-      // If user inputs originalPrice and offerPrice, auto-suggest discount percentage if empty or matching
-      if ((name === 'originalPrice' || name === 'offerPrice') && !prev.discountPercentage) {
-        const o = Number(name === 'originalPrice' ? value : prev.originalPrice)
-        const p = Number(name === 'offerPrice' ? value : prev.offerPrice)
-        if (o > 0 && p > 0 && p <= o) {
-          updated.discountPercentage = Math.round(((o - p) / o) * 100).toString()
-        }
-      }
-      return updated
-    })
+    setForm((prev) => ({ ...prev, [name]: value }))
 
     setErrors((prev) => {
       if (prev[name]) {
@@ -119,20 +98,8 @@ export default function OffersDeals({ onSuccess, onCancel, initialData = null })
       errs.couponCode = 'Coupon code can only contain letters, numbers, and hyphens.'
     }
 
-    const orig = Number(form.originalPrice)
-    if (!form.originalPrice.trim()) {
-      errs.originalPrice = 'Original price is required.'
-    } else if (isNaN(orig) || orig <= 0) {
-      errs.originalPrice = 'Original price must be greater than 0.'
-    }
-
-    const off = Number(form.offerPrice)
-    if (!form.offerPrice.trim()) {
-      errs.offerPrice = 'Offer / Deal price is required.'
-    } else if (isNaN(off) || off <= 0) {
-      errs.offerPrice = 'Offer price must be greater than 0.'
-    } else if (orig > 0 && off > orig) {
-      errs.offerPrice = 'Offer price cannot be greater than original price.'
+    if (!form.validFrom) {
+      errs.validFrom = 'Valid from date is required.'
     }
 
     if (!form.expiryDate) {
@@ -143,6 +110,9 @@ export default function OffersDeals({ onSuccess, onCancel, initialData = null })
       today.setHours(0, 0, 0, 0)
       if (expiry < today) {
         errs.expiryDate = 'Expiry date must be in the future.'
+      }
+      if (form.validFrom && form.validFrom > form.expiryDate) {
+        errs.validFrom = 'Valid from cannot be after the expiry date.'
       }
     }
 
@@ -182,8 +152,7 @@ export default function OffersDeals({ onSuccess, onCancel, initialData = null })
         dealHeadline: form.dealHeadline.trim(),
         discountPercentage: Number(form.discountPercentage),
         couponCode: form.couponCode.trim(),
-        originalPrice: Number(form.originalPrice),
-        offerPrice: Number(form.offerPrice),
+        validFrom: form.validFrom,
         expiryDate: form.expiryDate,
         description: form.description.trim(),
         imageUrl: uploadedImageUrl,
@@ -301,60 +270,26 @@ export default function OffersDeals({ onSuccess, onCancel, initialData = null })
           </div>
         </div>
 
-        {/* Two-column: Original Price (₹) * & Offer / Deal Price (₹) * */}
-        <div className={styles.fieldRow}>
-          <div className={`${styles.field} ${errors.originalPrice ? styles.fieldError : ''}`}>
-            <label htmlFor="originalPrice">
-              Original Price (₹) <span className={styles.requiredStar}>*</span>
-            </label>
-            <input
-              id="originalPrice"
-              name="originalPrice"
-              type="number"
-              min="1"
-              step="0.01"
-              placeholder="e.g. 500"
-              value={form.originalPrice}
-              onChange={handleChange}
-            />
-            {errors.originalPrice && (
-              <span className={styles.errorText}>
-                <AlertCircle size={14} /> {errors.originalPrice}
-              </span>
-            )}
-          </div>
-
-          <div className={`${styles.field} ${errors.offerPrice ? styles.fieldError : ''}`}>
-            <label htmlFor="offerPrice">
-              Offer / Deal Price (₹) <span className={styles.requiredStar}>*</span>
-            </label>
-            <input
-              id="offerPrice"
-              name="offerPrice"
-              type="number"
-              min="1"
-              step="0.01"
-              placeholder="e.g. 350"
-              value={form.offerPrice}
-              onChange={handleChange}
-            />
-            {errors.offerPrice && (
-              <span className={styles.errorText}>
-                <AlertCircle size={14} /> {errors.offerPrice}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Calculated Savings info */}
-        {discountInfo && (
-          <div className={styles.savingsBanner}>
-            <span className={styles.savingsIcon}>💰</span>
-            <span>
-              Your customers save ₹{discountInfo.saved} ({discountInfo.pct}% off) with this deal!
+        {/* Valid From Date * */}
+        <div className={`${styles.field} ${errors.validFrom ? styles.fieldError : ''}`}>
+          <label htmlFor="validFrom">
+            Valid From Date <span className={styles.requiredStar}>*</span>
+          </label>
+          <DateInput
+            id="validFrom"
+            name="validFrom"
+            placeholder="Select valid from date"
+            value={form.validFrom}
+            onChange={handleChange}
+            max={form.expiryDate || undefined}
+            required
+          />
+          {errors.validFrom && (
+            <span className={styles.errorText}>
+              <AlertCircle size={14} /> {errors.validFrom}
             </span>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Deal Expiry Date * */}
         <div className={`${styles.field} ${errors.expiryDate ? styles.fieldError : ''}`}>
@@ -367,7 +302,7 @@ export default function OffersDeals({ onSuccess, onCancel, initialData = null })
             type="date"
             value={form.expiryDate}
             onChange={handleChange}
-            min={new Date().toISOString().split('T')[0]}
+            min={[new Date().toISOString().split('T')[0], form.validFrom].filter(Boolean).sort().pop()}
           />
           {errors.expiryDate && (
             <span className={styles.errorText}>
