@@ -42,11 +42,8 @@
   letter-spacing: -0.025em;
 }
 
-.highlight {
-  background: #ea580c;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.title :global(.fold-text-segment:nth-child(n+15)) {
+  color: #ea580c;
 }
 
 .subheadline {

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Search, X, Star, MapPin, ChevronDown } from 'lucide-react'
 import HerosecBelowcard from './HerosecBelowcard'
+import FoldText from './FoldText'
 import styles from './HeroSection.module.css'
 
 const LOCATIONS = [
@@ -157,8 +158,21 @@ export default function HeroSection() {
           {/* Top Headline */}
           <div className={styles.headerBlock}>
             <h1 className={styles.title}>
-              Find the Best{' '}
-              <span className={styles.highlight}>Offers Near You</span>
+              <FoldText
+                text="Find the Best Offers Near You"
+                splitBy="char"
+                hinge="top"
+                trigger="scroll"
+                duration={0.65}
+                stagger={0.04}
+                ease="power3.out"
+                perspective={700}
+                creaseShading={0.55}
+                fontSize="1em"
+                fontWeight="inherit"
+                color="currentColor"
+                style={{ lineHeight: '1.15', letterSpacing: '-0.025em' }}
+              />
             </h1>
             <p className={styles.subheadline}>
               Search across 5,000+ local businesses, verified deals & neighborhood services
