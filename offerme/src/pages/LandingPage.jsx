@@ -6,6 +6,7 @@ import MiddleSection from '@/pages/landingpage/landingmiddlesection/MiddleSectio
 import Landingcards from '@/pages/landingpage/Landingcards'
 import HowItWorks from '@/pages/landingpage/HowItWorks/HowItWorks'
 import Footer from '@/pages/footer/Footer'
+import WhatsApp from '@/pages/landingpage/whatsapp/WhatsApp'
 
 export default function LandingPage() {
   return (
@@ -20,6 +21,7 @@ export default function LandingPage() {
         <HowItWorks />
       </main>
       <Footer />
+      <WhatsApp />
     </div>
   )
 }
