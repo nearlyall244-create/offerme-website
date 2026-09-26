@@ -92,6 +92,27 @@
   line-height: 1.4;
 }
 
+.channelLink {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #25d366;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.channelLink:hover {
+  color: #1ebe5b;
+  text-decoration: underline;
+}
+
+.channelLink:focus-visible {
+  outline: 2px solid #25d366;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 /* ── Popup close button ────────────────────────────────────────── */
 .closeBtn {
   position: absolute;
