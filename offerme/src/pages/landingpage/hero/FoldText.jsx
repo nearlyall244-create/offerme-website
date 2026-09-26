@@ -37,6 +37,7 @@ const FoldText = ({
   perspective = 700,
   creaseShading = 0.55,
   trigger = 'mount',
+  repeatDelay = 0.75,
   fontSize = 80,
   fontWeight = 800,
   color = '#f7f2e8',
@@ -133,7 +134,7 @@ const FoldText = ({
 
     const play = repeat => {
       killTimeline();
-      timelineRef.current = gsap.timeline({ repeat: repeat ? -1 : 0, repeatDelay: repeat ? 0.75 : 0 });
+      timelineRef.current = gsap.timeline({ repeat: repeat ? -1 : 0, repeatDelay: repeat ? repeatDelay : 0 });
       timelineRef.current.fromTo(pieces, fromVars, toVars);
       return timelineRef.current;
     };
@@ -154,7 +155,7 @@ const FoldText = ({
         onEnter: () => play(false)
       });
     } else if (trigger === 'loop') {
-      play(true);
+      play(!reduceMotion);
     } else {
       play(false);
     }
@@ -174,6 +175,7 @@ const FoldText = ({
     perspective,
     safeCrease,
     trigger,
+    repeatDelay,
     hingeConfig.origin,
     hingeConfig.rotateX,
     hingeConfig.rotateY

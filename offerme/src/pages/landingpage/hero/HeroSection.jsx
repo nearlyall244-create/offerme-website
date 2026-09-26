@@ -162,7 +162,8 @@ export default function HeroSection() {
                 text="Find the Best Offers Near You"
                 splitBy="char"
                 hinge="top"
-                trigger="scroll"
+                trigger="loop"
+                repeatDelay={10}
                 duration={0.65}
                 stagger={0.04}
                 ease="power3.out"
