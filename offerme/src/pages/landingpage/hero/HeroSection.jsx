@@ -163,7 +163,7 @@ export default function HeroSection() {
                 splitBy="char"
                 hinge="top"
                 trigger="loop"
-                repeatDelay={10}
+                repeatDelay={5}
                 duration={0.65}
                 stagger={0.04}
                 ease="power3.out"
