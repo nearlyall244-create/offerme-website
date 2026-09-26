@@ -1,12 +1,7 @@
 import { useState } from 'react'
 import styles from './Whatsapp.module.css'
 
-const PHONE_NUMBER = "919XXXXXXXXX"
-
-const DEFAULT_MESSAGE =
-  "Hello OfferMe, I need some assistance."
-
-const WHATSAPP_URL = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(DEFAULT_MESSAGE)}`
+const WHATSAPP_URL = "https://whatsapp.com/channel/0029Vb8qCLpDeONCBAtL7X0B"
 
 const CHANNEL_URL = "https://whatsapp.com/channel/0029Vb8qCLpDeONCBAtL7X0B"
 
@@ -28,8 +23,8 @@ export default function WhatsApp() {
               <path d="m6 6 12 12" />
             </svg>
           </button>
-          <p className={styles.popupTitle}>Need Help?</p>
-          <p className={styles.popupText}>Chat with us on WhatsApp</p>
+          <p className={styles.popupTitle}>posts</p>
+          <p className={styles.popupText}>latest updated offers</p>
           <a
             className={styles.channelLink}
             href={CHANNEL_URL}

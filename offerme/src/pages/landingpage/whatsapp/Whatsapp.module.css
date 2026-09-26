@@ -43,18 +43,29 @@
 
 /* ── Popup ─────────────────────────────────────────────────────── */
 .popup {
-  position: relative;
-  margin-right: 10px;
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 10px);
   padding: 14px 34px 14px 16px;
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.16);
   opacity: 0;
   visibility: hidden;
-  transform: translateX(8px);
+  transform: translateY(-50%) translateX(8px);
   transition: opacity 0.25s ease, transform 0.25s ease,
     visibility 0.25s ease;
   white-space: nowrap;
+}
+
+/* Invisible bridge across the 10px gap so hover never breaks */
+.popup::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 100%;
+  width: 10px;
 }
 
 .popup::after {
@@ -73,7 +84,7 @@
 .wrapper:focus-within .popup {
   opacity: 1;
   visibility: visible;
-  transform: translateX(0);
+  transform: translateY(-50%) translateX(0);
 }
 
 .popupTitle {
