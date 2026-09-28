@@ -2,8 +2,8 @@
   max-width: 1200px;
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 48px);
-  min-height: calc(100dvh - 48px);
+  min-height: calc(100vh - 104px);
+  min-height: calc(100dvh - 104px);
 }
 
 .title {
@@ -58,8 +58,8 @@
 .tableWrapper {
   overflow: auto;
   flex: 1;
-  max-height: calc(100vh - 240px);
-  max-height: calc(100dvh - 240px);
+  max-height: calc(100vh - 200px);
+  max-height: calc(100dvh - 200px);
   min-height: 260px;
 }
 
@@ -234,4 +234,10 @@
   background: var(--color-primary);
   border-color: var(--color-primary);
   color: white;
+}
+
+@media (max-width: 768px) {
+  .page {
+    min-height: auto;
+  }
 }
