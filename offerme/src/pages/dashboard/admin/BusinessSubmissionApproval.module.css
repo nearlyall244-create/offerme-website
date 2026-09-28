@@ -1,5 +1,9 @@
 .page {
   max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 48px);
+  min-height: calc(100dvh - 48px);
 }
 
 .title {
@@ -51,19 +55,11 @@
   outline: none;
 }
 
-.resultsBar {
-  margin-bottom: 0.75rem;
-}
-
-.resultCount {
-  font-size: 0.8125rem;
-  color: var(--color-text-muted);
-}
-
 .tableWrapper {
   overflow: auto;
-  max-height: calc(100vh - 340px);
-  max-height: calc(100dvh - 340px);
+  flex: 1;
+  max-height: calc(100vh - 240px);
+  max-height: calc(100dvh - 240px);
   min-height: 260px;
 }
 

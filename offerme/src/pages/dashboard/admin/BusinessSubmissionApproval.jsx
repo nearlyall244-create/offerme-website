@@ -156,8 +156,6 @@ export default function BusinessSubmissionApproval() {
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
   const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
-  const startItem = filtered.length === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1
-  const endItem = Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)
 
   return (
     <div className={styles.page}>
@@ -182,12 +180,6 @@ export default function BusinessSubmissionApproval() {
           <option value="rejected">Rejected</option>
           <option value="deleted">Post Deleted</option>
         </select>
-      </div>
-
-      <div className={styles.resultsBar}>
-        <span className={styles.resultCount}>
-          Showing {startItem}–{endItem} of {filtered.length} submission{filtered.length !== 1 ? 's' : ''}
-        </span>
       </div>
 
       <div className={styles.tableWrapper}>
