@@ -1,0 +1,164 @@
+.section {
+  padding: 4rem 1.5rem;
+  background: var(--color-surface-alt);
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.header {
+  max-width: 640px;
+  margin: 0 auto 3rem;
+  text-align: center;
+}
+
+.heading {
+  display: inline-block;
+  margin: 0;
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  color: var(--color-text-heading);
+}
+
+.heading::after {
+  content: '';
+  display: block;
+  width: 3rem;
+  height: 4px;
+  margin: 0.75rem auto 0;
+  border-radius: 9999px;
+  background: #ea580c;
+}
+
+.subheading {
+  margin: 1rem 0 0;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  position: relative;
+  text-align: center;
+}
+
+.connector {
+  position: absolute;
+  top: 1.75rem;
+  left: -50%;
+  width: 100%;
+  height: 2px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, var(--color-border) 0%, #ea580c 100%);
+}
+
+.step:first-child .connector {
+  display: none;
+}
+
+.circle {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 2px solid #ea580c;
+  color: #ea580c;
+  box-shadow: 0 6px 16px rgba(234, 88, 12, 0.18);
+}
+
+.number {
+  position: absolute;
+  top: -0.55rem;
+  right: -0.7rem;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  background: #0f172a;
+  border-radius: 9999px;
+}
+
+:global(html.dark) .number {
+  background: #334155;
+}
+
+.stepTitle {
+  margin: 1.25rem 0 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--color-text-heading);
+}
+
+.stepDesc {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 1024px) {
+  .header {
+    margin-bottom: 2.25rem;
+  }
+
+  .steps {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem 1.5rem;
+  }
+
+  .step {
+    text-align: left;
+  }
+
+  .circle {
+    margin: 0;
+  }
+
+  .connector {
+    display: none;
+  }
+
+  .stepTitle {
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .section {
+    padding: 2.5rem 1rem;
+  }
+
+  .heading {
+    font-size: 1.75rem;
+  }
+
+  .subheading {
+    font-size: 1rem;
+  }
+
+  .steps {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+}

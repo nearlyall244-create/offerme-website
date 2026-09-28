@@ -4,7 +4,12 @@ import Iconsofcat from '@/pages/landingpage/Iconsofcat'
 import WhatLookingFor from '@/pages/landingpage/whatlookingfor/WhatLookingFor'
 import MiddleSection from '@/pages/landingpage/landingmiddlesection/MiddleSection'
 import Landingcards from '@/pages/landingpage/Landingcards'
+import WhatWeDo from '@/pages/landingpage/sections/WhatWeDo'
+import HowOfferMeWorks from '@/pages/landingpage/sections/HowItWorks'
+import GrowYourBusiness from '@/pages/landingpage/sections/GrowYourBusiness'
 import HowItWorks from '@/pages/landingpage/HowItWorks/HowItWorks'
+import WhyOfferMe from '@/pages/landingpage/sections/WhyOfferMe'
+import FinalCTA from '@/pages/landingpage/sections/FinalCTA'
 import Footer from '@/pages/footer/Footer'
 import WhatsApp from '@/pages/landingpage/whatsapp/WhatsApp'
 
@@ -18,7 +23,12 @@ export default function LandingPage() {
         <WhatLookingFor />
         <MiddleSection />
         <Landingcards />
+        <WhatWeDo />
+        <HowOfferMeWorks />
+        <GrowYourBusiness />
         <HowItWorks />
+        <WhyOfferMe />
+        <FinalCTA />
       </main>
       <Footer />
       <WhatsApp />

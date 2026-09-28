@@ -1,0 +1,316 @@
+.section {
+  padding: 3.5rem 1.5rem;
+}
+
+.panel {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 3rem;
+  align-items: center;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 3.25rem;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-muted) 0%,
+    var(--color-warm-bg) 100%
+  );
+  border: 1px solid var(--color-border);
+  border-radius: 1.5rem;
+}
+
+.content {
+  min-width: 0;
+}
+
+.heading {
+  margin: 0;
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  color: var(--color-text-heading);
+}
+
+.description {
+  margin: 1rem 0 0;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--color-text-muted);
+}
+
+.benefitList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  margin: 1.75rem 0 2.25rem;
+  padding: 0;
+  list-style: none;
+}
+
+.benefit {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+}
+
+.ctaBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: #ea580c;
+  border-radius: 0.75rem;
+  text-decoration: none;
+  box-shadow: 0 8px 20px rgba(234, 88, 12, 0.25);
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.ctaBtn:hover {
+  background: #c2410c;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(234, 88, 12, 0.32);
+}
+
+.ctaBtn svg {
+  transition: transform 0.2s ease;
+}
+
+.ctaBtn:hover svg {
+  transform: translateX(3px);
+}
+
+/* ── Business profile preview ─────────────────────────── */
+
+.visual {
+  position: relative;
+  min-width: 0;
+}
+
+.profileCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 1.25rem;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+  overflow: hidden;
+}
+
+.cardHeader {
+  height: 5rem;
+  background: linear-gradient(135deg, #ea580c 0%, #f97316 55%, #fbbf24 100%);
+}
+
+.cardBody {
+  padding: 0 1.5rem 1.5rem;
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  margin-top: -1.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 3px solid var(--color-surface);
+  color: #ea580c;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.14);
+}
+
+.identityText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.shopName {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--color-text-heading);
+}
+
+.shopMeta {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.previewList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.previewRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.875rem;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border-light);
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.rowIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.5rem;
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+}
+
+.rowLabel {
+  min-width: 0;
+}
+
+.rowCheck {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: #16a34a;
+}
+
+.addRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.875rem;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  border: 1.5px dashed var(--color-border);
+  border-radius: 0.75rem;
+}
+
+.floatingBadge {
+  position: absolute;
+  left: -0.75rem;
+  bottom: -1.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: #0f172a;
+  border-radius: 9999px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.28);
+}
+
+.floatingBadge svg {
+  color: #f59e0b;
+}
+
+:global(html.dark) .floatingBadge {
+  background: #1e293b;
+  border: 1px solid #334155;
+}
+
+/* ── Responsive ───────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .panel {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding: 2rem;
+  }
+
+  .heading {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .section {
+    padding: 2.5rem 1rem;
+  }
+
+  .panel {
+    padding: 1.5rem 1.25rem;
+    border-radius: 1.125rem;
+  }
+
+  .heading {
+    font-size: 1.75rem;
+  }
+
+  .description {
+    font-size: 1rem;
+  }
+
+  .benefitList {
+    margin: 1.5rem 0 2rem;
+  }
+
+  .benefit {
+    align-items: flex-start;
+    font-size: 0.9375rem;
+  }
+
+  .ctaBtn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .cardBody {
+    padding: 0 1rem 1.25rem;
+  }
+
+  .floatingBadge {
+    left: 0.5rem;
+    bottom: -1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ctaBtn,
+  .ctaBtn svg {
+    transition: none;
+  }
+
+  .ctaBtn:hover {
+    transform: none;
+  }
+}

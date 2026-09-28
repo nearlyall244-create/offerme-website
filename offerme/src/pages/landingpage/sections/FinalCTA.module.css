@@ -1,0 +1,137 @@
+.section {
+  padding: 4.5rem 1.5rem;
+  background:
+    radial-gradient(
+      48rem 18rem at 50% -10%,
+      rgba(234, 88, 12, 0.1),
+      transparent 70%
+    ),
+    linear-gradient(
+      135deg,
+      var(--color-primary-muted) 0%,
+      var(--color-warm-bg) 100%
+    );
+  border-top: 1px solid var(--color-border);
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.heading {
+  margin: 0;
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  color: var(--color-text-heading);
+}
+
+.description {
+  max-width: 620px;
+  margin: 1rem auto 0;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--color-text-muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.primaryBtn,
+.secondaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  text-decoration: none;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.primaryBtn {
+  color: #ffffff;
+  background: #ea580c;
+  box-shadow: 0 8px 20px rgba(234, 88, 12, 0.25);
+}
+
+.primaryBtn:hover {
+  background: #c2410c;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(234, 88, 12, 0.32);
+}
+
+.primaryBtn svg {
+  transition: transform 0.2s ease;
+}
+
+.primaryBtn:hover svg {
+  transform: translateX(3px);
+}
+
+.secondaryBtn {
+  color: var(--color-text-heading);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+}
+
+.secondaryBtn:hover {
+  border-color: #ea580c;
+  color: #ea580c;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+@media (max-width: 640px) {
+  .section {
+    padding: 3rem 1rem;
+  }
+
+  .heading {
+    font-size: 1.75rem;
+  }
+
+  .description {
+    font-size: 1rem;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+    margin-top: 1.75rem;
+  }
+
+  .primaryBtn,
+  .secondaryBtn {
+    width: 100%;
+    padding: 0.875rem 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .primaryBtn,
+  .secondaryBtn,
+  .primaryBtn svg {
+    transition: none;
+  }
+
+  .primaryBtn:hover,
+  .secondaryBtn:hover {
+    transform: none;
+  }
+}
