@@ -61,12 +61,23 @@
 }
 
 .tableWrapper {
-  overflow-x: auto;
+  overflow: auto;
+  max-height: calc(100vh - 340px);
+  max-height: calc(100dvh - 340px);
+  min-height: 260px;
 }
 
 .table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  box-shadow: inset 0 -1px 0 var(--color-border);
 }
 
 .table th,
