@@ -58,6 +58,24 @@
   --leading-tight: 1.25;
   --leading-snug: 1.375;
   --leading-relaxed: 1.625;
+
+  /* ── shadcn/ui semantic tokens ───────────────────────────────── */
+  --color-background: #ffffff;
+  --color-foreground: #0f172a;
+  --color-card: #ffffff;
+  --color-card-foreground: #0f172a;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0f172a;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #f1f5f9;
+  --color-secondary-foreground: #0f172a;
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #64748b;
+  --color-accent-foreground: #0f172a;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+  --color-input: #e2e8f0;
+  --color-ring: #2563eb;
 }
 
 /* ── Dark Mode ─────────────────────────────────────────────────── */
@@ -78,6 +96,20 @@ html.dark {
   --color-hero-from: #0f172a;
   --color-hero-via: #0f172a;
   --color-hero-to: #1c1917;
+
+  /* shadcn/ui semantic tokens */
+  --color-background: #0f172a;
+  --color-foreground: #f1f5f9;
+  --color-card: #1e293b;
+  --color-card-foreground: #f1f5f9;
+  --color-popover: #1e293b;
+  --color-popover-foreground: #f1f5f9;
+  --color-secondary: #1e293b;
+  --color-secondary-foreground: #f1f5f9;
+  --color-muted: #1e293b;
+  --color-muted-foreground: #94a3b8;
+  --color-accent-foreground: #f1f5f9;
+  --color-input: #334155;
 }
 
 html.dark body {

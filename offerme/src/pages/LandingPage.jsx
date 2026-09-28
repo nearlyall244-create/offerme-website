@@ -3,7 +3,7 @@ import HeroSection from '@/pages/landingpage/hero/HeroSection'
 import Iconsofcat from '@/pages/landingpage/Iconsofcat'
 import WhatLookingFor from '@/pages/landingpage/whatlookingfor/WhatLookingFor'
 import MiddleSection from '@/pages/landingpage/landingmiddlesection/MiddleSection'
-import Landingcards from '@/pages/landingpage/Landingcards'
+import HyperlocalSection from '@/pages/landingpage/HyperlocalSection'
 import WhatWeDo from '@/pages/landingpage/sections/WhatWeDo'
 import HowOfferMeWorks from '@/pages/landingpage/sections/HowItWorks'
 import GrowYourBusiness from '@/pages/landingpage/sections/GrowYourBusiness'
@@ -22,7 +22,7 @@ export default function LandingPage() {
         <Iconsofcat />
         <WhatLookingFor />
         <MiddleSection />
-        <Landingcards />
+        <HyperlocalSection />
         <WhatWeDo />
         <HowOfferMeWorks />
         <GrowYourBusiness />
