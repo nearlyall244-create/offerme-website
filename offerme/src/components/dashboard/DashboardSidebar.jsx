@@ -41,6 +41,8 @@ export default function DashboardSidebar({ role = 'user' }) {
   const location = useLocation()
   useAuth()
   const [pendingCount, setPendingCount] = useState(0)
+  const [panelOpen, setPanelOpen] = useState(false)
+  const [hoveredItem, setHoveredItem] = useState(null)
 
   useEffect(() => {
     if (role !== 'admin') return
@@ -62,14 +64,49 @@ export default function DashboardSidebar({ role = 'user' }) {
   const links = role === 'admin' ? adminLinks : role === 'business' ? businessLinks : userLinks
 
   return (
-    <aside className={styles.sidebar}>
-      <nav className={styles.nav}>
+    <aside
+      className={styles.sidebar}
+      onMouseEnter={() => setPanelOpen(true)}
+      onMouseLeave={() => {
+        setPanelOpen(false)
+        setHoveredItem(null)
+      }}
+    >
+      <nav className={styles.nav} aria-label="Dashboard">
         <ul className={styles.list}>
+          {links.map((link) => {
+            const isActive = location.pathname === link.to
+            return (
+              <li key={link.to}>
+                <Link
+                  to={link.to}
+                  aria-label={link.label}
+                  className={`${styles.link} ${isActive ? styles.active : ''} ${
+                    hoveredItem === link.to ? styles.hovered : ''
+                  }`}
+                  onMouseEnter={() => setHoveredItem(link.to)}
+                >
+                  <span className={styles.icon}>{link.icon}</span>
+                  <span className={styles.label}>{link.label}</span>
+                  {link.showBadge && pendingCount > 0 && (
+                    <span className={styles.badge}>{pendingCount}</span>
+                  )}
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
+      </nav>
+
+      <div className={`${styles.panel} ${panelOpen ? styles.panelOpen : ''}`}>
+        <ul className={styles.panelList}>
           {links.map((link) => (
             <li key={link.to}>
               <Link
                 to={link.to}
-                className={`${styles.link} ${location.pathname === link.to ? styles.active : ''}`}
+                className={`${styles.panelLink} ${
+                  location.pathname === link.to ? styles.active : ''
+                }`}
               >
                 <span className={styles.icon}>{link.icon}</span>
                 <span className={styles.label}>{link.label}</span>
@@ -80,8 +117,7 @@ export default function DashboardSidebar({ role = 'user' }) {
             </li>
           ))}
         </ul>
-      </nav>
-
+      </div>
     </aside>
   )
 }

@@ -1,16 +1,21 @@
 .sidebar {
+  position: sticky;
+  top: 3.5rem;
+  z-index: 20;
   display: flex;
   flex-direction: column;
-  width: 240px;
-  min-height: 100vh;
+  width: 64px;
+  flex: 0 0 64px;
+  height: calc(100vh - 3.5rem);
   background: white;
   border-right: 1px solid var(--color-border);
-  position: sticky;
-  top: 0;
 }
 
 .nav {
-  padding: 0.5rem 0;
+  height: 100%;
+  padding: 0.5rem;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .list {
@@ -23,14 +28,17 @@
 }
 
 .link {
+  position: relative;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.75rem;
-  padding: 0.625rem 1.25rem;
+  padding: 0.625rem 0;
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--color-text-muted);
   text-decoration: none;
+  border-radius: 0.5rem;
   transition: color 0.15s, background 0.15s;
 }
 
@@ -39,22 +47,37 @@
   background: var(--color-surface-alt);
 }
 
+.hovered {
+  color: var(--color-text);
+  background: var(--color-surface-alt);
+}
+
 .active {
-  color: var(--color-primary);
-  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
-  border-right: 3px solid var(--color-primary);
+  color: #ffffff;
+  background: #0080fc;
+}
+
+.link:hover.active,
+.hovered.active,
+.link.active:hover {
+  color: #ffffff;
+  background: #0080fc;
 }
 
 .icon {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
+  line-height: 1;
 }
 
 .label {
+  display: none;
   white-space: nowrap;
 }
 
 .badge {
-  margin-left: auto;
+  position: absolute;
+  top: 0.25rem;
+  right: 0.375rem;
   min-width: 1.25rem;
   height: 1.25rem;
   display: flex;
@@ -66,6 +89,83 @@
   background: var(--color-danger);
   border-radius: 1rem;
   padding: 0 0.375rem;
+}
+
+.panel {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  width: 240px;
+  max-height: 100%;
+  overflow-y: auto;
+  z-index: 60;
+  padding: 0.375rem;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 0 0.5rem 0.5rem 0;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateX(-12px);
+  transition:
+    opacity 0.18s ease,
+    transform 0.22s ease,
+    visibility 0s linear 0.22s;
+}
+
+.panelOpen {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(0);
+  transition:
+    opacity 0.18s ease,
+    transform 0.22s ease,
+    visibility 0s linear 0s;
+}
+
+.panelList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.panelLink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.625rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  border-radius: 0.375rem;
+  transition: color 0.15s, background 0.15s;
+}
+
+.panelLink:hover {
+  color: var(--color-text);
+  background: var(--color-surface-alt);
+}
+
+.panelLink .label {
+  display: inline;
+  color: inherit;
+}
+
+.panelLink .badge {
+  position: static;
+  margin-left: auto;
+}
+
+.panelLink.active,
+.panelLink.active:hover {
+  color: #ffffff;
+  background: #0080fc;
 }
 
 .logout {
@@ -91,7 +191,10 @@
 @media (max-width: 768px) {
   .sidebar {
     width: 100%;
+    flex: none;
+    height: auto;
     min-height: auto;
+    top: auto;
     position: fixed;
     bottom: 0;
     left: 0;
@@ -103,7 +206,9 @@
   }
 
   .nav {
+    height: auto;
     padding: 0.5rem 0;
+    overflow: visible;
   }
 
   .list {
@@ -117,11 +222,29 @@
     gap: 0.125rem;
     padding: 0.5rem;
     font-size: 0.6875rem;
+    border-radius: 0;
   }
 
-  .active {
-    border-right: none;
-    border-top: 2px solid var(--color-primary);
+  .label {
+    display: inline;
+  }
+
+  .badge {
+    position: absolute;
+    top: 0.125rem;
+    right: calc(50% - 1.25rem);
+  }
+
+  .active,
+  .link:hover.active,
+  .link.active:hover {
+    border-top: none;
+    background: #0080fc;
+    color: #ffffff;
+  }
+
+  .panel {
+    display: none;
   }
 
   .logout {
