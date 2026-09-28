@@ -37,41 +37,7 @@ const CELL_HOVER =
 export default function HyperlocalSection() {
   return (
     <section className="relative overflow-hidden bg-warm-bg">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute right-[3%] top-1/2 z-0 hidden -translate-y-1/2 text-orange-300/50 md:block"
-      >
-        <svg
-          className="h-72 w-72"
-          viewBox="0 0 200 200"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <rect
-            x="30"
-            y="50"
-            width="140"
-            height="130"
-            rx="12"
-            stroke="currentColor"
-            strokeWidth="6"
-          />
-          <path
-            d="M70 50V30C70 18.954 78.954 10 90 10H110C121.046 10 130 18.954 130 30V50"
-            stroke="currentColor"
-            strokeWidth="6"
-            strokeLinecap="round"
-          />
-          <circle cx="100" cy="110" r="8" fill="currentColor" />
-          <path
-            d="M85 125L100 140L115 125"
-            stroke="currentColor"
-            strokeWidth="6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </div>
+
 
       <div className="relative z-10 mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-10 px-6 py-14 md:grid-cols-2 md:gap-12 md:py-20">
         <ContainerStagger>
