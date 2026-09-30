@@ -12,6 +12,7 @@ export default function BusinessLogin() {
   const [resendSent, setResendSent] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [googleSignup, setGoogleSignup] = useState(null)
+  const [fieldsReady, setFieldsReady] = useState(false)
   const { signIn, signInWithGoogle, reloadUser, sendVerificationEmail, completePendingSignup } = useAuth()
   const navigate = useNavigate()
 
@@ -162,6 +163,8 @@ export default function BusinessLogin() {
                   onChange={handleChange}
                   placeholder="Enter your email"
                   autoComplete="email"
+                  readOnly={!fieldsReady}
+                  onFocus={() => setFieldsReady(true)}
                 />
               </div>
 
@@ -179,6 +182,8 @@ export default function BusinessLogin() {
                     onChange={handleChange}
                     placeholder="Enter your password"
                     autoComplete="current-password"
+                    readOnly={!fieldsReady}
+                    onFocus={() => setFieldsReady(true)}
                   />
                   <button
                     type="button"

@@ -12,6 +12,7 @@ export default function UnifiedLogin() {
   const [needsVerification, setNeedsVerification] = useState(false)
   const [resendSent, setResendSent] = useState(false)
   const [googleSignup, setGoogleSignup] = useState(null)
+  const [fieldsReady, setFieldsReady] = useState(false)
   const { signIn, signInWithGoogle, reloadUser, sendVerificationEmail, getToken, refreshProfile, completePendingSignup } = useAuth()
   const navigate = useNavigate()
 
@@ -162,6 +163,8 @@ export default function UnifiedLogin() {
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); setError('') }}
                   placeholder="you@example.com"
+                  readOnly={!fieldsReady}
+                  onFocus={() => setFieldsReady(true)}
                 />
               </div>
               <div className={styles.field}>
@@ -173,6 +176,8 @@ export default function UnifiedLogin() {
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); setError('') }}
                   placeholder="Your password"
+                  readOnly={!fieldsReady}
+                  onFocus={() => setFieldsReady(true)}
                 />
               </div>
               <button type="submit" className={styles.submitBtn} disabled={loading}>
