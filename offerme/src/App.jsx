@@ -42,6 +42,7 @@ import PostDetailsPage from '@/pages/dashboard/admin/PostDetailsPage'
 import AdminsPost from '@/pages/dashboard/admin/AdminsPost'
 import AdminViewPosts from '@/pages/dashboard/admin/AdminViewPosts'
 import AdminOffers from '@/pages/dashboard/admin/AdminOffers'
+import AdminEnquiry from '@/pages/dashboard/admin/AdminEnquiry'
 import AdminSettings from '@/pages/dashboard/admin/AdminSettings'
 
 import PrivacyPolicy from '@/pages/footer/PrivacyPolicy'
@@ -121,6 +122,7 @@ export default function App() {
             <Route path="view-posts" element={<AdminViewPosts />} />
             <Route path="post-details" element={<PostDetailsPage />} />
             <Route path="offers" element={<AdminOffers />} />
+            <Route path="enquiry" element={<AdminEnquiry />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
 

@@ -34,6 +34,7 @@ const adminLinks = [
   { to: '/admin/dashboard/view-posts', label: 'View Posts', icon: '👁️' },
   { to: '/admin/dashboard/post-details', label: 'Post Details', icon: '📄' },
   { to: '/admin/dashboard/offers', label: 'Offers Details', icon: '📊' },
+  { to: '/admin/dashboard/enquiry', label: 'Enquiry', icon: '✉️' },
   { to: '/admin/dashboard/settings', label: 'Settings', icon: '⚙️' },
 ]
 
