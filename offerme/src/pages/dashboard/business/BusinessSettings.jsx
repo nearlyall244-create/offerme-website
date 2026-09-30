@@ -6,7 +6,7 @@ import styles from './BusinessSettings.module.css'
 
 const DELETION_STATUS_LABELS = {
   no_request: 'No Request',
-  requested: 'Requested',
+  requested: 'Request Pending',
   rejected: 'Rejected',
   approved: 'Approved',
 }
@@ -35,6 +35,8 @@ export default function BusinessSettings() {
   const [deletionNotice, setDeletionNotice] = useState({ type: '', text: '' })
 
   const deletionStatus = userProfile?.deletion_status || 'no_request'
+  const deletionWordCount = deletionReason.trim() ? deletionReason.trim().split(/\s+/).length : 0
+  const deletionOverLimit = deletionWordCount > 1000
 
   useEffect(() => {
     // Refresh once on mount so the latest deletion-request status is shown.
@@ -136,7 +138,7 @@ export default function BusinessSettings() {
 
   const submitDeletionRequest = async () => {
     const message = deletionReason.trim()
-    if (!message) return
+    if (!message || message.split(/\s+/).length > 1000) return
 
     setSubmittingRequest(true)
     try {
@@ -344,12 +346,14 @@ export default function BusinessSettings() {
                   <p className={styles.dangerDesc}>
                     Submit a request to delete your business account. The request will be reviewed by the admin before any action is taken.
                   </p>
-                  <div className={styles.deletionStatusRow}>
-                    <span className={styles.deletionStatusLabel}>Status:</span>
-                    <span className={`${styles.deletionBadge} ${styles[`deletionBadge_${deletionStatus}`] || ''}`}>
-                      {DELETION_STATUS_LABELS[deletionStatus] || 'No Request'}
-                    </span>
-                  </div>
+                  {deletionStatus !== 'no_request' && (
+                    <div className={styles.deletionStatusRow}>
+                      <span className={styles.deletionStatusLabel}>Status:</span>
+                      <span className={`${styles.deletionBadge} ${styles[`deletionBadge_${deletionStatus}`] || ''}`}>
+                        {DELETION_STATUS_LABELS[deletionStatus] || 'Request Pending'}
+                      </span>
+                    </div>
+                  )}
                   {deletionStatus === 'requested' && (
                     <p className={styles.deletionUnderReview}>
                       Your account deletion request is already under review.
@@ -408,7 +412,7 @@ export default function BusinessSettings() {
         confirmLabel="Submit Request"
         cancelLabel="Cancel"
         danger
-        confirmDisabled={!deletionReason.trim() || submittingRequest}
+        confirmDisabled={!deletionReason.trim() || deletionOverLimit || submittingRequest}
         onConfirm={submitDeletionRequest}
         onCancel={() => {
           if (submittingRequest) return
@@ -424,11 +428,15 @@ export default function BusinessSettings() {
             id="deletion-reason"
             className={styles.textarea}
             rows={4}
-            maxLength={1000}
             value={deletionReason}
             onChange={(e) => setDeletionReason(e.target.value)}
             placeholder="Enter your reason for requesting account deletion..."
           />
+          <span
+            className={`${styles.wordCounter} ${deletionOverLimit ? styles.wordCounterOver : ''}`}
+          >
+            {deletionWordCount} / 1000 words
+          </span>
         </div>
       </ConfirmModal>
     </div>

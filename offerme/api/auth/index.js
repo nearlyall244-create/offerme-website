@@ -261,8 +261,9 @@ export default async function handler(req, res) {
       if (!message) {
         return res.status(400).json({ error: 'Please provide a reason for the account deletion request', field: 'message' })
       }
-      if (message.length > 1000) {
-        return res.status(400).json({ error: 'Message must be 1000 characters or fewer', field: 'message' })
+      const messageWordCount = message.split(/\s+/).filter(Boolean).length
+      if (messageWordCount > 1000) {
+        return res.status(400).json({ error: 'Reason must be 1000 words or fewer', field: 'message' })
       }
 
       const { data: owner } = await supabaseAdmin
