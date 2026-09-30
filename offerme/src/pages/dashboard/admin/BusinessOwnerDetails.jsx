@@ -11,13 +11,6 @@ const DELETION_STATUS_LABELS = {
   approved: 'Approved',
 }
 
-function getBusinessNames(owner) {
-  const embed = owner?.sell_your_bussiness
-  if (!embed) return ''
-  const list = Array.isArray(embed) ? embed : [embed]
-  return list.map((s) => s?.shop_name).filter(Boolean).join(', ')
-}
-
 export default function BusinessOwnerDetails() {
   const { user } = useAuth()
   const [owners, setOwners] = useState([])
@@ -378,22 +371,6 @@ export default function BusinessOwnerDetails() {
         {viewRequestOwner && (
           <div className={styles.requestDetails}>
             <div className={styles.requestRow}>
-              <span className={styles.requestLabel}>Business Owner Name</span>
-              <span className={styles.requestValue}>{viewRequestOwner.owner_name || '—'}</span>
-            </div>
-            <div className={styles.requestRow}>
-              <span className={styles.requestLabel}>Email</span>
-              <span className={styles.requestValue}>{viewRequestOwner.email || '—'}</span>
-            </div>
-            <div className={styles.requestRow}>
-              <span className={styles.requestLabel}>Business Name</span>
-              <span className={styles.requestValue}>{getBusinessNames(viewRequestOwner) || '—'}</span>
-            </div>
-            <div className={styles.requestRow}>
-              <span className={styles.requestLabel}>Phone Number</span>
-              <span className={styles.requestValue}>{viewRequestOwner.phone_number || '—'}</span>
-            </div>
-            <div className={styles.requestRow}>
               <span className={styles.requestLabel}>Request Message</span>
               <span className={styles.requestValue}>{viewRequestOwner.deletion_message || '—'}</span>
             </div>
@@ -403,18 +380,6 @@ export default function BusinessOwnerDetails() {
                 {viewRequestOwner.deletion_requested_at
                   ? formatDateTime(viewRequestOwner.deletion_requested_at)
                   : '—'}
-              </span>
-            </div>
-            <div className={styles.requestRow}>
-              <span className={styles.requestLabel}>Request Status</span>
-              <span className={styles.requestValue}>
-                {DELETION_STATUS_LABELS[viewRequestOwner.deletion_status || 'no_request'] || 'No Request'}
-              </span>
-            </div>
-            <div className={styles.requestRow}>
-              <span className={styles.requestLabel}>Admin Response</span>
-              <span className={styles.requestValue}>
-                {viewRequestOwner.deletion_admin_response || '—'}
               </span>
             </div>
           </div>
