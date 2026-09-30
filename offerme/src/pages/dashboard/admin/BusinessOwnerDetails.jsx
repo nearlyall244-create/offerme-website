@@ -4,6 +4,20 @@ import { formatDate, formatDateTime } from '@/utils/date'
 import ConfirmModal from '@/components/shared/ConfirmModal'
 import styles from './BusinessOwnerDetails.module.css'
 
+const DELETION_STATUS_LABELS = {
+  no_request: 'No Request',
+  requested: 'Requested',
+  rejected: 'Rejected',
+  approved: 'Approved',
+}
+
+function getBusinessNames(owner) {
+  const embed = owner?.sell_your_bussiness
+  if (!embed) return ''
+  const list = Array.isArray(embed) ? embed : [embed]
+  return list.map((s) => s?.shop_name).filter(Boolean).join(', ')
+}
+
 export default function BusinessOwnerDetails() {
   const { user } = useAuth()
   const [owners, setOwners] = useState([])
@@ -15,6 +29,13 @@ export default function BusinessOwnerDetails() {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [ownerToDelete, setOwnerToDelete] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
+
+  // Deletion request review state
+  const [viewRequestOwner, setViewRequestOwner] = useState(null)
+  const [rejectTarget, setRejectTarget] = useState(null)
+  const [rejectReason, setRejectReason] = useState('')
+  const [approveTarget, setApproveTarget] = useState(null)
+  const [deletionActionId, setDeletionActionId] = useState(null)
 
   useEffect(() => {
     requestAnimationFrame(async () => {
@@ -76,6 +97,42 @@ export default function BusinessOwnerDetails() {
       }
     } catch (err) {
       alert('Failed to update status: ' + err.message)
+    }
+  }
+
+  const handleDeletionAction = async () => {
+    const target = rejectTarget || approveTarget
+    if (!target) return
+    const action = rejectTarget ? 'reject-deletion' : 'approve-deletion'
+    setDeletionActionId(target.id)
+    try {
+      const token = await user.getIdToken()
+      const res = await fetch('/api/admin', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          owner_id: target.id,
+          action,
+          admin_response: (rejectReason || '').trim() || null,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+
+      const updated = data.owner
+      setOwners((prev) => prev.map((o) => (o.id === target.id ? { ...o, ...updated } : o)))
+      setSelectedOwner((prev) => (prev?.id === target.id ? { ...prev, ...updated } : prev))
+      setViewRequestOwner((prev) => (prev?.id === target.id ? { ...prev, ...updated } : prev))
+      setRejectTarget(null)
+      setApproveTarget(null)
+      setRejectReason('')
+    } catch (err) {
+      alert(`Failed to ${rejectTarget ? 'reject' : 'approve'} request: ${err.message}`)
+    } finally {
+      setDeletionActionId(null)
     }
   }
 
@@ -145,16 +202,69 @@ export default function BusinessOwnerDetails() {
                 <th>Email</th>
                 <th>Phone</th>
                 <th>Joined</th>
+                <th>Deletion Request</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filtered.map((owner) => (
+              {filtered.map((owner) => {
+                const delStatus = owner.deletion_status || 'no_request'
+                const delBadgeClass =
+                  delStatus === 'requested'
+                    ? styles.deletionBadgeRequested
+                    : delStatus === 'rejected'
+                      ? styles.deletionBadgeRejected
+                      : delStatus === 'approved'
+                        ? styles.deletionBadgeApproved
+                        : styles.deletionBadgeNoRequest
+
+                return (
                 <tr key={owner.id} className={selectedOwner?.id === owner.id ? styles.rowActive : ''}>
                   <td className={styles.ownerName}>{owner.owner_name}</td>
                   <td>{owner.email}</td>
                   <td>{owner.phone_number || '—'}</td>
                   <td>{formatDate(owner.created_at)}</td>
+                  <td>
+                    <div className={styles.deletionCell}>
+                      <span className={`${styles.deletionBadge} ${delBadgeClass}`}>
+                        {DELETION_STATUS_LABELS[delStatus] || 'No Request'}
+                      </span>
+                      {delStatus === 'requested' && (
+                        <div className={styles.deletionBtns}>
+                          <button
+                            className={styles.viewReqBtn}
+                            onClick={() => setViewRequestOwner(owner)}
+                          >
+                            View Request
+                          </button>
+                          <button
+                            className={styles.rejectReqBtn}
+                            onClick={() => { setRejectReason(''); setRejectTarget(owner) }}
+                            disabled={deletionActionId === owner.id}
+                          >
+                            Reject
+                          </button>
+                          <button
+                            className={styles.approveReqBtn}
+                            onClick={() => setApproveTarget(owner)}
+                            disabled={deletionActionId === owner.id}
+                          >
+                            Approve
+                          </button>
+                        </div>
+                      )}
+                      {(delStatus === 'rejected' || delStatus === 'approved') && (
+                        <div className={styles.deletionBtns}>
+                          <button
+                            className={styles.viewReqBtn}
+                            onClick={() => setViewRequestOwner(owner)}
+                          >
+                            View Request
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </td>
                   <td>
                     <div className={styles.actionsCell}>
                       <button className={styles.viewBtn} onClick={() => setSelectedOwner(owner)}>
@@ -170,10 +280,11 @@ export default function BusinessOwnerDetails() {
                     </div>
                   </td>
                 </tr>
-              ))}
+                )
+              })}
               {filtered.length === 0 && !loading && (
                 <tr>
-                  <td colSpan={5} className={styles.emptyCell}>
+                  <td colSpan={6} className={styles.emptyCell}>
                     {error ? `Error: ${error}` : 'No owners found.'}
                   </td>
                 </tr>
@@ -253,6 +364,102 @@ export default function BusinessOwnerDetails() {
         danger={true}
         onConfirm={confirmDelete}
         onCancel={() => { setShowDeleteModal(false); setOwnerToDelete(null) }}
+      />
+
+      {/* View Deletion Request */}
+      <ConfirmModal
+        open={!!viewRequestOwner}
+        title="Account Deletion Request"
+        confirmLabel="Close"
+        hideCancel
+        onConfirm={() => setViewRequestOwner(null)}
+        onCancel={() => setViewRequestOwner(null)}
+      >
+        {viewRequestOwner && (
+          <div className={styles.requestDetails}>
+            <div className={styles.requestRow}>
+              <span className={styles.requestLabel}>Business Owner Name</span>
+              <span className={styles.requestValue}>{viewRequestOwner.owner_name || '—'}</span>
+            </div>
+            <div className={styles.requestRow}>
+              <span className={styles.requestLabel}>Email</span>
+              <span className={styles.requestValue}>{viewRequestOwner.email || '—'}</span>
+            </div>
+            <div className={styles.requestRow}>
+              <span className={styles.requestLabel}>Business Name</span>
+              <span className={styles.requestValue}>{getBusinessNames(viewRequestOwner) || '—'}</span>
+            </div>
+            <div className={styles.requestRow}>
+              <span className={styles.requestLabel}>Phone Number</span>
+              <span className={styles.requestValue}>{viewRequestOwner.phone_number || '—'}</span>
+            </div>
+            <div className={styles.requestRow}>
+              <span className={styles.requestLabel}>Request Message</span>
+              <span className={styles.requestValue}>{viewRequestOwner.deletion_message || '—'}</span>
+            </div>
+            <div className={styles.requestRow}>
+              <span className={styles.requestLabel}>Requested Date</span>
+              <span className={styles.requestValue}>
+                {viewRequestOwner.deletion_requested_at
+                  ? formatDateTime(viewRequestOwner.deletion_requested_at)
+                  : '—'}
+              </span>
+            </div>
+            <div className={styles.requestRow}>
+              <span className={styles.requestLabel}>Request Status</span>
+              <span className={styles.requestValue}>
+                {DELETION_STATUS_LABELS[viewRequestOwner.deletion_status || 'no_request'] || 'No Request'}
+              </span>
+            </div>
+            <div className={styles.requestRow}>
+              <span className={styles.requestLabel}>Admin Response</span>
+              <span className={styles.requestValue}>
+                {viewRequestOwner.deletion_admin_response || '—'}
+              </span>
+            </div>
+          </div>
+        )}
+      </ConfirmModal>
+
+      {/* Reject Deletion Request */}
+      <ConfirmModal
+        open={!!rejectTarget}
+        title="Reject Account Deletion Request?"
+        message="Are you sure you want to reject this account deletion request?"
+        confirmLabel="Reject Request"
+        cancelLabel="Cancel"
+        danger
+        confirmDisabled={deletionActionId === rejectTarget?.id}
+        onConfirm={handleDeletionAction}
+        onCancel={() => { setRejectTarget(null); setRejectReason('') }}
+      >
+        <div>
+          <label className={styles.requestLabel} htmlFor="reject-reason" style={{ display: 'block', marginBottom: '0.5rem' }}>
+            Reason / Message (optional)
+          </label>
+          <textarea
+            id="reject-reason"
+            className={styles.requestTextarea}
+            rows={3}
+            maxLength={1000}
+            value={rejectReason}
+            onChange={(e) => setRejectReason(e.target.value)}
+            placeholder="Enter a reason for rejecting the request..."
+          />
+        </div>
+      </ConfirmModal>
+
+      {/* Approve Deletion Request */}
+      <ConfirmModal
+        open={!!approveTarget}
+        title="Approve Account Deletion Request?"
+        message="Are you sure you want to approve this account deletion request? The account will remain active until the deletion process is completed."
+        confirmLabel="Approve Request"
+        cancelLabel="Cancel"
+        success={false}
+        confirmDisabled={deletionActionId === approveTarget?.id}
+        onConfirm={handleDeletionAction}
+        onCancel={() => setApproveTarget(null)}
       />
     </div>
   )

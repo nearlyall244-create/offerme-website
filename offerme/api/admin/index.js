@@ -220,7 +220,7 @@ export default async function handler(req, res) {
       if (type === 'owners') {
         const { data, count, error } = await supabaseAdmin
           .from('business_owners')
-          .select('*', { count: 'exact' })
+          .select('*, sell_your_bussiness(shop_name)', { count: 'exact' })
           .order('created_at', { ascending: false })
           .range(offset, offset + limit - 1)
 
@@ -346,7 +346,45 @@ export default async function handler(req, res) {
 
     // ── PUT → admin toggles business active/inactive OR update owner status OR approve/reject submission ──
     if (req.method === 'PUT') {
-      const { shop_id, owner_id, account_status, action, rejection_reason } = req.body
+      const { shop_id, owner_id, account_status, action, rejection_reason, admin_response } = req.body
+
+      if (owner_id && (action === 'reject-deletion' || action === 'approve-deletion')) {
+        const { data: ownerRow } = await supabaseAdmin
+          .from('business_owners')
+          .select('id, deletion_status')
+          .eq('id', owner_id)
+          .maybeSingle()
+
+        if (!ownerRow) {
+          return res.status(404).json({ error: 'Business owner not found' })
+        }
+        if (ownerRow.deletion_status !== 'requested') {
+          return res.status(400).json({ error: 'This owner has no pending deletion request' })
+        }
+
+        const approved = action === 'approve-deletion'
+        const { data, error } = await supabaseAdmin
+          .from('business_owners')
+          .update({
+            deletion_request: false,
+            deletion_status: approved ? 'approved' : 'rejected',
+            deletion_reviewed_at: new Date().toISOString(),
+            deletion_admin_response: admin_response || null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', owner_id)
+          .select()
+          .single()
+
+        if (error) {
+          return res.status(500).json({ error: error.message })
+        }
+
+        return res.status(200).json({
+          message: approved ? 'Deletion request approved' : 'Deletion request rejected',
+          owner: data,
+        })
+      }
 
       if (owner_id && account_status) {
         const { data, error } = await supabaseAdmin

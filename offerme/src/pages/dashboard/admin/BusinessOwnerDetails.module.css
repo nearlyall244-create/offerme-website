@@ -314,3 +314,152 @@
     width: 100%;
   }
 }
+
+/* ── Deletion Request column ─────────────────────── */
+.deletionCell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.375rem;
+  min-width: 150px;
+}
+
+.deletionBadge {
+  display: inline-block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.deletionBadgeNoRequest {
+  color: #15803d;
+  background: #dcfce7;
+  border-color: #bbf7d0;
+}
+
+.deletionBadgeRequested {
+  color: #b91c1c;
+  background: #fee2e2;
+  border-color: #fecaca;
+}
+
+.deletionBadgeRejected {
+  color: #475569;
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+}
+
+.deletionBadgeApproved {
+  color: #1d4ed8;
+  background: #dbeafe;
+  border-color: #bfdbfe;
+}
+
+.deletionBtns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.viewReqBtn,
+.rejectReqBtn,
+.approveReqBtn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  border: 1px solid;
+  transition: background 0.15s, color 0.15s;
+}
+
+.viewReqBtn {
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 20%, transparent);
+}
+
+.viewReqBtn:hover {
+  background: var(--color-primary);
+  color: white;
+}
+
+.rejectReqBtn {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.08);
+  border-color: rgba(220, 38, 38, 0.2);
+}
+
+.rejectReqBtn:hover:not(:disabled) {
+  background: #dc2626;
+  color: white;
+}
+
+.approveReqBtn {
+  color: #15803d;
+  background: rgba(22, 163, 74, 0.08);
+  border-color: rgba(22, 163, 74, 0.25);
+}
+
+.approveReqBtn:hover:not(:disabled) {
+  background: #15803d;
+  color: white;
+}
+
+.viewReqBtn:disabled,
+.rejectReqBtn:disabled,
+.approveReqBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Deletion request modal details ──────────────── */
+.requestDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding: 1rem;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+}
+
+.requestRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.requestLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.requestValue {
+  font-size: 0.875rem;
+  color: var(--color-text);
+  word-break: break-word;
+}
+
+.requestTextarea {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.requestTextarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}

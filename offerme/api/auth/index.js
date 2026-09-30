@@ -241,6 +241,70 @@ export default async function handler(req, res) {
     }
   }
 
+  if (action === 'deletion-request') {
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method not allowed' })
+    }
+    try {
+      const { verifyToken } = await import('../_lib/verifyToken.js')
+      const { supabaseAdmin } = await import('../_lib/supabaseAdmin.js')
+
+      const authResult = await verifyToken(req)
+      if (authResult.error) {
+        return res.status(authResult.status).json({ error: authResult.error })
+      }
+
+      const uid = authResult.decodedToken.uid
+      const body = req.body || {}
+      const message = String(body.message ?? body.deletion_message ?? '').trim()
+
+      if (!message) {
+        return res.status(400).json({ error: 'Please provide a reason for the account deletion request', field: 'message' })
+      }
+      if (message.length > 1000) {
+        return res.status(400).json({ error: 'Message must be 1000 characters or fewer', field: 'message' })
+      }
+
+      const { data: owner } = await supabaseAdmin
+        .from('business_owners')
+        .select('id, deletion_status')
+        .eq('firebase_uid', uid)
+        .maybeSingle()
+
+      if (!owner) {
+        return res.status(404).json({ error: 'Business owner profile not found' })
+      }
+
+      if (owner.deletion_status === 'requested') {
+        return res.status(409).json({ error: 'Your account deletion request is already under review.' })
+      }
+
+      const { data: updatedOwner, error: updateErr } = await supabaseAdmin
+        .from('business_owners')
+        .update({
+          deletion_request: true,
+          deletion_message: message,
+          deletion_status: 'requested',
+          deletion_requested_at: new Date().toISOString(),
+          deletion_reviewed_at: null,
+          deletion_admin_response: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', owner.id)
+        .select()
+        .single()
+
+      if (updateErr) {
+        return res.status(500).json({ error: updateErr.message })
+      }
+
+      return res.status(200).json({ success: true, profile: updatedOwner })
+    } catch (err) {
+      console.error('[auth] deletion-request error:', err)
+      return res.status(500).json({ error: err.message || 'Failed to submit deletion request' })
+    }
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }

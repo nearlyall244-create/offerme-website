@@ -455,6 +455,61 @@ input:checked + .slider:before {
   transform: translateY(-1px);
 }
 
+/* Account Deletion Request status */
+.deletionStatusRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.deletionStatusLabel {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #7f1d1d;
+}
+
+.deletionBadge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.deletionBadge_no_request {
+  color: #15803d;
+  background: #dcfce7;
+  border-color: #bbf7d0;
+}
+
+.deletionBadge_requested {
+  color: #b91c1c;
+  background: #fee2e2;
+  border-color: #fecaca;
+}
+
+.deletionBadge_rejected {
+  color: #475569;
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+}
+
+.deletionBadge_approved {
+  color: #1d4ed8;
+  background: #dbeafe;
+  border-color: #bfdbfe;
+}
+
+.deletionUnderReview {
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #b91c1c;
+}
+
 @media (max-width: 640px) {
   .tabs {
     flex-direction: column;

@@ -12,6 +12,7 @@ export default function ConfirmModal({
   success = false,
   successMessage = '',
   confirmDisabled = false,
+  hideCancel = false,
   onConfirm,
   onCancel,
   children,
@@ -68,7 +69,7 @@ export default function ConfirmModal({
             <p className={styles.message}>{message}</p>
             {children}
             <div className={styles.footer}>
-              <button ref={cancelRef} className={styles.cancelBtn} onClick={onCancel}>{cancelLabel}</button>
+              {!hideCancel && <button ref={cancelRef} className={styles.cancelBtn} onClick={onCancel}>{cancelLabel}</button>}
               <button
                 ref={confirmRef}
                 className={`${styles.confirmBtn} ${danger ? styles.danger : ''} ${confirmDisabled ? styles.confirmDisabled : ''}`}
