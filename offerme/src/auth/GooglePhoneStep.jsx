@@ -2,9 +2,28 @@ import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { NAME_MAX, validateName, validatePhone } from '@/utils/validation'
 import styles from './Auth.module.css'
+import roleStyles from './RoleSelector.module.css'
 
-export default function GooglePhoneStep({ role, suggestedName = '', email = '', onDone, onCancel }) {
+const ROLE_OPTIONS = [
+  {
+    role: 'user',
+    icon: '👤',
+    name: 'User',
+    desc: 'Browse offers, save favorites, and discover local deals',
+    label: 'Sign up as User',
+  },
+  {
+    role: 'business',
+    icon: '🏪',
+    name: 'Business Owner',
+    desc: 'List your business, post offers, and reach more customers',
+    label: 'Sign up as Business',
+  },
+]
+
+export default function GooglePhoneStep({ suggestedName = '', email = '', onDone, onCancel }) {
   const { completeGoogleSignup } = useAuth()
+  const [selectedRole, setSelectedRole] = useState(null)
   const [name, setName] = useState(suggestedName)
   const [phone, setPhone] = useState('')
   const [errors, setErrors] = useState({})
@@ -13,6 +32,7 @@ export default function GooglePhoneStep({ role, suggestedName = '', email = '', 
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!selectedRole) return
     setFormError('')
     const nameErr = validateName(name)
     const phoneErr = validatePhone(phone)
@@ -24,7 +44,7 @@ export default function GooglePhoneStep({ role, suggestedName = '', email = '', 
 
     setSubmitting(true)
     try {
-      const finalRole = await completeGoogleSignup(role, {
+      const finalRole = await completeGoogleSignup(selectedRole, {
         name: name.trim(),
         phone_number: phone.trim(),
       })
@@ -35,11 +55,67 @@ export default function GooglePhoneStep({ role, suggestedName = '', email = '', 
     }
   }
 
+  if (!selectedRole) {
+    return (
+      <div className={styles.phoneStepBox}>
+        <p className={styles.phoneStepHint}>
+          {email ? <>Signed in as <strong>{email}</strong>. </> : null}
+          Choose how you want to use OfferMe to finish creating your account.
+        </p>
+
+        <div className={styles.roleChoiceGrid}>
+          {ROLE_OPTIONS.map((option) => (
+            <button
+              key={option.role}
+              type="button"
+              className={roleStyles.roleCard}
+              onClick={() => {
+                setFormError('')
+                setSelectedRole(option.role)
+              }}
+            >
+              <span className={roleStyles.roleIcon}>{option.icon}</span>
+              <span className={roleStyles.roleName}>{option.name}</span>
+              <span className={roleStyles.roleDesc}>{option.desc}</span>
+              <span className={roleStyles.roleBtn}>{option.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {onCancel && (
+          <div className={styles.verificationActions}>
+            <button type="button" className={styles.secondaryBtn} onClick={onCancel} disabled={submitting}>
+              Cancel
+            </button>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  const selectedRoleLabel = selectedRole === 'business' ? 'Business Owner' : 'User'
+
   return (
     <div className={styles.phoneStepBox}>
       <p className={styles.phoneStepHint}>
         {email ? <>Signed in as <strong>{email}</strong>. </> : null}
         Enter your name and phone number to finish creating your account. A valid phone number is required.
+      </p>
+
+      <p className={styles.roleChoiceNote}>
+        Signing up as <strong>{selectedRoleLabel}</strong>{' '}
+        <button
+          type="button"
+          className={styles.roleChangeBtn}
+          onClick={() => {
+            setSelectedRole(null)
+            setFormError('')
+            setErrors({})
+          }}
+          disabled={submitting}
+        >
+          Change
+        </button>
       </p>
 
       {formError && (

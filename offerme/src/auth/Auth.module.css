@@ -682,6 +682,37 @@
   line-height: 1.45;
 }
 
+.roleChoiceGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.roleChoiceNote {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+.roleChangeBtn {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: #2563eb;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.roleChangeBtn:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.roleChangeBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Responsive Styles */
 @media (max-width: 640px) {
   .wrapper,

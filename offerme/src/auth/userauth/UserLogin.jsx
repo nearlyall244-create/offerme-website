@@ -70,9 +70,9 @@ export default function UserLogin() {
     }
   }
 
-  const handleGooglePhoneDone = () => {
+  const handleGooglePhoneDone = (role) => {
     setGoogleSignup(null)
-    navigate('/dashboard')
+    navigate(role === 'business' ? '/business/dashboard' : '/dashboard')
   }
 
   const handleResendVerification = async () => {
