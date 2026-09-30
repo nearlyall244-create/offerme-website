@@ -22,7 +22,8 @@ export default function ContactPage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    setForm((prev) => ({ ...prev, [name]: value }))
+    const nextValue = name === 'phone' ? value.replace(/\D/g, '').slice(0, 10) : value
+    setForm((prev) => ({ ...prev, [name]: nextValue }))
     setFormError('')
     setErrors((prev) => {
       if (!prev[name] && !e.target.dataset.touched) return prev
@@ -179,8 +180,10 @@ export default function ContactPage() {
               id="contact-phone"
               name="phone"
               type="tel"
-              maxLength={15}
-              placeholder="9876543210"
+              maxLength={10}
+              inputMode="numeric"
+              pattern="[0-9]*"
+              placeholder="Your phone number"
               value={form.phone}
               onChange={handleChange}
               onBlur={handleBlur}
