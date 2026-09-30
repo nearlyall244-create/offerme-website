@@ -21,6 +21,11 @@ export default function ConfirmModal({
   const modalRef = useRef(null)
   const confirmRef = useRef(null)
   const cancelRef = useRef(null)
+  const confirmDisabledRef = useRef(confirmDisabled)
+
+  useEffect(() => {
+    confirmDisabledRef.current = confirmDisabled
+  }, [confirmDisabled])
 
   useEffect(() => {
     if (!open || success) return
@@ -28,13 +33,17 @@ export default function ConfirmModal({
       if (e.key === 'Escape') onCancel()
     }
     document.addEventListener('keydown', onKey)
-    if (confirmDisabled) {
+    return () => document.removeEventListener('keydown', onKey)
+  }, [open, onCancel, success])
+
+  useEffect(() => {
+    if (!open || success) return
+    if (confirmDisabledRef.current) {
       cancelRef.current?.focus()
     } else {
       confirmRef.current?.focus()
     }
-    return () => document.removeEventListener('keydown', onKey)
-  }, [open, onCancel, success, confirmDisabled])
+  }, [open, success])
 
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
