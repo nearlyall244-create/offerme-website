@@ -130,9 +130,21 @@ export default async function handler(req, res) {
         .maybeSingle()
 
       if (owner) {
+        const { normalizePhone } = await import('../_lib/validateSignup.js')
+        const phoneRaw =
+          body.phone_number ?? body.phone ?? body.phoneNumber ?? body.businessPhoneNumber ?? ''
+        const phoneDigits = normalizePhone(phoneRaw)
+        if (String(phoneRaw).trim() && phoneDigits.length !== 10) {
+          return res.status(400).json({ error: 'Phone number must contain exactly 10 digits' })
+        }
+
         const { data: updatedOwner, error: updateErr } = await supabaseAdmin
           .from('business_owners')
-          .update({ owner_name: trimmedName, updated_at: new Date().toISOString() })
+          .update({
+            owner_name: trimmedName,
+            ...(phoneDigits ? { phone_number: phoneDigits } : {}),
+            updated_at: new Date().toISOString(),
+          })
           .eq('id', owner.id)
           .select()
           .single()
@@ -143,7 +155,11 @@ export default async function handler(req, res) {
 
         await supabaseAdmin
           .from('sell_your_bussiness')
-          .update({ shop_name: trimmedName, updated_at: new Date().toISOString() })
+          .update({
+            shop_name: trimmedName,
+            ...(phoneDigits ? { enquiry_number: phoneDigits } : {}),
+            updated_at: new Date().toISOString(),
+          })
           .eq('owner_id', owner.id)
 
         return res.status(200).json({ success: true, profile: updatedOwner })

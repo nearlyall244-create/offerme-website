@@ -32,7 +32,7 @@ export default function BusinessSettings() {
     userProfile?.owner_name || userProfile?.shop_name || userProfile?.businessName || userProfile?.displayName || ''
   )
   const [phoneNumber, setPhoneNumber] = useState(
-    userProfile?.phone || userProfile?.phoneNumber || userProfile?.businessPhoneNumber || ''
+    userProfile?.phone_number || userProfile?.phone || userProfile?.phoneNumber || userProfile?.businessPhoneNumber || ''
   )
   const [statusMessage, setStatusMessage] = useState({ type: '', text: '' })
 
@@ -66,6 +66,7 @@ export default function BusinessSettings() {
           ''
         setBusinessName(currentName)
         const currentPhone =
+          userProfile?.phone_number ||
           userProfile?.phone ||
           userProfile?.phoneNumber ||
           userProfile?.businessPhoneNumber ||
@@ -117,6 +118,7 @@ export default function BusinessSettings() {
       userProfile?.displayName ||
       ''
     const originalPhone =
+      userProfile?.phone_number ||
       userProfile?.phone ||
       userProfile?.phoneNumber ||
       userProfile?.businessPhoneNumber ||
@@ -338,7 +340,11 @@ export default function BusinessSettings() {
                       <span>Phone Number</span>
                     </div>
                     <span className={styles.detailValue}>
-                      {userProfile?.phone || userProfile?.phoneNumber || userProfile?.businessPhoneNumber || 'Not provided'}
+                      {userProfile?.phone_number ||
+                        userProfile?.phone ||
+                        userProfile?.phoneNumber ||
+                        userProfile?.businessPhoneNumber ||
+                        'Not provided'}
                     </span>
                   </div>
 
