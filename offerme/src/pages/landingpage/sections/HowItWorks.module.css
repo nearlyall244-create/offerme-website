@@ -1,6 +1,7 @@
 .section {
   padding: 4rem 1.5rem;
   background: var(--color-surface-alt);
+  scroll-margin-top: 5rem;
 }
 
 .container {

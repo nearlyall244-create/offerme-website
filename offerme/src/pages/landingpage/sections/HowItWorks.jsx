@@ -30,7 +30,7 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section className={styles.section} aria-labelledby="how-it-works-heading">
+    <section id="how-it-works" className={styles.section} aria-labelledby="how-it-works-heading">
       <div className={styles.container}>
         <header className={styles.header}>
           <h2 id="how-it-works-heading" className={styles.heading}>

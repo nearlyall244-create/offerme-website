@@ -102,7 +102,7 @@ export default function Footer() {
             <ul className={styles.links}>
               <li><Link to="/auth/business/register">List Your Business</Link></li>
               <li><Link to="/categories">Browse Categories</Link></li>
-              <li><Link to="/about">How It Works</Link></li>
+              <li><Link to="/#how-it-works">How OfferMe Works</Link></li>
             </ul>
           </div>
         </div>

@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import Navbar from '@/components/navbar/Navbar'
 import HeroSection from '@/pages/landingpage/hero/HeroSection'
 import Iconsofcat from '@/pages/landingpage/Iconsofcat'
@@ -14,6 +16,16 @@ import Footer from '@/pages/footer/Footer'
 import WhatsApp from '@/pages/landingpage/whatsapp/WhatsApp'
 
 export default function LandingPage() {
+  const location = useLocation()
+
+  useEffect(() => {
+    if (!location.hash) return
+    const el = document.getElementById(location.hash.slice(1))
+    if (el) {
+      requestAnimationFrame(() => el.scrollIntoView({ behavior: 'smooth' }))
+    }
+  }, [location.hash])
+
   return (
     <div>
       <Navbar />
