@@ -26,7 +26,6 @@ export default function BusinessOwnerDetails() {
   // Deletion request review state
   const [viewRequestOwner, setViewRequestOwner] = useState(null)
   const [rejectTarget, setRejectTarget] = useState(null)
-  const [rejectReason, setRejectReason] = useState('')
   const [deletionActionId, setDeletionActionId] = useState(null)
 
   useEffect(() => {
@@ -107,7 +106,7 @@ export default function BusinessOwnerDetails() {
         body: JSON.stringify({
           owner_id: target.id,
           action: 'reject-deletion',
-          admin_response: (rejectReason || '').trim() || null,
+          admin_response: null,
         }),
       })
       const data = await res.json()
@@ -118,7 +117,6 @@ export default function BusinessOwnerDetails() {
       setSelectedOwner((prev) => (prev?.id === target.id ? { ...prev, ...updated } : prev))
       setViewRequestOwner((prev) => (prev?.id === target.id ? { ...prev, ...updated } : prev))
       setRejectTarget(null)
-      setRejectReason('')
     } catch (err) {
       alert(`Failed to reject request: ${err.message}`)
     } finally {
@@ -229,7 +227,7 @@ export default function BusinessOwnerDetails() {
                           </button>
                           <button
                             className={styles.rejectReqBtn}
-                            onClick={() => { setRejectReason(''); setRejectTarget(owner) }}
+                            onClick={() => setRejectTarget(owner)}
                             disabled={deletionActionId === owner.id}
                           >
                             Reject
@@ -386,23 +384,8 @@ export default function BusinessOwnerDetails() {
         danger
         confirmDisabled={deletionActionId === rejectTarget?.id}
         onConfirm={handleDeletionAction}
-        onCancel={() => { setRejectTarget(null); setRejectReason('') }}
-      >
-        <div>
-          <label className={styles.requestLabel} htmlFor="reject-reason" style={{ display: 'block', marginBottom: '0.5rem' }}>
-            Reason / Message (optional)
-          </label>
-          <textarea
-            id="reject-reason"
-            className={styles.requestTextarea}
-            rows={3}
-            maxLength={1000}
-            value={rejectReason}
-            onChange={(e) => setRejectReason(e.target.value)}
-            placeholder="Enter a reason for rejecting the request..."
-          />
-        </div>
-      </ConfirmModal>
+        onCancel={() => setRejectTarget(null)}
+      />
     </div>
   )
 }
