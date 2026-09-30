@@ -11,6 +11,14 @@ const DELETION_STATUS_LABELS = {
   approved: 'Approved',
 }
 
+const DELETION_REASONS = [
+  'I am no longer using this business account.',
+  'My business has been closed or is no longer operating.',
+  'I created this account by mistake and no longer need it.',
+  'I have another reason for deleting my business account.',
+  'Other',
+]
+
 export default function BusinessSettings() {
   const { user, userProfile, signOut, updateProfile, refreshProfile } = useAuth()
   const [activeTab, setActiveTab] = useState('business')
@@ -31,12 +39,15 @@ export default function BusinessSettings() {
   // Account deletion request state
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deletionReason, setDeletionReason] = useState('')
+  const [selectedDeletionOption, setSelectedDeletionOption] = useState(null)
   const [submittingRequest, setSubmittingRequest] = useState(false)
   const [deletionNotice, setDeletionNotice] = useState({ type: '', text: '' })
 
   const deletionStatus = userProfile?.deletion_status || 'no_request'
   const deletionWordCount = deletionReason.trim() ? deletionReason.trim().split(/\s+/).length : 0
   const deletionOverLimit = deletionWordCount > 1000
+  const isOtherDeletionReason =
+    selectedDeletionOption !== null && DELETION_REASONS[selectedDeletionOption] === 'Other'
 
   useEffect(() => {
     // Refresh once on mount so the latest deletion-request status is shown.
@@ -132,13 +143,30 @@ export default function BusinessSettings() {
   const openDeletionModal = () => {
     if (deletionStatus === 'requested') return
     setDeletionReason('')
+    setSelectedDeletionOption(null)
     setDeletionNotice({ type: '', text: '' })
     setShowDeleteModal(true)
   }
 
+  const selectDeletionReason = (index) => {
+    setSelectedDeletionOption(index)
+    if (DELETION_REASONS[index] === 'Other') {
+      setDeletionReason('')
+    } else {
+      setDeletionReason(DELETION_REASONS[index])
+    }
+  }
+
+  const closeDeletionModal = () => {
+    if (submittingRequest) return
+    setShowDeleteModal(false)
+    setDeletionReason('')
+    setSelectedDeletionOption(null)
+  }
+
   const submitDeletionRequest = async () => {
     const message = deletionReason.trim()
-    if (!message || message.split(/\s+/).length > 1000) return
+    if (selectedDeletionOption === null || !message || message.split(/\s+/).length > 1000) return
 
     setSubmittingRequest(true)
     try {
@@ -153,11 +181,14 @@ export default function BusinessSettings() {
 
       setShowDeleteModal(false)
       setDeletionReason('')
+      setSelectedDeletionOption(null)
       setDeletionNotice({ type: 'success', text: 'Your account deletion request has been submitted to the admin.' })
       await refreshProfile()
     } catch (err) {
       setDeletionNotice({ type: 'error', text: err.message || 'Failed to submit request.' })
       setShowDeleteModal(false)
+      setDeletionReason('')
+      setSelectedDeletionOption(null)
     } finally {
       setSubmittingRequest(false)
     }
@@ -412,14 +443,39 @@ export default function BusinessSettings() {
         confirmLabel="Submit Request"
         cancelLabel="Cancel"
         danger
-        confirmDisabled={!deletionReason.trim() || deletionOverLimit || submittingRequest}
+        confirmDisabled={
+          selectedDeletionOption === null ||
+          !deletionReason.trim() ||
+          deletionOverLimit ||
+          submittingRequest
+        }
         onConfirm={submitDeletionRequest}
-        onCancel={() => {
-          if (submittingRequest) return
-          setShowDeleteModal(false)
-          setDeletionReason('')
-        }}
+        onCancel={closeDeletionModal}
       >
+        <div className={styles.formGroup}>
+          <span className={styles.label} id="deletion-reason-label">
+            Select a reason
+          </span>
+          <div className={styles.reasonGroup} role="radiogroup" aria-labelledby="deletion-reason-label">
+            {DELETION_REASONS.map((reason, index) => (
+              <label
+                key={reason}
+                className={`${styles.reasonOption} ${
+                  selectedDeletionOption === index ? styles.reasonOptionSelected : ''
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="deletion-reason-option"
+                  className={styles.reasonRadio}
+                  checked={selectedDeletionOption === index}
+                  onChange={() => selectDeletionReason(index)}
+                />
+                <span className={styles.reasonText}>{reason}</span>
+              </label>
+            ))}
+          </div>
+        </div>
         <div className={styles.formGroup}>
           <label className={styles.label} htmlFor="deletion-reason">
             Reason / Message for Account Deletion
@@ -429,8 +485,15 @@ export default function BusinessSettings() {
             className={styles.textarea}
             rows={4}
             value={deletionReason}
+            disabled={selectedDeletionOption === null}
             onChange={(e) => setDeletionReason(e.target.value)}
-            placeholder="Enter your reason for requesting account deletion..."
+            placeholder={
+              selectedDeletionOption === null
+                ? 'Select a reason above to continue...'
+                : isOtherDeletionReason
+                  ? 'Enter your reason for requesting account deletion...'
+                  : ''
+            }
           />
           <span
             className={`${styles.wordCounter} ${deletionOverLimit ? styles.wordCounterOver : ''}`}

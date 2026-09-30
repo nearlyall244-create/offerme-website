@@ -17,6 +17,8 @@
   position: relative;
   width: 100%;
   max-width: 400px;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 0.75rem;
