@@ -365,8 +365,7 @@
 }
 
 .viewReqBtn,
-.rejectReqBtn,
-.approveReqBtn {
+.rejectReqBtn {
   padding: 0.25rem 0.5rem;
   font-size: 0.6875rem;
   font-weight: 500;
@@ -398,20 +397,8 @@
   color: white;
 }
 
-.approveReqBtn {
-  color: #15803d;
-  background: rgba(22, 163, 74, 0.08);
-  border-color: rgba(22, 163, 74, 0.25);
-}
-
-.approveReqBtn:hover:not(:disabled) {
-  background: #15803d;
-  color: white;
-}
-
 .viewReqBtn:disabled,
-.rejectReqBtn:disabled,
-.approveReqBtn:disabled {
+.rejectReqBtn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }

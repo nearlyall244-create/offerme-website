@@ -27,7 +27,6 @@ export default function BusinessOwnerDetails() {
   const [viewRequestOwner, setViewRequestOwner] = useState(null)
   const [rejectTarget, setRejectTarget] = useState(null)
   const [rejectReason, setRejectReason] = useState('')
-  const [approveTarget, setApproveTarget] = useState(null)
   const [deletionActionId, setDeletionActionId] = useState(null)
 
   useEffect(() => {
@@ -94,9 +93,8 @@ export default function BusinessOwnerDetails() {
   }
 
   const handleDeletionAction = async () => {
-    const target = rejectTarget || approveTarget
+    const target = rejectTarget
     if (!target) return
-    const action = rejectTarget ? 'reject-deletion' : 'approve-deletion'
     setDeletionActionId(target.id)
     try {
       const token = await user.getIdToken()
@@ -108,7 +106,7 @@ export default function BusinessOwnerDetails() {
         },
         body: JSON.stringify({
           owner_id: target.id,
-          action,
+          action: 'reject-deletion',
           admin_response: (rejectReason || '').trim() || null,
         }),
       })
@@ -120,10 +118,9 @@ export default function BusinessOwnerDetails() {
       setSelectedOwner((prev) => (prev?.id === target.id ? { ...prev, ...updated } : prev))
       setViewRequestOwner((prev) => (prev?.id === target.id ? { ...prev, ...updated } : prev))
       setRejectTarget(null)
-      setApproveTarget(null)
       setRejectReason('')
     } catch (err) {
-      alert(`Failed to ${rejectTarget ? 'reject' : 'approve'} request: ${err.message}`)
+      alert(`Failed to reject request: ${err.message}`)
     } finally {
       setDeletionActionId(null)
     }
@@ -236,13 +233,6 @@ export default function BusinessOwnerDetails() {
                             disabled={deletionActionId === owner.id}
                           >
                             Reject
-                          </button>
-                          <button
-                            className={styles.approveReqBtn}
-                            onClick={() => setApproveTarget(owner)}
-                            disabled={deletionActionId === owner.id}
-                          >
-                            Approve
                           </button>
                         </div>
                       )}
@@ -413,19 +403,6 @@ export default function BusinessOwnerDetails() {
           />
         </div>
       </ConfirmModal>
-
-      {/* Approve Deletion Request */}
-      <ConfirmModal
-        open={!!approveTarget}
-        title="Approve Account Deletion Request?"
-        message="Are you sure you want to approve this account deletion request? The account will remain active until the deletion process is completed."
-        confirmLabel="Approve Request"
-        cancelLabel="Cancel"
-        success={false}
-        confirmDisabled={deletionActionId === approveTarget?.id}
-        onConfirm={handleDeletionAction}
-        onCancel={() => setApproveTarget(null)}
-      />
     </div>
   )
 }
