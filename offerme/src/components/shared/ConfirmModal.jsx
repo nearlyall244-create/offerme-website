@@ -13,6 +13,7 @@ export default function ConfirmModal({
   successMessage = '',
   confirmDisabled = false,
   hideCancel = false,
+  maxWidth,
   onConfirm,
   onCancel,
   children,
@@ -50,7 +51,12 @@ export default function ConfirmModal({
       aria-modal="true"
       aria-labelledby="confirm-modal-title"
     >
-      <div className={styles.modal} ref={modalRef} onClick={(e) => e.stopPropagation()}>
+      <div
+        className={styles.modal}
+        ref={modalRef}
+        onClick={(e) => e.stopPropagation()}
+        style={maxWidth ? { maxWidth: `${maxWidth}px` } : undefined}
+      >
         {success ? (
           <div className={styles.successState}>
             <div className={styles.successIcon}>

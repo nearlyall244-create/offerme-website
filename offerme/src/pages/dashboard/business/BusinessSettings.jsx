@@ -443,6 +443,7 @@ export default function BusinessSettings() {
         confirmLabel="Submit Request"
         cancelLabel="Cancel"
         danger
+        maxWidth={560}
         confirmDisabled={
           selectedDeletionOption === null ||
           !deletionReason.trim() ||
