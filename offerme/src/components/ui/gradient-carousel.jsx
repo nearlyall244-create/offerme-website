@@ -31,7 +31,7 @@ export function GradientCarousel({
   cardAspectRatio = 16 / 10,
   label = 'Image carousel',
   autoplay = true,
-  autoplayInterval = 3500,
+  autoplayInterval = 1000,
   onChange,
   className,
   children,
@@ -53,7 +53,6 @@ export function GradientCarousel({
   const [width, setWidth] = React.useState(0)
   const [dragging, setDragging] = React.useState(false)
   const [dragX, setDragX] = React.useState(0)
-  const [hovered, setHovered] = React.useState(false)
 
   // derived, not synchronised in an effect: survives the images array changing
   const activeIndex = count === 0 ? 0 : ((index % count) + count) % count
@@ -111,13 +110,13 @@ export function GradientCarousel({
   const goForward = React.useCallback(() => go(activeIndex - 1), [go, activeIndex])
   const goBackward = React.useCallback(() => go(activeIndex + 1), [go, activeIndex])
 
-  // Autoplay pauses on hover and while the user is dragging; the effect re-runs
-  // on every index change (auto or manual), so the timer restarts cleanly.
+  // Autoplay pauses only while the user is dragging; the effect re-runs on
+  // every index change (auto or manual), so the timer restarts cleanly.
   React.useEffect(() => {
-    if (!autoplay || count < 2 || hovered || dragging) return undefined
+    if (!autoplay || count < 2 || dragging) return undefined
     const timer = setTimeout(goForward, autoplayInterval)
     return () => clearTimeout(timer)
-  }, [autoplay, autoplayInterval, count, hovered, dragging, goForward])
+  }, [autoplay, autoplayInterval, count, dragging, goForward])
 
   const handleKeyDown = (event) => {
     if (count < 2) return
@@ -207,13 +206,6 @@ export function GradientCarousel({
       aria-label={label}
       tabIndex={showNav ? 0 : undefined}
       onKeyDown={handleKeyDown}
-      onPointerEnter={(event) => {
-        // mouse-only: a tap on touch devices must not pause autoplay for good
-        if (event.pointerType === 'mouse') setHovered(true)
-      }}
-      onPointerLeave={(event) => {
-        if (event.pointerType === 'mouse') setHovered(false)
-      }}
       className={cn(
         'relative isolate select-none overflow-hidden rounded-2xl outline-none',
         className,
@@ -262,7 +254,7 @@ export function GradientCarousel({
                 opacity: hidden ? 0 : isActive ? 1 : Math.max(0.4, 1 - abs * 0.24),
                 zIndex: 30 - abs * 4,
                 transitionProperty: 'transform, opacity',
-                transitionDuration: dragging ? '0ms' : '1000ms',
+                transitionDuration: dragging ? '0ms' : '400ms',
                 transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
                 pointerEvents: hidden ? 'none' : 'auto',
               }}
